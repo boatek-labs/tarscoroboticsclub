@@ -118,7 +118,7 @@
                    outline:none;resize:vertical;min-height:80px;transition:.2s}
     .comment-input:focus{border-color:#E8BE1644}
 
-    .reveal{opacity:0;transform:translateY(16px);transition:.5s}
+    .reveal{opacity:1;transform:none;transition:.5s}
     .reveal.in{opacity:1;transform:none}
 
     @media(max-width:800px){
@@ -126,16 +126,14 @@
       #sidebar{position:static}
     }
   </style>
-  <link rel="stylesheet" href="assets/trc-brand.css" />
   <meta name="theme-color" content="#071B11" />
+  <link rel="stylesheet" href="assets/trc-brand.css?v=20261121-4" />
 </head>
 <body>
 
-<nav id="nav">
+<nav id="nav" class="trc-site-nav trc-page-nav">
   <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
-    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
-      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
-    </div>
+    <span class="trc-nav-mark"><img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club roundel" /></span>
     <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
   </a>
   <div style="display:flex;align-items:center;gap:16px">
@@ -525,10 +523,13 @@
 
 <script>
 // Reveal on scroll
-const observer = new IntersectionObserver(entries => {
+if ('IntersectionObserver' in window) {
+  document.documentElement.classList.add('has-intersection-reveal');
+  const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
 
 function copyCode() {
   const code = document.getElementById('main-code').innerText;

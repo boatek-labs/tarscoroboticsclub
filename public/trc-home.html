@@ -178,7 +178,7 @@
                 transition: width 1s ease; }
 
     /* ── Scroll reveal ── */
-    .reveal { opacity: 0; transform: translateY(28px); }
+    .reveal { opacity:1; transform:none; }
 
     /* ── Mobile ── */
     @media (max-width: 768px) {
@@ -188,7 +188,6 @@
     }
     #hamburger { display: none; }
   </style>
-  <link rel="stylesheet" href="assets/trc-brand.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   <meta name="description" content="Discover TARSCO Robotics Club: learn robotics, build real projects, explore engineering and join a community of student innovators in Ghana." />
   <meta name="robots" content="index,follow,max-image-preview:large" />
@@ -340,18 +339,19 @@ html[data-theme="light"] .trc-card{background:#fff!important;border-color:var(--
 html[data-theme="light"] footer{background:#eae6f0!important}
 @media(prefers-reduced-motion:reduce){.home-mark-ring,.home-mark-logo{animation:none!important}}
 </style>
+  <link rel="stylesheet" href="assets/trc-brand.css?v=20261121-4" />
 </head>
 <body>
 
 <!-- ════════════════════════════════════════════
      NAV
 ════════════════════════════════════════════ -->
-<nav id="nav">
+<nav id="nav" class="trc-site-nav trc-home-nav">
   <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
     <!-- Logo -->
     <a href="/" class="flex items-center gap-3 group" aria-label="TARSCO Robotics Club home">
-      <img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club emblem" />
+      <span class="trc-nav-mark"><img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club roundel" /></span>
       <span class="brand-lockup"><strong>TARSCO</strong><span>ROBOTICS CLUB</span></span>
     </a>
 
@@ -1191,18 +1191,19 @@ function filterLevel(level) {
 
 
 // ── GSAP Animations ──
-gsap.registerPlugin(ScrollTrigger);
+const hasGsapAnimations = Boolean(window.gsap && window.ScrollTrigger);
+if (hasGsapAnimations) gsap.registerPlugin(ScrollTrigger);
 
 // Reveal on scroll
-gsap.utils.toArray('.reveal').forEach(el => {
-  gsap.to(el, {
+if (hasGsapAnimations) gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.fromTo(el, {opacity:0, y:18}, {
     opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
     scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
   });
 });
 
 // Hero entrance
-gsap.timeline({ delay: 0.2 })
+if (hasGsapAnimations) gsap.timeline({ delay: 0.2 })
   .from('.hero-eyebrow', { opacity: 0, y: 20, duration: 0.6 })
   .from('.hero-title',   { opacity: 0, y: 40, duration: 0.7, stagger: 0.1 }, '-=0.3')
   .from('.hero-title + p', { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
@@ -1211,6 +1212,7 @@ gsap.timeline({ delay: 0.2 })
 // Counter animation
 function animateCounter(id, target, suffix = '') {
   const el = document.getElementById(id);
+  if (!hasGsapAnimations) { el.textContent = target + suffix; return; }
   gsap.to({ val: 0 }, {
     val: target, duration: 2, ease: 'power2.out',
     delay: 0.8,

@@ -86,19 +86,17 @@
               box-shadow:0 0 10px #E8BE16,0 0 20px #E8BE1655;animation:pulse 2s infinite;flex-shrink:0}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-    .reveal{opacity:0;transform:translateY(20px)}
+    .reveal{opacity:1;transform:none;}
   </style>
-  <link rel="stylesheet" href="assets/trc-brand.css" />
   <meta name="theme-color" content="#071B11" />
+  <link rel="stylesheet" href="assets/trc-brand.css?v=20261121-4" />
 </head>
 <body>
 
 <!-- NAV -->
-<nav id="nav">
+<nav id="nav" class="trc-site-nav trc-page-nav">
   <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
-    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
-      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
-    </div>
+    <span class="trc-nav-mark"><img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club roundel" /></span>
     <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
   </a>
   <div style="display:flex;align-items:center;gap:20px">
@@ -397,9 +395,9 @@
 </div>
 
 <script>
-gsap.registerPlugin(ScrollTrigger);
-gsap.utils.toArray('.reveal').forEach(el => {
-  gsap.to(el, { opacity:1, y:0, duration:.6, ease:'power2.out',
+if (window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+if (window.gsap && window.ScrollTrigger) gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.fromTo(el, {opacity:0, y:18}, { opacity:1, y:0, duration:.6, ease:'power2.out',
     scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'} });
 });
 

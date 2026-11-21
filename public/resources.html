@@ -56,19 +56,17 @@
             display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
     .dl-btn:hover{background:#E8BE16;color:#071B11}
 
-    .reveal{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+    .reveal{opacity:1;transform:none;transition:opacity .5s,transform .5s}
     .reveal.in{opacity:1;transform:none}
   </style>
-  <link rel="stylesheet" href="assets/trc-brand.css" />
   <meta name="theme-color" content="#071B11" />
+  <link rel="stylesheet" href="assets/trc-brand.css?v=20261121-4" />
 </head>
 <body>
 
-<nav id="nav">
+<nav id="nav" class="trc-site-nav trc-page-nav">
   <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
-    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
-      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
-    </div>
+    <span class="trc-nav-mark"><img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club roundel" /></span>
     <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
   </a>
   <div style="display:flex;align-items:center;gap:20px">
@@ -285,10 +283,13 @@
 
 <script>
 // Intersection observer for reveal
-const observer = new IntersectionObserver(entries => {
+if ('IntersectionObserver' in window) {
+  document.documentElement.classList.add('has-intersection-reveal');
+  const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
 
 function setFilter(type, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
