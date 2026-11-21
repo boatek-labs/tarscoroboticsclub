@@ -288,6 +288,58 @@ html[data-theme="light"] .text-silver,html[data-theme="light"] .text-muted{color
 <script>
 (()=>{const root=document.documentElement;let saved='dark';try{saved=localStorage.getItem('trc-theme')||'dark'}catch(e){}root.dataset.theme=saved;function sync(){document.querySelectorAll('[data-theme-toggle]').forEach(b=>{const light=root.dataset.theme==='light';b.innerHTML=light?'<i class="fa-solid fa-moon"></i>':'<i class="fa-solid fa-sun"></i>';b.setAttribute('aria-label',light?'Switch to dark mode':'Switch to light mode')})}document.addEventListener('click',e=>{const b=e.target.closest('[data-theme-toggle]');if(!b)return;root.dataset.theme=root.dataset.theme==='light'?'dark':'light';try{localStorage.setItem('trc-theme',root.dataset.theme)}catch(e){}sync()});document.addEventListener('DOMContentLoaded',sync);sync()})();
 </script>
+<style id="trc-home-redesign">
+:root{--home-bg:#111114;--home-panel:#1a1a20;--home-panel-2:#22222a;--home-text:#f5f4f7;--home-muted:#aaa8b4;--home-line:#34323d;--home-accent:#b69af7;--home-accent-strong:#9d7bea}
+html,body{background:var(--home-bg)!important;color:var(--home-text)!important}
+body{background-image:radial-gradient(ellipse at 80% 8%,rgba(182,154,247,.10),transparent 36%)!important}
+#nav{background:rgba(17,17,20,.94)!important;border-color:var(--home-line)!important}
+.nav-links{display:flex}.nav-actions{display:flex!important;align-items:center;gap:10px}
+.nav-link{color:#d6d3de!important}.nav-link:hover,.nav-link.active{color:var(--home-accent)!important}.nav-link:after{background:var(--home-accent)!important}
+#hamburger{border-color:var(--home-line)!important}.theme-toggle{background:var(--home-panel)!important;border-color:var(--home-line)!important;color:var(--home-text)!important}
+#hero.trc-home-hero{min-height:calc(100svh - 64px);padding:120px 24px 76px;display:flex;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 78% 48%,rgba(182,154,247,.12),transparent 36%),linear-gradient(120deg,#111114,#17161d 58%,#111114)!important}
+.home-hero-inner{width:min(1180px,100%);margin:auto;display:grid;grid-template-columns:1.08fr .92fr;gap:64px;align-items:center;position:relative;z-index:2}
+.home-eyebrow{display:flex;align-items:center;gap:10px;font:700 .68rem Inter,sans-serif;letter-spacing:.16em;color:var(--home-muted);margin-bottom:30px}
+.home-eyebrow span{width:8px;height:8px;border-radius:50%;background:var(--home-accent);box-shadow:0 0 14px rgba(182,154,247,.7)}
+.home-hero-brand{display:flex;align-items:center;gap:13px;margin-bottom:24px}
+.home-hero-logo{width:58px;height:58px;object-fit:contain;border-radius:50%;background:#fff;padding:3px}
+.home-hero-brand div{display:flex;flex-direction:column;gap:4px}.home-hero-brand strong{font:850 1.05rem Inter,sans-serif;letter-spacing:.14em}.home-hero-brand small{font:700 .62rem Inter,sans-serif;letter-spacing:.2em;color:var(--home-accent)}
+.home-hero-copy h1{font:850 clamp(3.3rem,6.6vw,6.2rem)/.98 Inter,sans-serif;letter-spacing:-.075em;margin:0 0 24px;color:var(--home-text);text-wrap:balance}
+.home-hero-copy h1 em{font-style:normal;color:var(--home-accent)}
+.home-hero-copy>p{max-width:590px;color:var(--home-muted);font:400 1.02rem/1.85 Inter,sans-serif;margin:0 0 32px}
+.home-hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.home-btn{min-height:50px;padding:0 19px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font:750 .78rem Inter,sans-serif;letter-spacing:.025em;transition:.2s}
+.home-btn-primary{background:var(--home-accent);color:#17131f;border:1px solid var(--home-accent)}
+.home-btn-primary:hover{background:#c7b2ff;transform:translateY(-2px)}
+.home-btn-secondary{background:transparent;color:var(--home-text);border:1px solid #5b5667}
+.home-btn-secondary:hover{border-color:var(--home-accent);color:var(--home-accent)}
+.home-text-link{color:var(--home-muted);font:650 .76rem Inter,sans-serif;text-decoration:none;padding:12px 8px}.home-text-link:hover{color:var(--home-accent)}
+.home-hero-meta{display:flex;flex-wrap:wrap;gap:24px;border-top:1px solid var(--home-line);margin-top:42px;padding-top:23px;color:#c0bdca;font:700 .63rem Inter,sans-serif;letter-spacing:.12em}
+.home-hero-meta span{display:flex;align-items:center;gap:8px}.home-hero-meta i{color:var(--home-accent);font-size:.9rem}
+.home-hero-mark{position:relative;min-height:500px;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.home-mark-logo{width:min(74%,390px);aspect-ratio:1;object-fit:contain;background:#fff;border-radius:50%;padding:12px;box-shadow:0 28px 90px rgba(0,0,0,.4),0 0 90px rgba(182,154,247,.12);z-index:2}
+.home-mark-ring{position:absolute;border:1px solid rgba(182,154,247,.25);border-radius:50%;aspect-ratio:1}
+.home-mark-ring-one{width:88%;animation:homeOrbit 26s linear infinite}.home-mark-ring-two{width:100%;border-style:dashed;opacity:.45;animation:homeOrbit 42s linear infinite reverse}
+@keyframes homeOrbit{to{transform:rotate(360deg)}}
+.home-mark-caption{position:absolute;bottom:3%;display:flex;gap:12px;align-items:center;color:var(--home-muted);font:700 .57rem Inter,sans-serif;letter-spacing:.14em}
+.trc-card{background:linear-gradient(145deg,#22222a,#19191f)!important;border-color:var(--home-line)!important}
+.section-title,.faq-q{color:var(--home-text)!important}.section-title .c,.section-title .a,.stat-val,.evt-date,.cd-val{color:var(--home-accent)!important}
+.section-label,.stat-lbl{color:var(--home-muted)!important}footer{background:#0d0d10!important;border-color:var(--home-line)!important}
+#mobile-menu{background:#19191f!important;border-color:var(--home-line)!important}
+.btn-primary{background:var(--home-accent)!important;color:#17131f!important;border-color:var(--home-accent)!important}
+.btn-outline{border-color:#5b5667!important;color:var(--home-text)!important}
+@media(max-width:900px){.home-hero-inner{grid-template-columns:1fr .8fr;gap:28px}.home-hero-mark{min-height:390px}}
+@media(max-width:768px){.nav-links{display:none!important}.nav-actions{display:flex!important}.nav-actions .theme-toggle{display:none}.nav-actions .btn-outline,.nav-actions .btn-primary{padding:8px 11px!important;font-size:.68rem!important}.home-hero-inner{grid-template-columns:1fr;gap:20px}.home-hero-mark{min-height:310px;grid-row:1}.home-mark-logo{width:min(62%,250px)}#hero.trc-home-hero{padding:100px 22px 54px;min-height:auto}.home-hero-copy h1{font-size:clamp(3rem,13vw,4.8rem)}.home-hero-meta{gap:14px;margin-top:30px}.home-mark-caption{font-size:.48rem;gap:7px}}
+@media(max-width:420px){.nav-actions{gap:6px!important}.nav-actions .btn-outline,.nav-actions .btn-primary{padding:8px 9px!important;font-size:.62rem!important}.home-hero-mark{min-height:270px}.home-hero-actions .home-btn{width:100%}.home-text-link{width:100%;text-align:center}}
+html[data-theme="light"]{--home-bg:#f4f2f8;--home-panel:#fff;--home-panel-2:#ebe7f2;--home-text:#211d2b;--home-muted:#625c6d;--home-line:#ddd7e7;--home-accent:#7854bd}
+html[data-theme="light"] body,html[data-theme="light"] #hero.trc-home-hero{background:#f4f2f8!important;color:var(--home-text)!important}
+html[data-theme="light"] #hero.trc-home-hero{background:radial-gradient(ellipse at 78% 48%,rgba(120,84,189,.10),transparent 36%),linear-gradient(120deg,#f6f4fa,#eeebf4 58%,#f6f4fa)!important}
+html[data-theme="light"] .home-hero-copy h1,html[data-theme="light"] .section-title,html[data-theme="light"] .faq-q{color:var(--home-text)!important}
+html[data-theme="light"] #nav,html[data-theme="light"] #mobile-menu{background:rgba(248,246,251,.96)!important}
+html[data-theme="light"] .nav-link{color:#383242!important}
+html[data-theme="light"] .trc-card{background:#fff!important;border-color:var(--home-line)!important}
+html[data-theme="light"] footer{background:#eae6f0!important}
+@media(prefers-reduced-motion:reduce){.home-mark-ring,.home-mark-logo{animation:none!important}}
+</style>
 </head>
 <body>
 
@@ -313,7 +365,7 @@ html[data-theme="light"] .text-silver,html[data-theme="light"] .text-muted{color
     </div>
 
     <!-- CTA cluster -->
-    <div class="nav-links flex items-center gap-3">
+    <div class="nav-actions flex items-center gap-3">
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light mode"><i class="fa-solid fa-sun"></i></button>
       <a href="login.html"  class="btn-outline" style="padding:8px 18px;font-size:.85rem">Log In</a>
       <a href="login.html?signup=1" class="btn-primary"  style="padding:8px 18px;font-size:.85rem">Join Free</a>
@@ -347,85 +399,28 @@ html[data-theme="light"] .text-silver,html[data-theme="light"] .text-muted{color
 <!-- ════════════════════════════════════════════
      HERO
 ════════════════════════════════════════════ -->
-<section id="hero">
-  <div class="hex-bg"></div>
-  <canvas id="circuit-canvas"></canvas>
-  <div class="scanline"></div>
-
-  <div class="max-w-7xl mx-auto px-6 w-full py-24 grid lg:grid-cols-2 gap-16 items-center">
-
-    <!-- Left -->
-    <div>
-      <div class="trc-badge mb-6 reveal" style="display:inline-flex;align-items:center;gap:10px;padding:6px 14px">
-        <img class="hero-mini-seal" src="assets/trc-roundel.webp" alt="" />
-        <div><div class="hero-eyebrow">TARSCO Robotics Club</div><div style="font:600 .62rem 'JetBrains Mono',monospace;color:#BDCCBF;letter-spacing:.14em;margin-top:2px">INNOVATE · BUILD · INSPIRE</div></div>
+<section id="hero" class="trc-home-hero">
+  <div class="home-hero-inner">
+    <div class="home-hero-copy">
+      <div class="home-eyebrow"><span></span> TARKWA SENIOR HIGH SCHOOL · EST. 2009</div>
+      <div class="home-hero-brand">
+        <img src="assets/trc-roundel.webp" alt="TARSCO Robotics Club official logo" class="home-hero-logo">
+        <div><strong>TARSCO</strong><small>ROBOTICS CLUB</small></div>
       </div>
-
-      <h1 class="hero-title reveal mb-6">
-        WE DON'T JUST<br/><span class="accent">IMAGINE</span><br/>THE FUTURE.<br/><span class="hero-build">WE BUILD IT.</span>
-      </h1>
-
-      <p class="text-silver text-base leading-relaxed mb-8 reveal max-w-lg">
-        We are the builders, thinkers and problem-solvers of TARSCO. From the first circuit to an autonomous machine, we turn bold ideas into working technology.
-      </p>
-
-      <div class="flex flex-wrap gap-4 reveal">
-        <a href="login.html?signup=1" class="btn-primary">
-          Explore the club <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
-        <a href="#projects" class="btn-outline"><i class="fa-solid fa-cubes"></i> Explore our builds</a>
+      <h1>Ideas are only<br>the <em>beginning.</em></h1>
+      <p>We are a community of student builders, curious thinkers and problem-solvers. Learn robotics, create real projects and turn what you imagine into something you can share with the world.</p>
+      <div class="home-hero-actions">
+        <a href="login.html?signup=1" class="home-btn home-btn-primary">Create an account <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="login.html" class="home-btn home-btn-secondary">Log in <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="#projects" class="home-text-link">Explore projects <i class="fa-solid fa-arrow-down"></i></a>
       </div>
-
-      <!-- Mini stats -->
-      <div class="flex gap-8 mt-12 pt-8 border-t border-border reveal">
-        <div><div class="stat-val" id="s1">0</div><div class="stat-lbl">Students</div></div>
-        <div><div class="stat-val" id="s2">0</div><div class="stat-lbl">Lessons</div></div>
-        <div><div class="stat-val" id="s3">0</div><div class="stat-lbl">Projects Built</div></div>
-      </div>
+      <div class="home-hero-meta"><span><i class="fa-solid fa-microchip"></i> LEARN</span><span><i class="fa-solid fa-screwdriver-wrench"></i> CREATE</span><span><i class="fa-solid fa-people-group"></i> COLLABORATE</span></div>
     </div>
-
-    <!-- Editorial robotics visual — replaces the code/progress mockup -->
-    <div class="hero-visual reveal" aria-label="Illustration of a robotic rover">
-      <div class="hero-visual-grid"></div>
-      <div class="hero-orbit hero-orbit-one"></div><div class="hero-orbit hero-orbit-two"></div>
-      <div class="hero-visual-kicker"><span class="hero-kicker-dot"></span> IDEAS INTO ENGINEERING</div>
-      <svg class="hero-rover" viewBox="0 0 560 430" role="img" aria-label="A modern autonomous robotics rover illustration">
-        <defs>
-          <linearGradient id="roverBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f1e8"/><stop offset="1" stop-color="#aeb8c3"/></linearGradient>
-          <linearGradient id="roverGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#263b52"/><stop offset="1" stop-color="#101b2b"/></linearGradient>
-          <linearGradient id="roverGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f5d778"/><stop offset="1" stop-color="#c18a35"/></linearGradient>
-          <filter id="roverShadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#020711" flood-opacity=".45"/></filter>
-        </defs>
-        <ellipse cx="282" cy="362" rx="180" ry="25" fill="#050b14" opacity=".48"/>
-        <g filter="url(#roverShadow)" stroke-linejoin="round">
-          <path d="M170 268 215 220 373 220 421 270 402 319 187 319Z" fill="url(#roverBody)" stroke="#82909d" stroke-width="3"/>
-          <path d="m215 220 40-42h92l26 42Z" fill="#d7dce0" stroke="#8996a1" stroke-width="3"/>
-          <path d="m252 178 18-42h57l20 42Z" fill="url(#roverGlass)" stroke="#c5a04d" stroke-width="3"/>
-          <path d="m269 136 17-27h27l14 27" fill="none" stroke="#e8bd63" stroke-width="5" stroke-linecap="round"/>
-          <circle cx="300" cy="119" r="8" fill="#e8bd63"/>
-          <path d="m187 249 54-26h130l39 37-11 18H195Z" fill="url(#roverGlass)" stroke="#8b99a7" stroke-width="3"/>
-          <path d="m216 260 35-21h95l30 21-13 35H228Z" fill="#17263a" stroke="#536579" stroke-width="2"/>
-          <rect x="266" y="248" width="44" height="27" rx="6" fill="url(#roverGold)"/>
-          <circle cx="288" cy="261" r="7" fill="#182437"/>
-          <path d="M173 275 128 301M420 276l40 25" stroke="#aeb8c3" stroke-width="12" stroke-linecap="round"/>
-          <g fill="#111b29" stroke="#8995a1" stroke-width="5">
-            <circle cx="152" cy="316" r="35"/><circle cx="439" cy="316" r="35"/>
-            <circle cx="152" cy="316" r="13" fill="#c7a04d"/><circle cx="439" cy="316" r="13" fill="#c7a04d"/>
-          </g>
-          <path d="M185 319h218" stroke="#e6b957" stroke-width="4" stroke-linecap="round"/>
-          <path d="M190 237 172 211l-14 4M405 237l20-26 15 4" fill="none" stroke="#c8d0d7" stroke-width="7" stroke-linecap="round"/>
-          <circle cx="157" cy="215" r="8" fill="#e7bd64"/><circle cx="440" cy="215" r="8" fill="#e7bd64"/>
-          <path d="M280 178v-22m40 22v-22" stroke="#d7a84d" stroke-width="4"/>
-          <path d="M265 299h72" stroke="#e6bd63" stroke-width="3" stroke-linecap="round"/>
-        </g>
-        <g fill="none" stroke="#d4aa52" opacity=".65"><path d="M80 172h68l22 22M418 112h55l18 18M95 343h48M425 365h58"/></g>
-        <g fill="#e9c56d"><circle cx="80" cy="172" r="4"/><circle cx="491" cy="130" r="4"/><circle cx="95" cy="343" r="4"/><circle cx="483" cy="365" r="4"/></g>
-      </svg>
-      <div class="hero-float-card hero-float-top"><i class="fa-solid fa-microchip"></i><span><b>ENGINEER</b><small>Think beyond limits</small></span></div>
-      <div class="hero-float-card hero-float-bottom"><i class="fa-solid fa-gears"></i><span><b>BUILD</b><small>Make ideas real</small></span></div>
-      <div class="hero-visual-caption"><span>01 / THINK</span><span>02 / DESIGN</span><span>03 / BUILD</span></div>
+    <div class="home-hero-mark" aria-label="TARSCO Robotics Club logo">
+      <div class="home-mark-ring home-mark-ring-one"></div><div class="home-mark-ring home-mark-ring-two"></div>
+      <img src="assets/trc-roundel.webp" alt="TARSCO Robotics Club emblem" class="home-mark-logo">
+      <div class="home-mark-caption"><span>STUDENT INNOVATION</span><span>•</span><span>ROBOTICS & ENGINEERING</span></div>
     </div>
-
   </div>
 </section>
 
