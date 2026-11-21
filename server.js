@@ -168,6 +168,23 @@ async function updateStreak(userId) {
 }
 
 // ──────────────────────────────
+// SERVERLESS INITIALIZATION
+// ──────────────────────────────
+let initialization;
+app.use(async (req, res, next) => {
+  try {
+    if (!initialization) initialization = initDB();
+    await initialization;
+    next();
+  } catch (error) {
+    console.error('TRC initialization failed:', error);
+    res.status(500).json({
+      message: 'The platform could not initialize. Check DATABASE_URL and Neon connectivity.'
+    });
+  }
+});
+
+// ──────────────────────────────
 // AUTH ROUTES
 // ──────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
@@ -890,22 +907,8 @@ app.get('*', (req, res) => {
 });
 
 // ──────────────────────────────
-// SERVERLESS + LOCAL STARTUP
+// LOCAL STARTUP
 // ──────────────────────────────
-let initialization;
-app.use(async (req, res, next) => {
-  try {
-    if (!initialization) initialization = initDB();
-    await initialization;
-    next();
-  } catch (error) {
-    console.error('TRC initialization failed:', error);
-    res.status(500).json({
-      message: 'The platform could not initialize. Check DATABASE_URL and Neon connectivity.'
-    });
-  }
-});
-
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`TRC Platform running on http://localhost:${PORT}`);
