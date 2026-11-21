@@ -1,0 +1,38 @@
+name: Import TRC platform source
+on:
+  push:
+    branches: [main]
+    paths:
+      - platform-source.tar.gz.b64
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract platform source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f platform-source.tar.gz.b64
+          mkdir -p /tmp/trc-stage
+          base64 --decode platform-source.tar.gz.b64 > /tmp/trc-platform.tar.gz
+          tar -tzf /tmp/trc-platform.tar.gz | grep -q '^trc-platform/'
+          tar -xzf /tmp/trc-platform.tar.gz -C /tmp/trc-stage
+          test -f /tmp/trc-stage/trc-platform/server.js
+          cp -a /tmp/trc-stage/trc-platform/. .
+          rm -f platform-source.tar.gz.b64
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to import."
+            exit 0
+          fi
+          git commit -m "Import TRC platform and apply club branding"
+          git push
