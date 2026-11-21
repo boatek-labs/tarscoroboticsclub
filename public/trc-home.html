@@ -189,7 +189,39 @@
     #hamburger { display: none; }
   </style>
   <link rel="stylesheet" href="assets/trc-brand.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   <meta name="theme-color" content="#071B11" />
+<style id="trc-premium-refresh">
+:root{--trc-gold:#e6bd42;--trc-white:#f6f7f1}
+body{background:#06130d;color:var(--trc-white);font-family:Inter,sans-serif}
+#nav{background:rgba(5,18,11,.9);border-bottom:1px solid rgba(230,189,66,.16)}
+#hero{min-height:92vh;padding-top:90px;background:radial-gradient(ellipse at 78% 45%,rgba(30,105,61,.28),transparent 43%),linear-gradient(115deg,#06130d,#0a2115 55%,#07170f)}
+#hero:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(230,189,66,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(230,189,66,.08) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(90deg,transparent,#000 55%,#000)}
+#hero .max-w-7xl{position:relative;z-index:1}
+.hero-title{font-family:Inter,sans-serif;font-size:clamp(3.5rem,7vw,6.8rem);font-weight:800;letter-spacing:-.075em;line-height:.94;text-wrap:balance}
+.hero-title .accent{color:var(--trc-gold);text-shadow:0 10px 55px rgba(230,189,66,.15)}
+.hero-build{display:inline-block;font-size:.67em;letter-spacing:-.055em;color:#f6f7f1;margin-top:.13em}
+.hero-eyebrow{font-family:Inter,sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.16em}
+.trc-badge{border-radius:999px!important;border-color:rgba(230,189,66,.3)!important;background:rgba(230,189,66,.07)!important}
+.btn-primary,.btn-outline{font-family:Inter,sans-serif;font-size:.78rem;font-weight:800;letter-spacing:.045em;border-radius:8px;padding:15px 22px}
+.btn-primary{background:var(--trc-gold);box-shadow:0 12px 35px rgba(230,189,66,.16)}
+.btn-primary:hover{background:#f4d36d;box-shadow:0 15px 42px rgba(230,189,66,.24)}
+.btn-outline{border-color:rgba(245,247,241,.23);background:rgba(255,255,255,.025)}
+.trc-card{background:linear-gradient(145deg,rgba(19,54,34,.94),rgba(9,30,19,.98));border:1px solid rgba(230,189,66,.14);border-radius:14px;box-shadow:0 18px 55px rgba(0,0,0,.18)}
+.trc-card:hover{border-color:rgba(230,189,66,.45);transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.32)}
+section.py-24[style*="#0A2114"]{background:#091b12!important}
+.stat-val{color:var(--trc-gold)}.pillar-icon{border-radius:12px!important}
+.nav-link{font-family:Inter,sans-serif;font-size:.75rem;letter-spacing:.06em}
+#hero .trc-card{border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.45),0 0 80px rgba(40,125,71,.13)}
+#hero .trc-card>div:first-child{background:#10291b!important}
+#hero .trc-card>div:nth-child(2),#hero .trc-card>div:last-child{background:#06130d!important}
+#hero .glow-dot{background:#e6bd42;box-shadow:0 0 14px #e6bd42}
+#hero .prog-fill{background:linear-gradient(90deg,#e6bd42,#65a878)}
+.fa-solid,.fa-regular{line-height:1;vertical-align:middle}
+.module-card .fa-solid{font-size:1.8rem;color:var(--trc-gold)}
+@media(max-width:768px){#hero{min-height:auto;padding-top:65px}.hero-title{font-size:clamp(3rem,12vw,4.5rem);letter-spacing:-.07em}.hero-build{font-size:.68em}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
 
@@ -264,24 +296,18 @@
       </div>
 
       <h1 class="hero-title reveal mb-6">
-        BUILD<br/>
-        <span class="accent">SMARTER</span><br/>
-        ROBOTS.
+        WE DON'T JUST<br/><span class="accent">IMAGINE</span><br/>THE FUTURE.<br/><span class="hero-build">WE BUILD IT.</span>
       </h1>
 
       <p class="text-silver text-base leading-relaxed mb-8 reveal max-w-lg">
-        TRC is the official robotics club of TARSCO School. Learn electronics, write code, 
-        build real machines — and compete. Free for every student.
+        We are the builders, thinkers and problem-solvers of TARSCO. From the first circuit to an autonomous machine, we turn bold ideas into working technology.
       </p>
 
       <div class="flex flex-wrap gap-4 reveal">
         <a href="login.html?signup=1" class="btn-primary">
-          Start Learning
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-          </svg>
+          Explore the club <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
-        <a href="#projects" class="btn-outline">View Projects</a>
+        <a href="#projects" class="btn-outline"><i class="fa-solid fa-cubes"></i> Explore our builds</a>
       </div>
 
       <!-- Mini stats -->
@@ -460,7 +486,7 @@
       <!-- Module cards -->
       <div class="trc-card p-6 reveal module-card" data-level="beginner">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">🤖</div>
+          <div class="text-3xl"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-beginner">Beginner</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">Introduction to Robotics</h3>
@@ -474,7 +500,7 @@
 
       <div class="trc-card p-6 reveal module-card" data-level="beginner">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">⚡</div>
+          <div class="text-3xl"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-beginner">Beginner</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">Basic Electronics</h3>
@@ -488,7 +514,7 @@
 
       <div class="trc-card p-6 reveal module-card" data-level="beginner">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">🔌</div>
+          <div class="text-3xl"><i class="fa-solid fa-plug" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-beginner">Beginner</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">Arduino Basics</h3>
@@ -502,7 +528,7 @@
 
       <div class="trc-card p-6 reveal module-card" data-level="intermediate">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">📡</div>
+          <div class="text-3xl"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-intermediate">Intermediate</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">Sensors &amp; Actuators</h3>
@@ -516,7 +542,7 @@
 
       <div class="trc-card p-6 reveal module-card" data-level="intermediate">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">💻</div>
+          <div class="text-3xl"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-intermediate">Intermediate</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">Programming for Robotics</h3>
@@ -530,7 +556,7 @@
 
       <div class="trc-card p-6 reveal module-card" data-level="advanced">
         <div class="flex items-start justify-between mb-4">
-          <div class="text-3xl">🧠</div>
+          <div class="text-3xl"><i class="fa-solid fa-brain" aria-hidden="true"></i></div>
           <span class="lvl-badge lvl-advanced">Advanced</span>
         </div>
         <h3 class="font-display font-bold text-lg text-light mb-2">AI in Robotics</h3>
