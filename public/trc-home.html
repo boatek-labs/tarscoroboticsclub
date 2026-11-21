@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRC — TARSCO Robotics Club</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:    '#071B11',
+            panel:   '#0C2818',
+            card:    '#12351F',
+            border:  '#285438',
+            cyan:    '#E8BE16',
+            amber:   '#F2CC24',
+            green:   '#69A66A',
+            muted:   '#77947D',
+            silver:  '#BDCCBF',
+            light:   '#F1F5EE',
+          },
+          fontFamily: {
+            display: ['Rajdhani', 'sans-serif'],
+            body:    ['Inter', 'sans-serif'],
+            mono:    ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #071B11; color: #F1F5EE; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+    /* ── Circuit canvas ── */
+    #circuit-canvas { position: absolute; inset: 0; pointer-events: none; opacity: 0.18; }
+
+    /* ── Nav ── */
+    #nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+           background: rgba(8,15,30,0.85); backdrop-filter: blur(14px);
+           border-bottom: 1px solid #285438; transition: all .3s; }
+    .nav-link { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.9rem;
+                letter-spacing: .08em; color: #BDCCBF; text-transform: uppercase;
+                transition: color .2s; position: relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px;
+                       background:#E8BE16; transition: width .25s; }
+    .nav-link:hover { color: #E8BE16; }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: #E8BE16; }
+
+    /* ── Hero ── */
+    #hero { min-height: 100vh; display: flex; align-items: center; position: relative;
+            overflow: hidden; padding-top: 80px; }
+    .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+                    color: #E8BE16; letter-spacing: .18em; text-transform: uppercase; }
+    .hero-title { font-family: 'Rajdhani', sans-serif; font-weight: 700;
+                  font-size: clamp(3rem, 8vw, 7rem); line-height: .95; color: #F1F5EE; }
+    .hero-title .accent { color: #E8BE16; }
+    .hero-title .amber  { color: #F2CC24; }
+    .trc-badge { display: inline-flex; align-items: center; gap: 6px;
+                 border: 1px solid #E8BE1633; background: #E8BE160D;
+                 padding: 4px 12px; border-radius: 2px; }
+
+    /* ── Glow dot ── */
+    .glow-dot { width: 8px; height: 8px; border-radius: 50%; background: #E8BE16;
+                box-shadow: 0 0 12px #E8BE16, 0 0 24px #E8BE1655; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── Scan line ── */
+    .scanline { position: absolute; left: 0; right: 0; height: 2px;
+                background: linear-gradient(90deg, transparent, #E8BE1644, transparent);
+                animation: scan 4s linear infinite; pointer-events: none; }
+    @keyframes scan { from{top:0%} to{top:100%} }
+
+    /* ── Buttons ── */
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px;
+                   font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem;
+                   letter-spacing: .1em; text-transform: uppercase;
+                   background: #E8BE16; color: #071B11;
+                   padding: 12px 28px; border-radius: 2px; transition: all .2s;
+                   border: none; cursor: pointer; text-decoration: none; }
+    .btn-primary:hover { background: #F7D94A; transform: translateY(-2px);
+                         box-shadow: 0 8px 32px #E8BE1644; }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px;
+                   font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem;
+                   letter-spacing: .1em; text-transform: uppercase;
+                   background: transparent; color: #F1F5EE;
+                   padding: 11px 28px; border-radius: 2px;
+                   border: 1px solid #285438; transition: all .2s;
+                   cursor: pointer; text-decoration: none; }
+    .btn-outline:hover { border-color: #E8BE16; color: #E8BE16;
+                         box-shadow: 0 0 16px #E8BE1622; }
+
+    /* ── Section labels ── */
+    .section-label { font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+                     color: #77947D; letter-spacing: .2em; text-transform: uppercase; }
+    .section-title { font-family: 'Rajdhani', sans-serif; font-weight: 700;
+                     font-size: clamp(2rem, 4vw, 3rem); color: #F1F5EE; }
+    .section-title .c { color: #E8BE16; }
+    .section-title .a { color: #F2CC24; }
+
+    /* ── Cards ── */
+    .trc-card { background: #12351F; border: 1px solid #285438;
+                border-radius: 4px; transition: all .25s; }
+    .trc-card:hover { border-color: #E8BE1644; transform: translateY(-4px);
+                      box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px #E8BE1622; }
+
+    /* ── Pillar icons ── */
+    .pillar-icon { width: 48px; height: 48px; border-radius: 4px;
+                   display: flex; align-items: center; justify-content: center;
+                   font-size: 1.4rem; }
+
+    /* ── Stats bar ── */
+    .stat-val { font-family: 'Rajdhani', sans-serif; font-weight: 700;
+                font-size: 2.5rem; line-height: 1; color: #E8BE16; }
+    .stat-lbl { font-family: 'Inter', sans-serif; font-size: .8rem;
+                color: #77947D; text-transform: uppercase; letter-spacing: .1em; }
+
+    /* ── Level badge ── */
+    .lvl-badge { font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+                 padding: 2px 8px; border-radius: 2px; font-weight: 500; }
+    .lvl-beginner    { background: #69A66A22; color: #69A66A; border: 1px solid #69A66A33; }
+    .lvl-intermediate{ background: #E8BE1622; color: #E8BE16; border: 1px solid #E8BE1633; }
+    .lvl-advanced    { background: #F2CC2422; color: #F2CC24; border: 1px solid #F2CC2433; }
+
+    /* ── Project card ── */
+    .proj-img { width: 100%; height: 180px; object-fit: cover; background: #0C2818; display:block; }
+    .proj-img-placeholder { width: 100%; height: 180px; background: linear-gradient(135deg, #0C2818, #285438);
+                            display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+
+    /* ── Event card ── */
+    .evt-date { font-family: 'Rajdhani', sans-serif; font-weight: 700;
+                font-size: 1.5rem; color: #E8BE16; line-height: 1; }
+    .evt-month{ font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+                color: #77947D; text-transform: uppercase; letter-spacing: .1em; }
+
+    /* ── FAQ ── */
+    .faq-item { border-bottom: 1px solid #285438; }
+    .faq-q { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1.05rem;
+              color: #F1F5EE; cursor: pointer; padding: 20px 0;
+              display: flex; justify-content: space-between; align-items: center; }
+    .faq-a { font-size: .9rem; color: #BDCCBF; line-height: 1.7;
+              max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .35s; }
+    .faq-a.open { max-height: 200px; padding-bottom: 16px; }
+
+    /* ── Footer ── */
+    footer { background: #071B11; border-top: 1px solid #285438; }
+    .footer-link { color: #77947D; font-size: .85rem; transition: color .2s; text-decoration:none; }
+    .footer-link:hover { color: #E8BE16; }
+
+    /* ── Mobile menu ── */
+    #mobile-menu { display: none; }
+    #mobile-menu.open { display: flex; }
+
+    /* ── Hexagon grid bg ── */
+    .hex-bg { position: absolute; inset: 0; pointer-events: none;
+              background-image:
+                radial-gradient(circle at 20% 50%, #E8BE1608 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #F2CC2408 0%, transparent 40%);
+    }
+
+    /* ── Progress bar ── */
+    .prog-bar { height: 4px; background: #285438; border-radius: 2px; overflow: hidden; }
+    .prog-fill{ height: 100%; border-radius: 2px; background: linear-gradient(90deg, #E8BE16, #69A66A);
+                transition: width 1s ease; }
+
+    /* ── Scroll reveal ── */
+    .reveal { opacity: 0; transform: translateY(28px); }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      #hamburger { display: flex; }
+      .hero-title { font-size: clamp(2.4rem, 11vw, 4rem); }
+    }
+    #hamburger { display: none; }
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-3 group">
+      <img class="trc-nav-seal" src="assets/trc-roundel.webp" alt="TARSCO Robotics Club emblem" />
+      <span style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;letter-spacing:.04em">
+        TARSCO <span style="color:#77947D;font-weight:500">Robotics Club</span>
+      </span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="nav-links flex items-center gap-8">
+      <a href="#learn"    class="nav-link">Learn</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#events"   class="nav-link">Events</a>
+      <a href="#community"class="nav-link">Community</a>
+      <a href="#about"    class="nav-link">About</a>
+    </div>
+
+    <!-- CTA cluster -->
+    <div class="nav-links flex items-center gap-3">
+      <a href="login.html"  class="btn-outline" style="padding:8px 18px;font-size:.85rem">Log In</a>
+      <a href="login.html?signup=1" class="btn-primary"  style="padding:8px 18px;font-size:.85rem">Join Free</a>
+    </div>
+
+    <!-- Hamburger -->
+    <button id="hamburger" onclick="toggleMenu()"
+      class="flex flex-col gap-1.5 p-2 cursor-pointer border border-border rounded-sm">
+      <span class="block w-5 h-0.5 bg-silver"></span>
+      <span class="block w-5 h-0.5 bg-silver"></span>
+      <span class="block w-4 h-0.5 bg-silver"></span>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="flex-col px-6 pb-4 gap-4 border-t border-border">
+    <a href="#learn"     class="nav-link py-2">Learn</a>
+    <a href="#projects"  class="nav-link py-2">Projects</a>
+    <a href="#events"    class="nav-link py-2">Events</a>
+    <a href="#community" class="nav-link py-2">Community</a>
+    <a href="#about"     class="nav-link py-2">About</a>
+    <div class="flex gap-3 pt-2">
+      <a href="login.html"  class="btn-outline" style="padding:8px 16px;font-size:.85rem;flex:1;justify-content:center">Log In</a>
+      <a href="login.html?signup=1" class="btn-primary"  style="padding:8px 16px;font-size:.85rem;flex:1;justify-content:center">Join Free</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hex-bg"></div>
+  <canvas id="circuit-canvas"></canvas>
+  <div class="scanline"></div>
+
+  <div class="max-w-7xl mx-auto px-6 w-full py-24 grid lg:grid-cols-2 gap-16 items-center">
+
+    <!-- Left -->
+    <div>
+      <div class="trc-badge mb-6 reveal" style="display:inline-flex;align-items:center;gap:10px;padding:6px 14px">
+        <img class="hero-mini-seal" src="assets/trc-roundel.webp" alt="" />
+        <div><div class="hero-eyebrow">TARSCO Robotics Club</div><div style="font:600 .62rem 'JetBrains Mono',monospace;color:#BDCCBF;letter-spacing:.14em;margin-top:2px">INNOVATE · BUILD · INSPIRE</div></div>
+      </div>
+
+      <h1 class="hero-title reveal mb-6">
+        BUILD<br/>
+        <span class="accent">SMARTER</span><br/>
+        ROBOTS.
+      </h1>
+
+      <p class="text-silver text-base leading-relaxed mb-8 reveal max-w-lg">
+        TRC is the official robotics club of TARSCO School. Learn electronics, write code, 
+        build real machines — and compete. Free for every student.
+      </p>
+
+      <div class="flex flex-wrap gap-4 reveal">
+        <a href="login.html?signup=1" class="btn-primary">
+          Start Learning
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+        <a href="#projects" class="btn-outline">View Projects</a>
+      </div>
+
+      <!-- Mini stats -->
+      <div class="flex gap-8 mt-12 pt-8 border-t border-border reveal">
+        <div><div class="stat-val" id="s1">0</div><div class="stat-lbl">Students</div></div>
+        <div><div class="stat-val" id="s2">0</div><div class="stat-lbl">Lessons</div></div>
+        <div><div class="stat-val" id="s3">0</div><div class="stat-lbl">Projects Built</div></div>
+      </div>
+    </div>
+
+    <!-- Right — terminal card -->
+    <div class="reveal hidden lg:block">
+      <div class="trc-card p-0 overflow-hidden" style="border-color:#E8BE1633">
+        <!-- Window chrome -->
+        <div class="flex items-center gap-2 px-4 py-3" style="background:#0C2818;border-bottom:1px solid #285438">
+          <div class="w-3 h-3 rounded-full" style="background:#FF5F57"></div>
+          <div class="w-3 h-3 rounded-full" style="background:#FEBC2E"></div>
+          <div class="w-3 h-3 rounded-full" style="background:#28C840"></div>
+          <span class="ml-4 text-xs font-mono text-muted">trc_robotics_lab.ino</span>
+        </div>
+        <!-- Code preview -->
+        <div class="p-6 font-mono text-sm leading-7" style="background:#071B11">
+          <div><span style="color:#77947D">// TRC Obstacle Avoidance Bot</span></div>
+          <div><span style="color:#E8BE16">#include</span> <span style="color:#69A66A">&lt;Servo.h&gt;</span></div>
+          <div class="mt-2"><span style="color:#E8BE16">Servo</span> <span style="color:#F1F5EE">leftMotor, rightMotor;</span></div>
+          <div><span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">trigPin = </span><span style="color:#F2CC24">9</span><span style="color:#F1F5EE">, echoPin = </span><span style="color:#F2CC24">10</span><span style="color:#F1F5EE">;</span></div>
+          <div class="mt-2"><span style="color:#77947D">void</span> <span style="color:#69A66A">setup</span><span style="color:#F1F5EE">() {</span></div>
+          <div class="pl-4"><span style="color:#F1F5EE">leftMotor.attach(</span><span style="color:#F2CC24">5</span><span style="color:#F1F5EE">);</span></div>
+          <div class="pl-4"><span style="color:#F1F5EE">rightMotor.attach(</span><span style="color:#F2CC24">6</span><span style="color:#F1F5EE">);</span></div>
+          <div class="pl-4"><span style="color:#F1F5EE">Serial.begin(</span><span style="color:#F2CC24">9600</span><span style="color:#F1F5EE">);</span></div>
+          <div><span style="color:#F1F5EE">}</span></div>
+          <div class="mt-2"><span style="color:#77947D">void</span> <span style="color:#69A66A">loop</span><span style="color:#F1F5EE">() {</span></div>
+          <div class="pl-4"><span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">dist = getDistance();</span></div>
+          <div class="pl-4"><span style="color:#E8BE16">if</span> <span style="color:#F1F5EE">(dist &lt; </span><span style="color:#F2CC24">20</span><span style="color:#F1F5EE">) avoidObstacle();</span></div>
+          <div class="pl-4"><span style="color:#E8BE16">else</span> <span style="color:#F1F5EE">moveForward();</span></div>
+          <div><span style="color:#F1F5EE">}</span></div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="glow-dot" style="width:6px;height:6px"></div>
+            <span style="color:#69A66A;font-size:.75rem">Lesson 07 — Sensor Integration · 84% complete</span>
+          </div>
+        </div>
+        <!-- Progress -->
+        <div class="px-6 pb-6" style="background:#071B11">
+          <div class="flex justify-between text-xs text-muted mb-1">
+            <span>Module progress</span><span>84%</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="hero-prog" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     THREE PILLARS
+════════════════════════════════════════════ -->
+<section class="py-24" style="background:#0A2114">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <p class="section-label mb-3">What you do here</p>
+      <h2 class="section-title">One Club. Three Paths.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Learn -->
+      <div class="trc-card p-8 reveal group">
+        <div class="pillar-icon mb-6" style="background:#E8BE1615;border:1px solid #E8BE1633">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#E8BE16" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-display font-bold text-light mb-3">Learn</h3>
+        <p class="text-silver text-sm leading-relaxed mb-6">
+          Structured paths from total beginner to advanced builder. Study electronics, Arduino, sensors, 
+          AI in robotics, and competition prep — all in one place.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#E8BE16">✓</span> Beginner → Advanced modules
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#E8BE16">✓</span> Quizzes &amp; achievements
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#E8BE16">✓</span> Daily streak tracking
+          </li>
+        </ul>
+        <a href="#learn" class="nav-link text-sm" style="color:#E8BE16">Explore lessons →</a>
+      </div>
+
+      <!-- Build -->
+      <div class="trc-card p-8 reveal group" style="border-color:#F2CC2422">
+        <div class="pillar-icon mb-6" style="background:#F2CC2415;border:1px solid #F2CC2433">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#F2CC24" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-display font-bold text-light mb-3">Build</h3>
+        <p class="text-silver text-sm leading-relaxed mb-6">
+          Explore real club projects with full technical docs — schematics, code, build steps. 
+          Club members submit their own, and every build gets a full project page.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#F2CC24">✓</span> Full project documentation
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#F2CC24">✓</span> Submit &amp; get approved
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#F2CC24">✓</span> Join project teams
+          </li>
+        </ul>
+        <a href="#projects" class="nav-link text-sm" style="color:#F2CC24">See projects →</a>
+      </div>
+
+      <!-- Connect -->
+      <div class="trc-card p-8 reveal group" style="border-color:#69A66A22">
+        <div class="pillar-icon mb-6" style="background:#69A66A15;border:1px solid #69A66A33">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#69A66A" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-display font-bold text-light mb-3">Connect</h3>
+        <p class="text-silver text-sm leading-relaxed mb-6">
+          Ask questions, upvote answers, collaborate on projects, and DM club executives. 
+          Apply for full club membership and unlock exclusive updates.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#69A66A">✓</span> Community Q&amp;A forum
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#69A66A">✓</span> Direct messaging
+          </li>
+          <li class="flex items-center gap-2 text-sm text-silver">
+            <span style="color:#69A66A">✓</span> Apply for club membership
+          </li>
+        </ul>
+        <a href="#community" class="nav-link text-sm" style="color:#69A66A">Join the club →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     LEARN — MODULE PREVIEW
+════════════════════════════════════════════ -->
+<section id="learn" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 reveal">
+      <div>
+        <p class="section-label mb-3">Learning Paths</p>
+        <h2 class="section-title">From Zero to <span class="c">Robot Builder</span></h2>
+      </div>
+      <a href="learn.html" class="btn-outline">All Modules →</a>
+    </div>
+
+    <!-- Level tabs -->
+    <div class="flex gap-2 mb-8 reveal">
+      <button onclick="filterLevel('all')"         class="lvl-tab active-tab px-4 py-2 rounded-sm text-sm font-display font-semibold border transition-all" style="border-color:#285438;color:#BDCCBF" data-level="all">All Levels</button>
+      <button onclick="filterLevel('beginner')"    class="lvl-tab px-4 py-2 rounded-sm text-sm font-display font-semibold border transition-all" style="border-color:#285438;color:#BDCCBF" data-level="beginner">Beginner</button>
+      <button onclick="filterLevel('intermediate')" class="lvl-tab px-4 py-2 rounded-sm text-sm font-display font-semibold border transition-all" style="border-color:#285438;color:#BDCCBF" data-level="intermediate">Intermediate</button>
+      <button onclick="filterLevel('advanced')"    class="lvl-tab px-4 py-2 rounded-sm text-sm font-display font-semibold border transition-all" style="border-color:#285438;color:#BDCCBF" data-level="advanced">Advanced</button>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="modules-grid">
+
+      <!-- Module cards -->
+      <div class="trc-card p-6 reveal module-card" data-level="beginner">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">🤖</div>
+          <span class="lvl-badge lvl-beginner">Beginner</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">Introduction to Robotics</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">What is a robot? History, types, real-world uses, and the core principles that every builder needs to know.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>8 lessons</span>
+          <span>~3 hrs</span>
+          <span>No prerequisites</span>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 reveal module-card" data-level="beginner">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">⚡</div>
+          <span class="lvl-badge lvl-beginner">Beginner</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">Basic Electronics</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">Voltage, current, resistance — breadboards, LEDs, resistors. Build your first circuit before writing a single line of code.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>10 lessons</span>
+          <span>~4 hrs</span>
+          <span>Intro to Robotics</span>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 reveal module-card" data-level="beginner">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">🔌</div>
+          <span class="lvl-badge lvl-beginner">Beginner</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">Arduino Basics</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">Setup, pins, serial monitor, blink sketches, and digital I/O. Your first real conversation with hardware.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>12 lessons</span>
+          <span>~5 hrs</span>
+          <span>Basic Electronics</span>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 reveal module-card" data-level="intermediate">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">📡</div>
+          <span class="lvl-badge lvl-intermediate">Intermediate</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">Sensors &amp; Actuators</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">Ultrasonic distance, IR, servos, DC motors, and stepper motors. Make your robot sense its world and respond.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>14 lessons</span>
+          <span>~6 hrs</span>
+          <span>Arduino Basics</span>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 reveal module-card" data-level="intermediate">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">💻</div>
+          <span class="lvl-badge lvl-intermediate">Intermediate</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">Programming for Robotics</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">Logic, loops, functions, state machines — C++ fundamentals applied to real robotics control flows.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>11 lessons</span>
+          <span>~5 hrs</span>
+          <span>Arduino Basics</span>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 reveal module-card" data-level="advanced">
+        <div class="flex items-start justify-between mb-4">
+          <div class="text-3xl">🧠</div>
+          <span class="lvl-badge lvl-advanced">Advanced</span>
+        </div>
+        <h3 class="font-display font-bold text-lg text-light mb-2">AI in Robotics</h3>
+        <p class="text-silver text-sm leading-relaxed mb-4">Computer vision, object detection, edge AI on microcontrollers. Where robotics meets machine learning.</p>
+        <div class="flex items-center justify-between text-xs text-muted pt-4 border-t border-border">
+          <span>16 lessons</span>
+          <span>~8 hrs</span>
+          <span>Sensors + Programming</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PROJECTS
+════════════════════════════════════════════ -->
+<section id="projects" class="py-24" style="background:#0A2114">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 reveal">
+      <div>
+        <p class="section-label mb-3">Club Projects</p>
+        <h2 class="section-title">Built by <span class="a">TRC Members</span></h2>
+      </div>
+      <a href="projects.html" class="btn-outline">All Projects →</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <div class="trc-card overflow-hidden reveal">
+        <div class="proj-img-placeholder">🚗</div>
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="lvl-badge" style="background:#E8BE1615;color:#E8BE16;border-color:#E8BE1633">Autonomous</span>
+            <span class="text-xs text-muted font-mono">2024</span>
+          </div>
+          <h3 class="font-display font-bold text-lg text-light mb-2">Obstacle Avoidance Car</h3>
+          <p class="text-silver text-sm leading-relaxed mb-4">HC-SR04 ultrasonic sensors + L298N motor driver. Navigates a room autonomously without human input.</p>
+          <div class="flex items-center gap-3 pt-4 border-t border-border">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">K</div>
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">A</div>
+            </div>
+            <span class="text-xs text-muted">2 members</span>
+            <a href="project.html" class="ml-auto text-xs" style="color:#E8BE16">View →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="trc-card overflow-hidden reveal">
+        <div class="proj-img-placeholder">🦾</div>
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="lvl-badge" style="background:#F2CC2415;color:#F2CC24;border-color:#F2CC2433">Mechanical</span>
+            <span class="text-xs text-muted font-mono">2025</span>
+          </div>
+          <h3 class="font-display font-bold text-lg text-light mb-2">3-DOF Robotic Arm</h3>
+          <p class="text-silver text-sm leading-relaxed mb-4">Servo-controlled 3-degree-of-freedom arm with joystick input and inverse kinematics for object pick &amp; place.</p>
+          <div class="flex items-center gap-3 pt-4 border-t border-border">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">E</div>
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">J</div>
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">M</div>
+            </div>
+            <span class="text-xs text-muted">3 members</span>
+            <a href="project.html" class="ml-auto text-xs" style="color:#F2CC24">View →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="trc-card overflow-hidden reveal">
+        <div class="proj-img-placeholder">🌿</div>
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="lvl-badge" style="background:#69A66A15;color:#69A66A;border-color:#69A66A33">IoT</span>
+            <span class="text-xs text-muted font-mono">2025</span>
+          </div>
+          <h3 class="font-display font-bold text-lg text-light mb-2">Smart Plant Monitor</h3>
+          <p class="text-silver text-sm leading-relaxed mb-4">ESP32-based soil moisture and temperature logger with auto-watering relay. Sends alerts via web dashboard.</p>
+          <div class="flex items-center gap-3 pt-4 border-t border-border">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full border border-border flex items-center justify-center text-xs" style="background:#285438">S</div>
+            </div>
+            <span class="text-xs text-muted">1 member</span>
+            <a href="project.html" class="ml-auto text-xs" style="color:#69A66A">View →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     EVENTS
+════════════════════════════════════════════ -->
+<section id="events" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 reveal">
+      <div>
+        <p class="section-label mb-3">Events &amp; Announcements</p>
+        <h2 class="section-title">What's <span class="c">Happening</span></h2>
+      </div>
+      <a href="events.html" class="btn-outline">All Events →</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+
+      <div class="trc-card p-6 flex gap-5 reveal">
+        <div class="text-center min-w-16">
+          <div class="evt-date">14</div>
+          <div class="evt-month">Jul</div>
+        </div>
+        <div class="border-l border-border pl-5 flex-1">
+          <span class="lvl-badge mb-2 inline-block" style="background:#E8BE1615;color:#E8BE16;border-color:#E8BE1633">Competition</span>
+          <h3 class="font-display font-bold text-base text-light mb-1">Regional Robotics Championship</h3>
+          <p class="text-silver text-sm">TRC sends 3 teams this year. Open spectating for all students.</p>
+          <p class="text-muted text-xs mt-2 font-mono">TARSCO Assembly Hall · 9:00 AM</p>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 flex gap-5 reveal">
+        <div class="text-center min-w-16">
+          <div class="evt-date">21</div>
+          <div class="evt-month">Jul</div>
+        </div>
+        <div class="border-l border-border pl-5 flex-1">
+          <span class="lvl-badge mb-2 inline-block" style="background:#69A66A15;color:#69A66A;border-color:#69A66A33">Workshop</span>
+          <h3 class="font-display font-bold text-base text-light mb-1">Intro to Arduino — Free Workshop</h3>
+          <p class="text-silver text-sm">Open to all TARSCO students. Bring a notebook. Components provided.</p>
+          <p class="text-muted text-xs mt-2 font-mono">Computer Lab B · 2:00 PM</p>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 flex gap-5 reveal">
+        <div class="text-center min-w-16">
+          <div class="evt-date">28</div>
+          <div class="evt-month">Jul</div>
+        </div>
+        <div class="border-l border-border pl-5 flex-1">
+          <span class="lvl-badge mb-2 inline-block" style="background:#F2CC2415;color:#F2CC24;border-color:#F2CC2433">Build Day</span>
+          <h3 class="font-display font-bold text-base text-light mb-1">Monthly Club Build Session</h3>
+          <p class="text-silver text-sm">Club members only. Project teams work on active builds. Mentors present.</p>
+          <p class="text-muted text-xs mt-2 font-mono">Robotics Lab · 10:00 AM</p>
+        </div>
+      </div>
+
+      <div class="trc-card p-6 flex gap-5 reveal">
+        <div class="text-center min-w-16">
+          <div class="evt-date">05</div>
+          <div class="evt-month">Aug</div>
+        </div>
+        <div class="border-l border-border pl-5 flex-1">
+          <span class="lvl-badge mb-2 inline-block" style="background:#A855F722;color:#A855F7;border-color:#A855F733">Talk</span>
+          <h3 class="font-display font-bold text-base text-light mb-1">AI &amp; The Future of Robotics</h3>
+          <p class="text-silver text-sm">Guest speaker from KNUST. Q&amp;A after. Open to all students.</p>
+          <p class="text-muted text-xs mt-2 font-mono">Main Hall · 3:00 PM</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     COMMUNITY
+════════════════════════════════════════════ -->
+<section id="community" class="py-24" style="background:#0A2114">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="text-center mb-16 reveal">
+      <p class="section-label mb-3">Community</p>
+      <h2 class="section-title">Ask. Answer. <span class="c">Build Together.</span></h2>
+      <p class="text-silver mt-4 max-w-xl mx-auto text-sm leading-relaxed">
+        Got a wiring problem? Stuck on a sketch? The TRC community has answers — or will figure it out with you.
+      </p>
+    </div>
+
+    <!-- Sample Q&A threads -->
+    <div class="max-w-3xl mx-auto space-y-4 mb-12">
+
+      <div class="trc-card p-5 reveal">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style="background:#E8BE1622;color:#E8BE16">K</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-semibold text-light">Kwame A.</span>
+              <span class="text-xs text-muted">· 2h ago</span>
+              <span class="lvl-badge ml-auto" style="background:#69A66A15;color:#69A66A;border-color:#69A66A33">Member</span>
+            </div>
+            <p class="text-sm text-silver">My HC-SR04 is reading 0 even when objects are right in front. I've checked the wiring 3 times. Using 5V from Arduino. Any ideas?</p>
+            <div class="flex items-center gap-4 mt-3">
+              <button class="flex items-center gap-1 text-xs text-muted hover:text-cyan transition-colors">
+                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+                <span>14 upvotes</span>
+              </button>
+              <button class="text-xs text-muted hover:text-cyan transition-colors">7 replies</button>
+              <span class="ml-auto text-xs" style="color:#69A66A">✓ Answered</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trc-card p-5 reveal">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style="background:#F2CC2422;color:#F2CC24">E</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-semibold text-light">Esi M.</span>
+              <span class="text-xs text-muted">· 5h ago</span>
+            </div>
+            <p class="text-sm text-silver">Does anyone have code for controlling 2 servos simultaneously with a joystick? I want to build a mini pan-tilt camera mount.</p>
+            <div class="flex items-center gap-4 mt-3">
+              <button class="flex items-center gap-1 text-xs text-muted hover:text-cyan transition-colors">
+                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+                <span>6 upvotes</span>
+              </button>
+              <button class="text-xs text-muted hover:text-cyan transition-colors">3 replies</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trc-card p-5 reveal">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style="background:#69A66A22;color:#69A66A">J</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-semibold text-light">Junior T.</span>
+              <span class="text-xs text-muted">· 1d ago</span>
+            </div>
+            <p class="text-sm text-silver">What's the difference between PWM and a regular digital signal? The lesson mentioned it but I want to understand it properly.</p>
+            <div class="flex items-center gap-4 mt-3">
+              <button class="flex items-center gap-1 text-xs text-muted hover:text-cyan transition-colors">
+                <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+                <span>22 upvotes</span>
+              </button>
+              <button class="text-xs text-muted hover:text-cyan transition-colors">11 replies</button>
+              <span class="ml-auto text-xs" style="color:#69A66A">✓ Answered</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center reveal">
+      <a href="community.html" class="btn-primary">Join the Discussion</a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     ABOUT
+════════════════════════════════════════════ -->
+<section id="about" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <div class="reveal">
+        <p class="section-label mb-4">About TRC</p>
+        <h2 class="section-title mb-6">The <span class="c">Robotics Club</span> of TARSCO School</h2>
+        <p class="text-silver leading-relaxed mb-4">
+          TRC was founded by students who believed that building machines shouldn't be something you wait until university to do. 
+          We compete, we build, and we teach — all within TARSCO School.
+        </p>
+        <p class="text-silver leading-relaxed mb-8">
+          Any TARSCO student can create an account and start learning. Club membership is by application — 
+          members get access to project teams, internal updates, and competition preparation.
+        </p>
+
+        <div class="grid grid-cols-2 gap-5 mb-8">
+          <div class="trc-card p-4">
+            <div class="stat-val text-2xl mb-1">3</div>
+            <div class="stat-lbl text-xs">Competition Trophies</div>
+          </div>
+          <div class="trc-card p-4">
+            <div class="stat-val text-2xl mb-1" style="color:#F2CC24">15</div>
+            <div class="stat-lbl text-xs">Club Members</div>
+          </div>
+          <div class="trc-card p-4">
+            <div class="stat-val text-2xl mb-1" style="color:#69A66A">6</div>
+            <div class="stat-lbl text-xs">Active Projects</div>
+          </div>
+          <div class="trc-card p-4">
+            <div class="stat-val text-2xl mb-1" style="color:#A855F7">2009</div>
+            <div class="stat-lbl text-xs">Year Established</div>
+          </div>
+        </div>
+
+        <a href="#about" class="btn-outline">Learn More About TRC</a>
+      </div>
+
+      <!-- Join card -->
+      <div class="reveal">
+        <div class="trc-card p-8" style="border-color:#E8BE1633">
+          <div class="about-crest-lockup">
+            <img src="assets/tarsco-robotics-crest.webp" alt="TARSCO Robotics Club shield crest" />
+            <div><span class="section-label">Official Club Identity</span><strong>TARSCO Robotics Club</strong><small>CARPE DIEM · SINCE 2009</small></div>
+          </div>
+          <div class="flex items-center gap-3 mb-6">
+            <div class="glow-dot"></div>
+            <span class="section-label">Membership Open</span>
+          </div>
+          <h3 class="font-display font-bold text-2xl text-light mb-4">Ready to Join the Club?</h3>
+          <p class="text-silver text-sm leading-relaxed mb-6">
+            Start by creating a free student account — you get full access to lessons, quizzes, and the community. 
+            When you're ready, apply for club membership to unlock everything.
+          </p>
+
+          <div class="space-y-3 mb-8">
+            <div class="flex items-center gap-3 text-sm text-silver">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0" style="background:#E8BE1622;color:#E8BE16;border:1px solid #E8BE1633">1</div>
+              Create a free student account
+            </div>
+            <div class="flex items-center gap-3 text-sm text-silver">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0" style="background:#E8BE1622;color:#E8BE16;border:1px solid #E8BE1633">2</div>
+              Complete at least one learning module
+            </div>
+            <div class="flex items-center gap-3 text-sm text-silver">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0" style="background:#E8BE1622;color:#E8BE16;border:1px solid #E8BE1633">3</div>
+              Apply for club membership
+            </div>
+            <div class="flex items-center gap-3 text-sm text-silver">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0" style="background:#E8BE1622;color:#E8BE16;border:1px solid #E8BE1633">4</div>
+              Admin reviews &amp; approves your application
+            </div>
+          </div>
+
+          <a href="login.html?signup=1" class="btn-primary w-full justify-center">Create Free Account</a>
+          <p class="text-center text-muted text-xs mt-4">TARSCO students only. Free forever.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════ -->
+<section class="py-24" style="background:#0A2114">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center mb-12 reveal">
+      <p class="section-label mb-3">Questions</p>
+      <h2 class="section-title">FAQ</h2>
+    </div>
+
+    <div class="space-y-0 reveal">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do I need to buy any equipment to start?
+          <svg class="w-5 h-5 text-muted flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="faq-a">No equipment needed to start. All lessons work in your browser. When you join the club and start building, the club provides components for approved projects.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is TRC only for students who already know electronics?
+          <svg class="w-5 h-5 text-muted flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="faq-a">Absolutely not. The Beginner path starts from zero — no prior knowledge of electronics, coding, or robotics is assumed. If you can follow instructions, you can build robots.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What's the difference between a Student and a Club Member?
+          <svg class="w-5 h-5 text-muted flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="faq-a">All TARSCO students get a free account with full access to lessons, quizzes, the community, and resources. Club Members are verified by admin and additionally get project team access, the ability to submit projects for the club portfolio, and internal club updates.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I apply for club membership?
+          <svg class="w-5 h-5 text-muted flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="faq-a">After creating a student account, go to your dashboard and click "Apply for Club Membership". Admins review applications and respond within a few days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I submit my own robotics project?
+          <svg class="w-5 h-5 text-muted flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="faq-a">Yes — verified club members can submit projects through the dashboard. Each submission goes through an admin approval step before being published to the public projects page.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════════ -->
+<section class="py-24 relative overflow-hidden">
+  <div class="hex-bg"></div>
+  <div class="max-w-4xl mx-auto px-6 text-center reveal">
+    <p class="section-label mb-4">Ready to start?</p>
+    <h2 class="hero-title mb-6" style="font-size:clamp(2.5rem,5vw,4.5rem)">
+      Your First Robot<br/>Starts <span class="accent">Today.</span>
+    </h2>
+    <p class="text-silver leading-relaxed mb-10 max-w-xl mx-auto">
+      Free for every TARSCO student. No experience needed. Start learning in minutes.
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="login.html?signup=1" class="btn-primary" style="font-size:1.1rem;padding:14px 36px">Create Free Account</a>
+      <a href="#about"  class="btn-outline" style="font-size:1.1rem;padding:14px 36px">About TRC</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="py-16">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-10 mb-12">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 border-2 border-cyan flex items-center justify-center rounded-sm" style="background:#E8BE1615">
+            <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:1rem">TRC</span>
+          </div>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">TARSCO Robotics Club</span>
+        </div>
+        <p class="text-muted text-sm leading-relaxed max-w-xs">
+          The official robotics club of TARSCO School. Learn, build, and compete — together.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-light mb-4 font-display tracking-wide">Platform</h4>
+        <ul class="space-y-2">
+          <li><a href="learn.html"     class="footer-link">Learn Robotics</a></li>
+          <li><a href="projects.html"  class="footer-link">Projects</a></li>
+          <li><a href="events.html"    class="footer-link">Events</a></li>
+          <li><a href="community.html" class="footer-link">Community</a></li>
+          <li><a href="resources.html" class="footer-link">Resources</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-light mb-4 font-display tracking-wide">Club</h4>
+        <ul class="space-y-2">
+          <li><a href="#about"   class="footer-link">About TRC</a></li>
+          <li><a href="join.html"    class="footer-link">Join the Club</a></li>
+          <li><a href="gallery.html" class="footer-link">Gallery</a></li>
+          <li><a href="contact.html" class="footer-link">Contact</a></li>
+          <li><a href="login.html"   class="footer-link">Student Login</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-muted text-xs font-mono">© 2025 TARSCO Robotics Club · TARSCO School, Ghana</p>
+      <div class="flex items-center gap-2">
+        <div class="glow-dot" style="width:6px;height:6px"></div>
+        <span class="text-muted text-xs font-mono">Platform online</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════ -->
+<script>
+// ── Mobile menu ──
+function toggleMenu() {
+  const m = document.getElementById('mobile-menu');
+  m.classList.toggle('open');
+}
+
+// ── FAQ ──
+function toggleFaq(el) {
+  const ans = el.nextElementSibling;
+  const svg = el.querySelector('svg');
+  ans.classList.toggle('open');
+  svg.style.transform = ans.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+// ── Level filter ──
+function filterLevel(level) {
+  document.querySelectorAll('.lvl-tab').forEach(b => {
+    b.style.borderColor = '#285438';
+    b.style.color = '#BDCCBF';
+    b.style.background = 'transparent';
+  });
+  const active = document.querySelector(`.lvl-tab[data-level="${level}"]`);
+  active.style.borderColor = '#E8BE16';
+  active.style.color = '#E8BE16';
+  active.style.background = '#E8BE160D';
+
+  document.querySelectorAll('.module-card').forEach(c => {
+    if (level === 'all' || c.dataset.level === level) {
+      c.style.display = '';
+    } else {
+      c.style.display = 'none';
+    }
+  });
+}
+
+// ── Circuit canvas ──
+(function() {
+  const canvas = document.getElementById('circuit-canvas');
+  const ctx = canvas.getContext('2d');
+  let nodes = [], drawn = false;
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    drawn = false;
+    nodes = [];
+    generate();
+  }
+
+  function generate() {
+    const W = canvas.width, H = canvas.height;
+    const cols = Math.ceil(W / 80), rows = Math.ceil(H / 80);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (Math.random() > 0.55) {
+          nodes.push({
+            x: c * 80 + Math.random() * 30 - 15,
+            y: r * 80 + Math.random() * 30 - 15
+          });
+        }
+      }
+    }
+  }
+
+  function draw() {
+    if (!canvas.width) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#E8BE16';
+    ctx.lineWidth = 1;
+
+    nodes.forEach((n, i) => {
+      // dot
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#E8BE16';
+      ctx.fill();
+
+      // connect nearest few
+      nodes.slice(i + 1, i + 4).forEach(m => {
+        const d = Math.hypot(m.x - n.x, m.y - n.y);
+        if (d < 160) {
+          ctx.globalAlpha = 1 - d / 160;
+          ctx.beginPath();
+          // L-shaped trace
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(m.x, n.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.stroke();
+        }
+      });
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  new ResizeObserver(resize).observe(canvas.parentElement || document.body);
+  resize();
+  draw();
+})();
+
+
+// ── GSAP Animations ──
+gsap.registerPlugin(ScrollTrigger);
+
+// Reveal on scroll
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+
+// Hero entrance
+gsap.timeline({ delay: 0.2 })
+  .from('.hero-eyebrow', { opacity: 0, y: 20, duration: 0.6 })
+  .from('.hero-title',   { opacity: 0, y: 40, duration: 0.7, stagger: 0.1 }, '-=0.3')
+  .from('.hero-title + p', { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
+  .from('.btn-primary, .btn-outline', { opacity: 0, y: 16, stagger: 0.1, duration: 0.4 }, '-=0.2');
+
+// Counter animation
+function animateCounter(id, target, suffix = '') {
+  const el = document.getElementById(id);
+  gsap.to({ val: 0 }, {
+    val: target, duration: 2, ease: 'power2.out',
+    delay: 0.8,
+    onUpdate: function() { el.textContent = Math.round(this.targets()[0].val) + suffix; }
+  });
+}
+animateCounter('s1', 142);
+animateCounter('s2', 60, '+');
+animateCounter('s3', 24);
+
+// Hero progress bar
+setTimeout(() => {
+  document.getElementById('hero-prog').style.width = '84%';
+}, 800);
+
+// Nav scroll behavior
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    nav.style.background = 'rgba(8,15,30,0.97)';
+  } else {
+    nav.style.background = 'rgba(8,15,30,0.85)';
+  }
+});
+</script>
+
+</body>
+</html>

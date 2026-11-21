@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover{color:#E8BE16}
+
+    /* Layout */
+    #layout{max-width:1100px;margin:0 auto;padding:80px 20px 60px;display:grid;
+            grid-template-columns:1fr 300px;gap:28px}
+
+    /* Card */
+    .trc-card{background:#0C2818;border:1px solid #285438;border-radius:4px}
+
+    /* Hero cover */
+    #cover{width:100%;height:320px;background:linear-gradient(135deg,#081E12,#12351F);
+           display:flex;align-items:center;justify-content:center;font-size:6rem;
+           border-radius:4px;overflow:hidden;margin-bottom:24px;border:1px solid #285438}
+    #cover img{width:100%;height:100%;object-fit:cover}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem}
+    .b-auto{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .b-mech{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .b-iot{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-ai{background:#A855F715;color:#A855F7;border:1px solid #A855F733}
+
+    /* Section headers */
+    .sec-h{font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;
+           margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+    .sec-h::after{content:'';flex:1;height:1px;background:#285438}
+
+    /* Code block */
+    .code-block{background:#071B11;border:1px solid #285438;border-radius:4px;overflow:hidden;margin:14px 0}
+    .code-header{background:#0C2818;border-bottom:1px solid #285438;padding:8px 16px;
+                 display:flex;justify-content:space-between;align-items:center}
+    .code-body{padding:18px;font-family:'JetBrains Mono',monospace;font-size:.8rem;
+               line-height:1.8;overflow-x:auto;color:#BDCCBF}
+
+    /* Materials list */
+    .mat-item{display:flex;align-items:center;gap:10px;padding:8px 0;
+              border-bottom:1px solid #28543811;font-size:.88rem;color:#BDCCBF}
+    .mat-item:last-child{border-bottom:none}
+    .mat-qty{font-family:'JetBrains Mono',monospace;font-size:.72rem;
+             background:#285438;color:#BDCCBF;padding:1px 7px;border-radius:2px;margin-left:auto}
+
+    /* Build steps */
+    .step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811}
+    .step:last-child{border-bottom:none}
+    .step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid #E8BE1644;
+              background:#E8BE1612;display:flex;align-items:center;justify-content:center;
+              font-family:Rajdhani;font-weight:700;font-size:.85rem;color:#E8BE16;
+              flex-shrink:0;margin-top:1px}
+
+    /* Gallery */
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .gallery-img{aspect-ratio:1;background:linear-gradient(135deg,#081E12,#285438);
+                 border-radius:3px;display:flex;align-items:center;justify-content:center;
+                 font-size:1.8rem;cursor:pointer;transition:.2s;border:1px solid #285438}
+    .gallery-img:hover{border-color:#E8BE1644;transform:scale(1.03)}
+
+    /* Team member */
+    .team-member{display:flex;align-items:center;gap:10px;padding:10px 0;
+                 border-bottom:1px solid #28543811}
+    .team-member:last-child{border-bottom:none}
+    .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+            justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+
+    /* Comment */
+    .comment{display:flex;gap:10px;padding:14px 0;border-bottom:1px solid #28543811}
+    .comment:last-child{border-bottom:none}
+    .comment-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+                    justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0}
+
+    /* Sidebar sticky */
+    #sidebar{position:sticky;top:80px;align-self:start;display:flex;flex-direction:column;gap:14px}
+
+    /* Btn */
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;
+                 font-weight:700;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;
+                 background:#E8BE16;color:#071B11;padding:10px 20px;border-radius:2px;
+                 border:none;cursor:pointer;transition:.2s;text-decoration:none;width:100%;
+                 justify-content:center}
+    .btn-primary:hover{background:#F7D94A}
+    .btn-outline{display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;
+                 font-weight:700;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;
+                 background:transparent;color:#F1F5EE;padding:9px 20px;border-radius:2px;
+                 border:1px solid #285438;cursor:pointer;transition:.2s;text-decoration:none;
+                 width:100%;justify-content:center}
+    .btn-outline:hover{border-color:#E8BE1644;color:#E8BE16}
+
+    /* Info box */
+    .info-box{border-radius:3px;padding:12px 16px;font-size:.85rem;line-height:1.7;
+              border-left:3px solid}
+    .info-tip{background:#E8BE160D;border-color:#E8BE16;color:#BDCCBF}
+
+    /* Tag chip */
+    .chip{background:#285438;color:#BDCCBF;font-family:'JetBrains Mono',monospace;
+          font-size:.62rem;padding:2px 8px;border-radius:2px}
+
+    /* Comment input */
+    .comment-input{width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;
+                   padding:10px 14px;color:#F1F5EE;font-family:Inter;font-size:.88rem;
+                   outline:none;resize:vertical;min-height:80px;transition:.2s}
+    .comment-input:focus{border-color:#E8BE1644}
+
+    .reveal{opacity:0;transform:translateY(16px);transition:.5s}
+    .reveal.in{opacity:1;transform:none}
+
+    @media(max-width:800px){
+      #layout{grid-template-columns:1fr}
+      #sidebar{position:static}
+    }
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a href="projects.html" class="nav-link" style="display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      All Projects
+    </a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+  </div>
+</nav>
+
+<div id="layout">
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div>
+
+    <!-- Cover -->
+    <div id="cover" class="reveal">🦾</div>
+
+    <!-- Title block -->
+    <div class="reveal" style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="badge b-mech">Mechanical</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D">2025</span>
+        <span style="background:#69A66A15;color:#69A66A;border:1px solid #69A66A33;font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:2px 8px;border-radius:2px">✓ Approved</span>
+      </div>
+      <h1 style="font-family:Rajdhani;font-weight:700;font-size:clamp(1.8rem,4vw,2.8rem);color:#F1F5EE;line-height:1.1;margin-bottom:12px">3-DOF Robotic Arm with Inverse Kinematics</h1>
+      <p style="color:#BDCCBF;line-height:1.8;font-size:.95rem">A 3-degree-of-freedom robotic arm built from scratch using 3D-printed joints, MG996R high-torque servos, and an Arduino Mega 2560. Implements basic inverse kinematics for smooth, precise end-effector positioning. Controlled via joystick with real-time angle readouts on the serial monitor.</p>
+    </div>
+
+    <!-- Tags -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px" class="reveal">
+      <span class="chip">arduino-mega</span>
+      <span class="chip">servo</span>
+      <span class="chip">inverse-kinematics</span>
+      <span class="chip">3d-printing</span>
+      <span class="chip">mechanical</span>
+      <span class="chip">joystick</span>
+    </div>
+
+    <!-- Problem solved -->
+    <div class="reveal">
+      <div class="sec-h">Problem / Purpose</div>
+      <p style="color:#BDCCBF;line-height:1.8;font-size:.92rem">Manual pick-and-place tasks in robotics competitions are often handled by rigid, pre-programmed arms that can't adapt to varying object positions. This project aimed to build a 3-DOF arm that calculates joint angles from a desired end-effector position in real time — making it adaptable and competition-ready without reprogramming for each scenario.</p>
+    </div>
+
+    <!-- Materials -->
+    <div class="reveal">
+      <div class="sec-h">Materials & Components</div>
+      <div class="trc-card" style="padding:0 16px">
+        <div class="mat-item">
+          <span style="font-size:1rem">🔧</span>
+          <span>Arduino Mega 2560</span>
+          <span class="mat-qty">×1</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">⚙️</span>
+          <span>MG996R Metal Gear Servo</span>
+          <span class="mat-qty">×3</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">🕹️</span>
+          <span>2-Axis Joystick Module (KY-023)</span>
+          <span class="mat-qty">×1</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">🖨️</span>
+          <span>3D Printed PLA Arm Joints (4 parts)</span>
+          <span class="mat-qty">×1 set</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">🔌</span>
+          <span>12V 3A Power Supply</span>
+          <span class="mat-qty">×1</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">🔌</span>
+          <span>Voltage Regulator (LM2596 step-down)</span>
+          <span class="mat-qty">×1</span>
+        </div>
+        <div class="mat-item">
+          <span style="font-size:1rem">📦</span>
+          <span>M3 bolts, nuts, servo horns, breadboard</span>
+          <span class="mat-qty">various</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Circuit diagram placeholder -->
+    <div class="reveal">
+      <div class="sec-h">Circuit Diagram</div>
+      <div style="background:#0C2818;border:1px solid #285438;border-radius:4px;padding:40px;text-align:center;margin-bottom:8px">
+        <div style="font-size:3rem;margin-bottom:12px">📐</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#77947D">Full wiring diagram — Arduino Mega → LM2596 → MG996R ×3 + KY-023 joystick</div>
+        <div style="margin-top:16px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <div style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#BDCCBF">
+            Servo 1 (Base) → Pin 2<br/>
+            Servo 2 (Shoulder) → Pin 3<br/>
+            Servo 3 (Elbow) → Pin 4<br/>
+            Joystick X → A0 · Y → A1<br/>
+            Power: 5V regulated from LM2596
+          </div>
+        </div>
+      </div>
+      <a href="#" style="font-size:.8rem;color:#E8BE16;text-decoration:none">Download full diagram PNG →</a>
+    </div>
+
+    <!-- Code -->
+    <div class="reveal">
+      <div class="sec-h">Code</div>
+
+      <div class="info-box info-tip" style="margin-bottom:14px">
+        Full commented sketch below. The <code style="font-family:'JetBrains Mono',monospace;background:#285438;color:#E8BE16;padding:1px 5px;border-radius:2px">inverseKinematics()</code> function converts target X/Y coordinates into joint angles using trigonometric relations.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#77947D">robotic_arm.ino</span>
+          <button onclick="copyCode()" style="font-family:Rajdhani;font-size:.72rem;color:#77947D;background:none;border:none;cursor:pointer">Copy</button>
+        </div>
+        <div class="code-body" id="main-code">
+<span style="color:#77947D">// TRC — 3-DOF Robotic Arm with Inverse Kinematics</span>
+<span style="color:#77947D">// Team: Esi D., Jerry D., Michael A. | 2025</span>
+
+<span style="color:#E8BE16">#include</span> <span style="color:#69A66A">&lt;Servo.h&gt;</span>
+<span style="color:#E8BE16">#include</span> <span style="color:#69A66A">&lt;math.h&gt;</span>
+
+<span style="color:#77947D">// Arm segment lengths (cm)</span>
+<span style="color:#E8BE16">const float</span> <span style="color:#F1F5EE">L1 = </span><span style="color:#F2CC24">12.0</span><span style="color:#F1F5EE">;</span>
+<span style="color:#E8BE16">const float</span> <span style="color:#F1F5EE">L2 = </span><span style="color:#F2CC24">10.0</span><span style="color:#F1F5EE">;</span>
+
+<span style="color:#F1F5EE">Servo base, shoulder, elbow;</span>
+
+<span style="color:#77947D">void</span> <span style="color:#69A66A">setup</span><span style="color:#F1F5EE">() {</span>
+  <span style="color:#F1F5EE">base.attach(</span><span style="color:#F2CC24">2</span><span style="color:#F1F5EE">);</span>
+  <span style="color:#F1F5EE">shoulder.attach(</span><span style="color:#F2CC24">3</span><span style="color:#F1F5EE">);</span>
+  <span style="color:#F1F5EE">elbow.attach(</span><span style="color:#F2CC24">4</span><span style="color:#F1F5EE">);</span>
+  <span style="color:#F1F5EE">Serial.begin(</span><span style="color:#F2CC24">9600</span><span style="color:#F1F5EE">);</span>
+<span style="color:#F1F5EE">}</span>
+
+<span style="color:#77947D">void</span> <span style="color:#69A66A">loop</span><span style="color:#F1F5EE">() {</span>
+  <span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">joyX = analogRead(A0);</span>
+  <span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">joyY = analogRead(A1);</span>
+
+  <span style="color:#77947D">// Map joystick to target coordinates</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">targetX = map(joyX, </span><span style="color:#F2CC24">0</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">1023</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">-20</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">20</span><span style="color:#F1F5EE">);</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">targetY = map(joyY, </span><span style="color:#F2CC24">0</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">1023</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">2</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">20</span><span style="color:#F1F5EE">);</span>
+
+  <span style="color:#F1F5EE">inverseKinematics(targetX, targetY);</span>
+  <span style="color:#F1F5EE">delay(</span><span style="color:#F2CC24">20</span><span style="color:#F1F5EE">);</span>
+<span style="color:#F1F5EE">}</span>
+
+<span style="color:#77947D">void</span> <span style="color:#69A66A">inverseKinematics</span><span style="color:#F1F5EE">(</span><span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">x, </span><span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">y) {</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">d = sqrt(x*x + y*y);</span>
+  <span style="color:#E8BE16">if</span> <span style="color:#F1F5EE">(d > L1 + L2) return; </span><span style="color:#77947D">// out of reach</span>
+
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">cosA2 = (d*d - L1*L1 - L2*L2) / (</span><span style="color:#F2CC24">2</span><span style="color:#F1F5EE">*L1*L2);</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">theta2 = acos(cosA2);</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">k1 = L1 + L2*cos(theta2);</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">k2 = L2*sin(theta2);</span>
+  <span style="color:#E8BE16">float</span> <span style="color:#F1F5EE">theta1 = atan2(y,x) - atan2(k2,k1);</span>
+
+  <span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">ang1 = constrain(degrees(theta1), </span><span style="color:#F2CC24">0</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">180</span><span style="color:#F1F5EE">);</span>
+  <span style="color:#E8BE16">int</span> <span style="color:#F1F5EE">ang2 = constrain(degrees(theta2), </span><span style="color:#F2CC24">0</span><span style="color:#F1F5EE">, </span><span style="color:#F2CC24">180</span><span style="color:#F1F5EE">);</span>
+
+  <span style="color:#F1F5EE">shoulder.write(ang1);</span>
+  <span style="color:#F1F5EE">elbow.write(ang2);</span>
+
+  <span style="color:#F1F5EE">Serial.print(</span><span style="color:#69A66A">"θ1: "</span><span style="color:#F1F5EE">); Serial.print(ang1);</span>
+  <span style="color:#F1F5EE">Serial.print(</span><span style="color:#69A66A">"  θ2: "</span><span style="color:#F1F5EE">); Serial.println(ang2);</span>
+<span style="color:#F1F5EE">}</span>
+        </div>
+      </div>
+      <a href="#" style="display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633;padding:7px 14px;border-radius:2px;text-decoration:none;margin-top:6px;transition:.2s" onmouseover="this.style.background='#E8BE16';this.style.color='#071B11'" onmouseout="this.style.background='#E8BE1615';this.style.color='#E8BE16'">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download .ino File
+      </a>
+    </div>
+
+    <!-- Build steps -->
+    <div class="reveal">
+      <div class="sec-h">Build Steps</div>
+      <div class="trc-card" style="padding:0 16px">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Print & Assemble the Arm Structure</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">3D print the 4 joint parts in PLA at 30% infill. Attach servo horns to each joint before assembling. The base servo mounts on the bottom plate, shoulder at joint 1, elbow at joint 2.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Wire the Power Circuit</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">MG996R servos draw up to 2.5A stall current each. Never power them from the Arduino 5V rail. Use the LM2596 step-down to get 6V from your 12V supply. Connect servo power rails to this output and share GND with the Arduino.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Connect Servos & Joystick</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">Servo signal wires → Arduino pins 2, 3, 4. Joystick VCC → 5V, GND → GND, VRx → A0, VRy → A1. Double-check shared grounds between servo power supply and Arduino.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Upload & Calibrate</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">Upload the sketch. Open Serial Monitor at 9600 baud. Move the joystick slowly and observe θ1/θ2 values. If servos jitter, add a 100µF capacitor across the servo power rails. Adjust L1/L2 constants in code to match your printed arm dimensions exactly.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Test & Iterate</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">Test the full range of motion. If the elbow servo strains at full extension, reduce the max target Y in the map() call. Consider adding a gripper servo on pin 5 for pick-and-place capability.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="reveal">
+      <div class="sec-h">Build Gallery</div>
+      <div class="gallery-grid">
+        <div class="gallery-img">🦾</div>
+        <div class="gallery-img">📐</div>
+        <div class="gallery-img">⚙️</div>
+        <div class="gallery-img">🔌</div>
+        <div class="gallery-img">💻</div>
+        <div class="gallery-img">🏆</div>
+      </div>
+    </div>
+
+    <!-- Demo video -->
+    <div class="reveal" style="margin-top:28px">
+      <div class="sec-h">Demo Video</div>
+      <div style="background:#0C2818;border:1px solid #285438;border-radius:4px;padding:40px;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:12px">▶️</div>
+        <p style="font-size:.88rem;color:#BDCCBF;margin-bottom:16px">Watch the arm perform a pick-and-place task in real time using the joystick.</p>
+        <a href="#" style="font-family:Rajdhani;font-weight:700;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;color:#E8BE16;text-decoration:none">Watch on YouTube →</a>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="reveal" style="margin-top:32px">
+      <div class="sec-h">Comments <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#77947D;font-weight:400;margin-left:8px">3</span></div>
+
+      <div class="trc-card" style="padding:0 16px;margin-bottom:16px">
+        <div class="comment">
+          <div class="comment-avatar" style="background:#E8BE1622;color:#E8BE16">K</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-weight:500;font-size:.88rem;color:#F1F5EE">Kwame A.</span>
+              <span style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace">2 days ago</span>
+            </div>
+            <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">This is incredible work! I had no idea you could implement inverse kinematics on an Arduino. The math explanation in the code comments really helped me understand it. Did you consider adding a claw gripper?</p>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="comment-avatar" style="background:#69A66A22;color:#69A66A">A</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-weight:500;font-size:.88rem;color:#F1F5EE">Abena O.</span>
+              <span style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace">1 day ago</span>
+            </div>
+            <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">The power circuit tip about not using Arduino 5V for the servos saved me! I was about to make that mistake on my own build. Thank you for documenting this so well.</p>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="comment-avatar" style="background:#A855F722;color:#A855F7">J</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-weight:500;font-size:.88rem;color:#F1F5EE">Jerry D.</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;background:#A855F715;color:#A855F7;border:1px solid #A855F733;padding:1px 6px;border-radius:2px">Exec</span>
+              <span style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace">12 hrs ago</span>
+            </div>
+            <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Excellent documentation standard — this is exactly the level of detail we want for all TRC projects. The team should be proud of this one. We're planning to feature it at the next open day.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comment form -->
+      <div style="display:flex;gap:10px">
+        <div class="comment-avatar" style="background:#E8BE1622;color:#E8BE16;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0">K</div>
+        <div style="flex:1">
+          <textarea class="comment-input" id="comment-input" placeholder="Add a comment…"></textarea>
+          <button onclick="postComment()" style="font-family:Rajdhani;font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;background:#E8BE16;color:#071B11;padding:8px 16px;border-radius:2px;border:none;cursor:pointer;margin-top:8px;transition:.2s" onmouseover="this.style.background='#F7D94A'" onmouseout="this.style.background='#E8BE16'">Post Comment</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div id="sidebar">
+
+    <!-- Project info card -->
+    <div class="trc-card" style="padding:18px">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Project Details</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Type</span>
+          <span class="badge b-mech">Mechanical</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Year</span>
+          <span style="color:#F1F5EE;font-family:'JetBrains Mono',monospace">2025</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Level</span>
+          <span style="color:#F2CC24">Advanced</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Status</span>
+          <span style="color:#69A66A">✓ Approved</span>
+        </div>
+        <div style="height:1px;background:#285438"></div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Views</span>
+          <span style="color:#BDCCBF;font-family:'JetBrains Mono',monospace">248</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem">
+          <span style="color:#77947D">Code downloads</span>
+          <span style="color:#BDCCBF;font-family:'JetBrains Mono',monospace">34</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team card -->
+    <div class="trc-card" style="padding:18px">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Project Team</div>
+      <div style="padding:0">
+        <div class="team-member">
+          <div class="avatar" style="background:#E8BE1622;color:#E8BE16">E</div>
+          <div>
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Esi Darko</div>
+            <div style="font-size:.72rem;color:#77947D">Lead Engineer</div>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="avatar" style="background:#A855F722;color:#A855F7">J</div>
+          <div>
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Jerry Dark</div>
+            <div style="font-size:.72rem;color:#77947D">Software & IK Math</div>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="avatar" style="background:#F2CC2422;color:#F2CC24">M</div>
+          <div>
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Michael Asare</div>
+            <div style="font-size:.72rem;color:#77947D">3D Design & Assembly</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="trc-card" style="padding:18px">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Actions</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="#" class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download Code
+        </a>
+        <a href="community.html" class="btn-outline">Ask a Question</a>
+        <a href="messages.html" class="btn-outline">Message Team</a>
+      </div>
+    </div>
+
+    <!-- Related lesson -->
+    <div class="trc-card" style="padding:18px;border-color:#E8BE1622">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px">Related Lesson</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="font-size:1.8rem">📡</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Sensors & Actuators</div>
+          <div style="font-size:.75rem;color:#77947D">Module 4 · Intermediate</div>
+        </div>
+      </div>
+      <a href="lesson.html" style="display:block;text-align:center;font-family:Rajdhani;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:#E8BE16;margin-top:12px;text-decoration:none">Go to Module →</a>
+    </div>
+
+  </div>
+
+</div><!-- end layout -->
+
+<script>
+// Reveal on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+function copyCode() {
+  const code = document.getElementById('main-code').innerText;
+  navigator.clipboard.writeText(code).catch(()=>{});
+  event.target.textContent = 'Copied!';
+  setTimeout(()=>event.target.textContent='Copy',1800);
+}
+
+function postComment() {
+  const inp = document.getElementById('comment-input');
+  const text = inp.value.trim();
+  if(!text) return;
+
+  const list = document.querySelector('.trc-card .comment').parentElement;
+  const div = document.createElement('div');
+  div.className = 'comment';
+  div.innerHTML = `
+    <div class="comment-avatar" style="background:#E8BE1622;color:#E8BE16;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0">K</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-weight:500;font-size:.88rem;color:#F1F5EE">Kwame A.</span>
+        <span style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace">Just now</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">${text}</p>
+    </div>`;
+  list.appendChild(div);
+  inp.value = '';
+}
+</script>
+</body>
+</html>

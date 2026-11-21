@@ -1,0 +1,69 @@
+/* TARSCO Robotics Club — shared brand layer */
+:root {
+  color-scheme: dark;
+  --trc-forest: #071B11;
+  --trc-forest-2: #0C2818;
+  --trc-panel: #12351F;
+  --trc-line: #285438;
+  --trc-gold: #E8BE16;
+  --trc-gold-soft: #F7D94A;
+  --trc-green: #69A66A;
+  --trc-muted: #77947D;
+  --trc-silver: #BDCCBF;
+  --trc-white: #F1F5EE;
+}
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--trc-forest);
+  color: var(--trc-white);
+  background-image: radial-gradient(ellipse at 78% 0%, rgba(232,190,22,.055), transparent 34%),
+                    radial-gradient(ellipse at 5% 38%, rgba(105,166,106,.07), transparent 32%);
+}
+::selection { background: rgba(232,190,22,.28); color: #fff; }
+a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--trc-gold) !important; outline-offset: 3px; }
+#nav {
+  background: rgba(7,27,17,.9) !important;
+  border-color: rgba(105,166,106,.22) !important;
+  box-shadow: 0 10px 35px rgba(0,0,0,.12);
+}
+.nav-link:hover, .nav-link.active, .footer-link:hover { color: var(--trc-gold) !important; }
+.nav-link::after { background: var(--trc-gold) !important; }
+.btn-primary {
+  background: var(--trc-gold) !important;
+  color: #102416 !important;
+  border: 1px solid var(--trc-gold) !important;
+  box-shadow: 0 8px 22px rgba(232,190,22,.12);
+}
+.btn-primary:hover { background: var(--trc-gold-soft) !important; box-shadow: 0 10px 28px rgba(232,190,22,.2) !important; }
+.btn-outline { border-color: rgba(189,204,191,.38) !important; color: var(--trc-white) !important; }
+.btn-outline:hover { border-color: var(--trc-gold) !important; color: var(--trc-gold) !important; }
+.trc-card { border-color: rgba(105,166,106,.23) !important; }
+.trc-card:hover { border-color: rgba(232,190,22,.55) !important; }
+.trc-badge { border-color: rgba(232,190,22,.35) !important; background: rgba(232,190,22,.075) !important; }
+.section-title .c, .section-title .a, .hero-title .accent, .hero-title .amber { color: var(--trc-gold) !important; }
+.stat-val, .evt-date, .cd-val { color: var(--trc-gold) !important; }
+.prog-fill, .lesson-prog-fill { background: linear-gradient(90deg,var(--trc-green),var(--trc-gold)) !important; }
+#mobile-menu { background: rgba(7,27,17,.98); border-color: var(--trc-line) !important; }
+input, textarea, select { accent-color: var(--trc-gold); }
+button, a { touch-action: manipulation; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--trc-forest); }
+::-webkit-scrollbar-thumb { background: #315B3D; border: 2px solid var(--trc-forest); border-radius: 12px; }
+::-webkit-scrollbar-thumb:hover { background: #527A43; }
+.trc-nav-seal { display:block; width:42px; height:42px; border-radius:50%; object-fit:cover; background:#fff; border:2px solid var(--trc-gold); box-shadow:0 0 0 3px rgba(232,190,22,.12); }
+.hero-mini-seal { width:34px; height:34px; border-radius:50%; object-fit:cover; background:#fff; border:1px solid var(--trc-gold); }
+@media (max-width: 768px) {
+  body { background-image: radial-gradient(ellipse at 50% 0%, rgba(232,190,22,.06), transparent 38%); }
+  .trc-nav-seal { width:36px; height:36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+
+.about-crest-lockup { display:flex; align-items:center; gap:16px; padding-bottom:20px; margin-bottom:22px; border-bottom:1px solid rgba(105,166,106,.2); }
+.about-crest-lockup img { width:88px; height:124px; object-fit:contain; border-radius:5px; background:#fff; border:1px solid rgba(232,190,22,.7); padding:3px; flex:0 0 auto; }
+.about-crest-lockup div { display:flex; flex-direction:column; gap:7px; }
+.about-crest-lockup strong { color:var(--trc-white); font:700 1.2rem Rajdhani,sans-serif; letter-spacing:.04em; }
+.about-crest-lockup small { color:var(--trc-gold); font:600 .62rem 'JetBrains Mono',monospace; letter-spacing:.11em; }
+@media(max-width:480px){ .about-crest-lockup img{width:72px;height:104px;} .about-crest-lockup strong{font-size:1.05rem;} }

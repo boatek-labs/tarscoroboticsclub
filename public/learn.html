@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learn Robotics — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    /* Nav */
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover,.nav-link.active{color:#E8BE16}
+
+    /* Progress header */
+    #progress-bar{background:#0C2818;border-bottom:1px solid #285438;padding:12px 24px;
+                  display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+
+    /* Layout */
+    #layout{max-width:1200px;margin:0 auto;padding:80px 20px 60px}
+
+    /* Section label */
+    .sec-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;
+               text-transform:uppercase;letter-spacing:.18em}
+
+    /* Level pill */
+    .lvl-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:3px;
+              font-family:Rajdhani;font-weight:700;font-size:.85rem;letter-spacing:.06em;
+              cursor:pointer;transition:.2s;border:1px solid transparent}
+    .lvl-pill.all        {background:#28543844;color:#BDCCBF;border-color:#285438}
+    .lvl-pill.beginner   {background:#69A66A10;color:#69A66A;border-color:#69A66A33}
+    .lvl-pill.intermediate{background:#E8BE1610;color:#E8BE16;border-color:#E8BE1633}
+    .lvl-pill.advanced   {background:#F2CC2410;color:#F2CC24;border-color:#F2CC2433}
+    .lvl-pill.active,.lvl-pill:hover{opacity:1;transform:translateY(-1px)}
+    .lvl-pill:not(.active){opacity:.6}
+
+    /* Module card */
+    .module-card{background:#0C2818;border:1px solid #285438;border-radius:4px;overflow:hidden;transition:.25s;cursor:pointer;text-decoration:none;display:block;color:inherit}
+    .module-card:hover{border-color:#E8BE1633;transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .module-card.locked{opacity:.55;cursor:not-allowed}
+    .module-card.locked:hover{transform:none;border-color:#285438;box-shadow:none}
+
+    /* Card accent bar */
+    .card-accent{height:3px}
+    .accent-beginner{background:linear-gradient(90deg,#69A66A,#E8BE16)}
+    .accent-intermediate{background:linear-gradient(90deg,#E8BE16,#7C3AED)}
+    .accent-advanced{background:linear-gradient(90deg,#F2CC24,#FF3B30)}
+
+    /* Progress bar */
+    .prog-bar{height:5px;background:#285438;border-radius:3px;overflow:hidden}
+    .prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#E8BE16,#69A66A)}
+    .prog-fill.amber{background:linear-gradient(90deg,#F2CC24,#FFB347)}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem}
+    .b-beg{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-int{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .b-adv{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .b-done{background:#69A66A33;color:#69A66A;border:1px solid #69A66A66}
+    .b-inprog{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1644}
+    .b-lock{background:#285438;color:#77947D;border:1px solid #285438}
+
+    /* Lock icon */
+    .lock-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+                  background:#071B1188;backdrop-filter:blur(2px)}
+
+    /* Learning path connector */
+    .path-line{width:2px;height:28px;background:linear-gradient(#285438,#28543844);margin:0 auto}
+
+    /* Stat mini */
+    .mini-stat{display:flex;flex-direction:column;align-items:center}
+    .mini-stat-val{font-family:Rajdhani;font-weight:700;font-size:1.4rem;line-height:1;color:#E8BE16}
+    .mini-stat-lbl{font-size:.65rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em}
+
+    /* Glow dot */
+    .glow-dot{width:7px;height:7px;border-radius:50%;background:#E8BE16;
+              box-shadow:0 0 10px #E8BE16,0 0 20px #E8BE1655;animation:pulse 2s infinite;flex-shrink:0}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    .reveal{opacity:0;transform:translateY(20px)}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="learn.html"     class="nav-link active">Learn</a>
+    <a href="projects.html"  class="nav-link">Projects</a>
+    <a href="community.html" class="nav-link">Community</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+  </div>
+</nav>
+
+<!-- Progress header band -->
+<div id="progress-bar" style="margin-top:60px">
+  <div class="glow-dot"></div>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#E8BE16;letter-spacing:.1em">YOUR LEARNING PATH</span>
+  <div style="flex:1;max-width:320px">
+    <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#77947D;margin-bottom:4px">
+      <span>Overall progress</span>
+      <span id="overall-pct">47%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="overall-fill" style="width:0%"></div></div>
+  </div>
+  <div style="display:flex;gap:20px;margin-left:auto">
+    <div class="mini-stat"><div class="mini-stat-val" id="done-count">0</div><div class="mini-stat-lbl">Lessons Done</div></div>
+    <div class="mini-stat"><div class="mini-stat-val" style="color:#F2CC24" id="streak-val">0</div><div class="mini-stat-lbl">Day Streak</div></div>
+    <div class="mini-stat"><div class="mini-stat-val" style="color:#A855F7" id="badge-count">0</div><div class="mini-stat-lbl">Badges</div></div>
+  </div>
+</div>
+
+<div id="layout">
+
+  <!-- Hero section -->
+  <div class="reveal" style="margin-bottom:40px">
+    <p class="sec-label" style="margin-bottom:10px">TRC Learning Platform</p>
+    <h1 style="font-family:Rajdhani;font-weight:700;font-size:clamp(2rem,4vw,3rem);color:#F1F5EE;margin-bottom:10px">
+      Learn Robotics — <span style="color:#E8BE16">Step by Step</span>
+    </h1>
+    <p style="color:#BDCCBF;max-width:600px;line-height:1.7">
+      Eight structured modules take you from zero electronics knowledge to building AI-powered robots and competing. 
+      Work at your own pace. Track your streak. Earn badges.
+    </p>
+  </div>
+
+  <!-- Level filter -->
+  <div style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap" class="reveal">
+    <div class="lvl-pill all active"         onclick="filterLevel('all',this)">All Levels</div>
+    <div class="lvl-pill beginner"            onclick="filterLevel('beginner',this)">🟢 Beginner</div>
+    <div class="lvl-pill intermediate"        onclick="filterLevel('intermediate',this)">🔵 Intermediate</div>
+    <div class="lvl-pill advanced"            onclick="filterLevel('advanced',this)">🟠 Advanced</div>
+  </div>
+
+  <!-- Learning path -->
+  <div id="modules-path">
+
+    <!-- ── BEGINNER ── -->
+    <div style="margin-bottom:12px" class="reveal">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <div style="height:1px;flex:1;background:#285438"></div>
+        <span class="sec-label" style="color:#69A66A;border:1px solid #69A66A33;padding:4px 14px;border-radius:2px;background:#69A66A08">BEGINNER PATH</span>
+        <div style="height:1px;flex:1;background:#285438"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4" id="beginner-grid">
+
+      <!-- Module 1 - Completed -->
+      <a href="my-learning.html" class="module-card reveal" data-level="beginner">
+        <div class="card-accent accent-beginner"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">🤖</div>
+            <span class="badge b-done">✓ Complete</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-beg">Beginner</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 1</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Introduction to Robotics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">What is a robot? History, types, applications, and the 3 components every robot has.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:100%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">
+            <span>8 / 8 lessons</span>
+            <span style="color:#69A66A">100%</span>
+          </div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.78rem;color:#77947D">~3 hrs · 1 quiz</span>
+          <span style="font-size:.78rem;color:#69A66A">Completed ✓</span>
+        </div>
+      </a>
+
+      <!-- Module 2 - In progress -->
+      <a href="lesson.html" class="module-card reveal" data-level="beginner">
+        <div class="card-accent accent-beginner"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">⚡</div>
+            <span class="badge b-inprog">In Progress</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-beg">Beginner</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 2</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Basic Electronics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Voltage, current, resistance. Build your first circuit on a breadboard before writing a single line of code.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:70%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">
+            <span>7 / 10 lessons</span>
+            <span style="color:#E8BE16">70%</span>
+          </div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.78rem;color:#77947D">~4 hrs · 2 quizzes</span>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">Resume →</span>
+        </div>
+      </a>
+
+      <!-- Module 3 - Not started -->
+      <a href="lesson.html" class="module-card reveal" data-level="beginner">
+        <div class="card-accent accent-beginner"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">🔌</div>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Not started</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-beg">Beginner</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 3</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Arduino Basics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Setup, pins, serial monitor, blink sketches. Your first real conversation with programmable hardware.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">
+            <span>0 / 12 lessons</span>
+            <span>0%</span>
+          </div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.78rem;color:#77947D">~5 hrs · 2 quizzes</span>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">Start →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Path connector -->
+    <div class="path-line reveal"></div>
+
+    <!-- ── INTERMEDIATE ── -->
+    <div style="margin:12px 0 20px" class="reveal">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="height:1px;flex:1;background:#285438"></div>
+        <span class="sec-label" style="color:#E8BE16;border:1px solid #E8BE1633;padding:4px 14px;border-radius:2px;background:#E8BE1608">INTERMEDIATE PATH</span>
+        <div style="height:1px;flex:1;background:#285438"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4" id="intermediate-grid">
+
+      <div class="module-card reveal locked" data-level="intermediate" onclick="showLockMsg()">
+        <div class="card-accent accent-intermediate"></div>
+        <div style="padding:20px;position:relative">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">📡</div>
+            <span class="badge b-lock">🔒 Locked</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-int">Intermediate</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 4</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Sensors & Actuators</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Ultrasonic distance, IR, servos, DC motors. Make your robot sense the world and move through it.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:0%"></div></div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">Complete Arduino Basics first</div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438">
+          <span style="font-size:.78rem;color:#77947D">~6 hrs · 3 quizzes · 14 lessons</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal locked" data-level="intermediate" onclick="showLockMsg()">
+        <div class="card-accent accent-intermediate"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">💻</div>
+            <span class="badge b-lock">🔒 Locked</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-int">Intermediate</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 5</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Programming for Robotics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Logic, loops, functions, state machines. C++ fundamentals applied to real robotics control flows.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:0%"></div></div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">Complete Sensors & Actuators first</div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438">
+          <span style="font-size:.78rem;color:#77947D">~5 hrs · 2 quizzes · 11 lessons</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal locked" data-level="intermediate" onclick="showLockMsg()">
+        <div class="card-accent accent-intermediate"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">⚠️</div>
+            <span class="badge b-lock">🔒 Locked</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-int">Intermediate</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 6</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Safety in Robotics & Electronics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Short circuits, voltage limits, safe soldering, component ratings. Don't skip this one — it prevents accidents.</p>
+          <div class="prog-bar mb-2"><div class="prog-fill" style="width:0%"></div></div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">Complete Programming first</div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438">
+          <span style="font-size:.78rem;color:#77947D">~3 hrs · 1 quiz · 8 lessons</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Path connector -->
+    <div class="path-line reveal"></div>
+
+    <!-- ── ADVANCED ── -->
+    <div style="margin:12px 0 20px" class="reveal">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="height:1px;flex:1;background:#285438"></div>
+        <span class="sec-label" style="color:#F2CC24;border:1px solid #F2CC2433;padding:4px 14px;border-radius:2px;background:#F2CC2408">ADVANCED PATH</span>
+        <div style="height:1px;flex:1;background:#285438"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="advanced-grid">
+
+      <div class="module-card reveal locked" data-level="advanced" onclick="showLockMsg()">
+        <div class="card-accent accent-advanced"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">🧠</div>
+            <span class="badge b-lock">🔒 Locked</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-adv">Advanced</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 7</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">AI in Robotics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Computer vision, object detection with TensorFlow Lite, edge AI on ESP32-CAM. Where robotics meets machine learning.</p>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">OpenCV</span>
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">ESP32-CAM</span>
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">TFLite</span>
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Python</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill amber" style="width:0%"></div></div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438">
+          <span style="font-size:.78rem;color:#77947D">~8 hrs · 3 quizzes · 16 lessons</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal locked" data-level="advanced" onclick="showLockMsg()">
+        <div class="card-accent accent-advanced"></div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:2.2rem">🏆</div>
+            <span class="badge b-lock">🔒 Locked</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span class="badge b-adv">Advanced</span>
+            <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">Module 8</span>
+          </div>
+          <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.15rem;color:#F1F5EE;margin-bottom:8px">Competition Robotics</h3>
+          <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:14px">Strategy, autonomous routines, weight management, alliance play. What you need to compete and win at regional level.</p>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Competition Rules</span>
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Autonomous</span>
+            <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Strategy</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill amber" style="width:0%"></div></div>
+        </div>
+        <div style="padding:10px 20px 14px;border-top:1px solid #285438">
+          <span style="font-size:.78rem;color:#77947D">~10 hrs · 4 quizzes · 20 lessons</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lock toast -->
+  <div id="lock-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0C2818;border:1px solid #F2CC2444;border-radius:4px;padding:12px 20px;font-size:.85rem;color:#F2CC24;transition:transform .35s;z-index:200;white-space:nowrap">
+    🔒 Complete the previous module first to unlock this one
+  </div>
+
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, { opacity:1, y:0, duration:.6, ease:'power2.out',
+    scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'} });
+});
+
+// Progress counters
+setTimeout(() => {
+  document.getElementById('overall-fill').style.width = '47%';
+  let v=0; const t=setInterval(()=>{
+    v=Math.min(v+1,28); document.getElementById('done-count').textContent=v;
+    if(v>=28) clearInterval(t);
+  },40);
+  let v2=0; const t2=setInterval(()=>{
+    v2=Math.min(v2+1,7); document.getElementById('streak-val').textContent=v2;
+    if(v2>=7) clearInterval(t2);
+  },100);
+  let v3=0; const t3=setInterval(()=>{
+    v3=Math.min(v3+1,5); document.getElementById('badge-count').textContent=v3;
+    if(v3>=5) clearInterval(t3);
+  },150);
+}, 400);
+
+// Level filter
+function filterLevel(level, el) {
+  document.querySelectorAll('.lvl-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.module-card').forEach(c => {
+    if(level==='all' || c.dataset.level===level) {
+      c.style.display='block';
+    } else {
+      c.style.display='none';
+    }
+  });
+}
+
+// Lock message
+let lockTimeout;
+function showLockMsg() {
+  const t = document.getElementById('lock-toast');
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(lockTimeout);
+  lockTimeout = setTimeout(() => {
+    t.style.transform = 'translateX(-50%) translateY(80px)';
+  }, 2500);
+}
+</script>
+</body>
+</html>

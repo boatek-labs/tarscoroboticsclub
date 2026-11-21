@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join TRC — TARSCO Robotics Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover,.nav-link.active{color:#E8BE16}
+
+    /* Page nav tabs */
+    #page-tabs{background:#0C2818;border-bottom:1px solid #285438;padding:0 24px;
+               display:flex;gap:0;position:sticky;top:60px;z-index:90}
+    .page-tab{font-family:Rajdhani;font-weight:600;font-size:.9rem;padding:14px 20px;
+              border:none;background:transparent;color:#77947D;cursor:pointer;
+              transition:.2s;border-bottom:2px solid transparent;letter-spacing:.04em}
+    .page-tab.active{color:#E8BE16;border-bottom-color:#E8BE16}
+    .page-tab:hover:not(.active){color:#BDCCBF}
+
+    /* Page sections */
+    .page-section{display:none;max-width:900px;margin:0 auto;padding:48px 20px 72px}
+    .page-section.active{display:block}
+
+    /* Cards */
+    .trc-card{background:#0C2818;border:1px solid #285438;border-radius:4px}
+
+    /* Step */
+    .step-item{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid #28543811}
+    .step-item:last-child{border-bottom:none}
+    .step-num{width:36px;height:36px;border-radius:50%;border:1.5px solid #E8BE1644;
+              background:#E8BE160D;display:flex;align-items:center;justify-content:center;
+              font-family:Rajdhani;font-weight:700;font-size:1rem;color:#E8BE16;
+              flex-shrink:0;margin-top:2px}
+
+    /* Role comparison */
+    .role-col{background:#0C2818;border:1px solid #285438;border-radius:4px;overflow:hidden;flex:1}
+    .role-head{padding:16px 20px;border-bottom:1px solid #285438}
+    .role-feat{display:flex;align-items:center;gap:8px;padding:10px 20px;
+               font-size:.88rem;border-bottom:1px solid #28543811}
+    .role-feat:last-child{border-bottom:none}
+
+    /* Form */
+    .input{width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;
+           padding:10px 14px;color:#F1F5EE;font-family:Inter;font-size:.9rem;outline:none;transition:.2s}
+    .input:focus{border-color:#E8BE1644}
+    .input::placeholder{color:#77947D}
+    .label{display:block;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#BDCCBF;
+           text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+    .btn-primary{font-family:Rajdhani;font-weight:700;font-size:1rem;letter-spacing:.1em;
+                 text-transform:uppercase;background:#E8BE16;color:#071B11;padding:12px 28px;
+                 border-radius:2px;border:none;cursor:pointer;transition:.2s;display:inline-flex;
+                 align-items:center;gap:8px}
+    .btn-primary:hover{background:#F7D94A;box-shadow:0 8px 24px #E8BE1633}
+
+    /* Executive card */
+    .exec-card{display:flex;align-items:center;gap:14px;padding:16px;background:#0C2818;
+               border:1px solid #285438;border-radius:4px;transition:.2s}
+    .exec-card:hover{border-color:#E8BE1622}
+    .exec-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+                 justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0}
+
+    /* Stat highlight */
+    .stat-h{font-family:Rajdhani;font-weight:700;font-size:2.2rem;line-height:1}
+    .stat-l{font-size:.75rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+    /* FAQ */
+    .faq-item{border-bottom:1px solid #285438}
+    .faq-q{font-family:Rajdhani;font-weight:600;font-size:1rem;color:#F1F5EE;
+           cursor:pointer;padding:16px 0;display:flex;justify-content:space-between;align-items:center}
+    .faq-a{font-size:.88rem;color:#BDCCBF;line-height:1.7;max-height:0;overflow:hidden;transition:.35s}
+    .faq-a.open{max-height:200px;padding-bottom:14px}
+
+    /* Contact info */
+    .contact-item{display:flex;gap:12px;align-items:flex-start;padding:16px;
+                  background:#0C2818;border:1px solid #285438;border-radius:4px;margin-bottom:10px}
+    .c-icon{width:38px;height:38px;border-radius:4px;display:flex;align-items:center;
+            justify-content:center;font-size:1.2rem;flex-shrink:0}
+
+    /* Success state */
+    .success-box{background:#69A66A10;border:1px solid #69A66A33;border-radius:4px;
+                 padding:20px;text-align:center;display:none}
+
+    .sec-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;
+               text-transform:uppercase;letter-spacing:.16em}
+    .sec-title{font-family:Rajdhani;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.5rem);color:#F1F5EE}
+
+    .reveal{opacity:0;transform:translateY(18px)}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="trc-home.html" class="nav-link">Home</a>
+    <a href="learn.html"    class="nav-link">Learn</a>
+    <a href="projects.html" class="nav-link">Projects</a>
+    <a href="login.html"    style="font-family:Rajdhani;font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;background:#E8BE16;color:#071B11;padding:7px 16px;border-radius:2px;text-decoration:none">Log In</a>
+  </div>
+</nav>
+
+<!-- Page tabs -->
+<div id="page-tabs" style="margin-top:60px">
+  <button class="page-tab active" onclick="showPage('join',this)">Join TRC</button>
+  <button class="page-tab" onclick="showPage('about',this)">About</button>
+  <button class="page-tab" onclick="showPage('contact',this)">Contact</button>
+</div>
+
+<!-- ═══════════════════════════════
+     JOIN PAGE
+═══════════════════════════════ -->
+<div class="page-section active" id="page-join">
+
+  <!-- Hero -->
+  <div class="reveal" style="text-align:center;margin-bottom:48px">
+    <p class="sec-label" style="margin-bottom:12px">Free for every TARSCO student</p>
+    <h1 class="sec-title" style="margin-bottom:14px">Join the Robotics Club</h1>
+    <p style="color:#BDCCBF;max-width:520px;margin:0 auto;line-height:1.8">Create a free account to start learning. When you're ready, apply for full club membership and unlock project teams, competitions, and exclusive updates.</p>
+  </div>
+
+  <!-- Role comparison -->
+  <div style="display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap" class="reveal">
+    <!-- Student -->
+    <div class="role-col">
+      <div class="role-head">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1.2rem;color:#F1F5EE;margin-bottom:4px">Student Account</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#69A66A">Free · Instant access</div>
+      </div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> All 60+ lessons & modules</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Quizzes & badges</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Streak tracking</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Community Q&A forum</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Direct messaging</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Resource downloads</div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> View all projects</div>
+      <div class="role-feat"><span style="color:#285438">—</span> <span style="color:#77947D">Submit own projects</span></div>
+      <div class="role-feat"><span style="color:#285438">—</span> <span style="color:#77947D">Join project teams</span></div>
+      <div class="role-feat"><span style="color:#285438">—</span> <span style="color:#77947D">Internal member updates</span></div>
+      <div style="padding:16px 20px">
+        <a href="login.html?signup=1" class="btn-primary" style="width:100%;justify-content:center;font-size:.9rem;padding:10px">Create Free Account →</a>
+      </div>
+    </div>
+    <!-- Club Member -->
+    <div class="role-col" style="border-color:#E8BE1633;position:relative">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#E8BE16;color:#071B11;font-family:Rajdhani;font-weight:700;font-size:.75rem;padding:3px 14px;border-radius:2px;letter-spacing:.08em;white-space:nowrap">FULL MEMBER</div>
+      <div class="role-head" style="background:#E8BE1608;border-bottom-color:#E8BE1622">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1.2rem;color:#F1F5EE;margin-bottom:4px">Club Member</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#E8BE16">By application · Admin approved</div>
+      </div>
+      <div class="role-feat"><span style="color:#69A66A">✓</span> Everything in Student</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Submit your own projects</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Join & create project teams</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Internal member updates</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Competition team eligibility</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Access to Robotics Lab</div>
+      <div class="role-feat"><span style="color:#E8BE16">✓</span> Priority workshop seats</div>
+      <div style="padding:16px 20px">
+        <a href="login.html?signup=1" class="btn-primary" style="width:100%;justify-content:center;font-size:.9rem;padding:10px;background:#F2CC24" onmouseover="this.style.background='#F7D94A'" onmouseout="this.style.background='#F2CC24'">Apply for Membership →</a>
+        <div style="font-size:.72rem;color:#77947D;text-align:center;margin-top:8px">Create a student account first</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to join -->
+  <div class="reveal">
+    <p class="sec-label" style="margin-bottom:16px">How It Works</p>
+    <div class="trc-card" style="padding:0 20px">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Create a free student account</div>
+          <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">Sign up with your TARSCO school email. Takes about 30 seconds. Instant access to all lessons, the community, and resources.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Start learning</div>
+          <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">Begin with <strong style="color:#F1F5EE">Introduction to Robotics</strong> — 8 lessons, no prior experience required. Follow the structured path at your own pace.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Apply for club membership (optional)</div>
+          <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">From your student dashboard, click <em>"Apply for Club Membership"</em>. Write a short motivation statement — why do you want to be a TRC member? What do you want to build?</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:4px">Wait for executive review</div>
+          <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7">A club executive reviews your application within 2–5 days. You'll receive a notification and message when a decision is made. Approved members get immediate access to all member privileges.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;margin-top:48px" class="reveal">
+    <a href="login.html?signup=1" class="btn-primary" style="font-size:1.05rem;padding:14px 36px">Create Free Account →</a>
+    <p style="font-size:.82rem;color:#77947D;margin-top:12px">Already have an account? <a href="login.html" style="color:#E8BE16;text-decoration:none">Log in →</a></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════ -->
+<div class="page-section" id="page-about">
+
+  <div class="reveal" style="margin-bottom:40px">
+    <p class="sec-label" style="margin-bottom:10px">Est. 2009 · TARSCO School, Ghana</p>
+    <h1 class="sec-title" style="margin-bottom:14px;color:#F1F5EE">About <span style="color:#E8BE16">TRC</span></h1>
+    <p style="color:#BDCCBF;line-height:1.8;max-width:620px">TARSCO Robotics Club was founded by students who believed that real engineering shouldn't wait until university. We compete, we build, and we teach — right here at TARSCO School.</p>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:40px" class="reveal">
+    <div class="trc-card" style="padding:18px;text-align:center">
+      <div class="stat-h" style="color:#E8BE16">142</div>
+      <div class="stat-l">Students</div>
+    </div>
+    <div class="trc-card" style="padding:18px;text-align:center">
+      <div class="stat-h" style="color:#F2CC24">12</div>
+      <div class="stat-l">Club Members</div>
+    </div>
+    <div class="trc-card" style="padding:18px;text-align:center">
+      <div class="stat-h" style="color:#69A66A">24</div>
+      <div class="stat-l">Projects Built</div>
+    </div>
+    <div class="trc-card" style="padding:18px;text-align:center">
+      <div class="stat-h" style="color:#A855F7">3</div>
+      <div class="stat-l">Competition Wins</div>
+    </div>
+    <div class="trc-card" style="padding:18px;text-align:center">
+      <div class="stat-h" style="color:#F1F5EE">2009</div>
+      <div class="stat-l">Founded</div>
+    </div>
+  </div>
+
+  <!-- Mission -->
+  <div class="reveal" style="margin-bottom:32px">
+    <p class="sec-label" style="margin-bottom:14px">Our Mission</p>
+    <div class="trc-card" style="padding:24px">
+      <p style="color:#BDCCBF;line-height:1.9;font-size:.95rem">TRC exists to make hands-on robotics engineering accessible to every student at TARSCO School — regardless of background or prior experience. We provide structured learning, real hardware, mentorship, and a community where building something that breaks and fixing it is celebrated, not punished.</p>
+    </div>
+  </div>
+
+  <!-- What we do -->
+  <div class="reveal" style="margin-bottom:32px">
+    <p class="sec-label" style="margin-bottom:14px">What We Do</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+      <div class="trc-card" style="padding:18px">
+        <div style="font-size:1.6rem;margin-bottom:10px">🎓</div>
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">Teach</div>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Structured beginner-to-advanced modules, workshops, and lab sessions covering electronics, Arduino, sensors, AI, and competition robotics.</p>
+      </div>
+      <div class="trc-card" style="padding:18px">
+        <div style="font-size:1.6rem;margin-bottom:10px">🏗️</div>
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">Build</div>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Members design and build real robots — from simple obstacle-avoidance cars to AI-powered trash sorters and 3-DOF robotic arms.</p>
+      </div>
+      <div class="trc-card" style="padding:18px">
+        <div style="font-size:1.6rem;margin-bottom:10px">🏆</div>
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">Compete</div>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">We enter regional robotics competitions every year. TRC has placed in the top 3 in Line Follower, Sumo Robot, and Obstacle Course categories.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Executives -->
+  <div class="reveal">
+    <p class="sec-label" style="margin-bottom:14px">Club Executives</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="exec-card">
+        <div class="exec-avatar" style="background:#A855F722;color:#A855F7">J</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Jerry Dark</div>
+          <div style="font-size:.78rem;color:#77947D">President · Club Founder · Software Lead</div>
+        </div>
+        <a href="messages.html" style="margin-left:auto;font-family:Rajdhani;font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#E8BE16;text-decoration:none;border:1px solid #E8BE1633;padding:5px 12px;border-radius:2px">Message</a>
+      </div>
+      <div class="exec-card">
+        <div class="exec-avatar" style="background:#E8BE1622;color:#E8BE16">E</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Esi Darko</div>
+          <div style="font-size:.78rem;color:#77947D">Vice President · Hardware Lead</div>
+        </div>
+        <a href="messages.html" style="margin-left:auto;font-family:Rajdhani;font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#E8BE16;text-decoration:none;border:1px solid #E8BE1633;padding:5px 12px;border-radius:2px">Message</a>
+      </div>
+      <div class="exec-card">
+        <div class="exec-avatar" style="background:#F2CC2422;color:#F2CC24">M</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Michael Asare</div>
+          <div style="font-size:.78rem;color:#77947D">Technical Secretary · Mechanical Design</div>
+        </div>
+        <a href="messages.html" style="margin-left:auto;font-family:Rajdhani;font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#E8BE16;text-decoration:none;border:1px solid #E8BE1633;padding:5px 12px;border-radius:2px">Message</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     CONTACT PAGE
+═══════════════════════════════ -->
+<div class="page-section" id="page-contact">
+
+  <div class="reveal" style="margin-bottom:36px">
+    <p class="sec-label" style="margin-bottom:10px">Get in Touch</p>
+    <h1 class="sec-title" style="margin-bottom:10px">Contact TRC</h1>
+    <p style="color:#BDCCBF;line-height:1.7">Questions about the club, the platform, or joining? Reach out below or send a direct message on the platform.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;flex-wrap:wrap" class="reveal">
+
+    <!-- Contact info -->
+    <div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px">Contact Information</p>
+
+      <div class="contact-item">
+        <div class="c-icon" style="background:#E8BE1615">📍</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE;margin-bottom:2px">Location</div>
+          <div style="font-size:.85rem;color:#BDCCBF">TARSCO School<br/>Robotics Lab — Block C, Room 12<br/>Ghana</div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="c-icon" style="background:#69A66A15">📧</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE;margin-bottom:2px">Email</div>
+          <div style="font-size:.85rem;color:#BDCCBF">trc@tarsco.edu<br/><span style="color:#77947D;font-size:.78rem">Response within 2 school days</span></div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="c-icon" style="background:#F2CC2415">⏰</div>
+        <div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE;margin-bottom:2px">Lab Hours</div>
+          <div style="font-size:.85rem;color:#BDCCBF">Wednesday 12–2 PM (members)<br/>Friday 3–5 PM (open drop-in)</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px">On the Platform</p>
+        <a href="messages.html" style="display:flex;align-items:center;gap:8px;font-family:Rajdhani;font-weight:700;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;background:#E8BE16;color:#071B11;padding:10px 18px;border-radius:2px;text-decoration:none;transition:.2s;width:fit-content" onmouseover="this.style.background='#F7D94A'" onmouseout="this.style.background='#E8BE16'">
+          Message an Executive →
+        </a>
+      </div>
+    </div>
+
+    <!-- Contact form -->
+    <div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px">Send a Message</p>
+      <div class="trc-card" style="padding:20px">
+        <div id="contact-success" class="success-box">
+          <div style="font-size:2rem;margin-bottom:8px">✅</div>
+          <div style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#69A66A;margin-bottom:4px">Message Sent!</div>
+          <p style="font-size:.85rem;color:#BDCCBF">We'll respond within 2 school days.</p>
+        </div>
+        <div id="contact-form">
+          <div style="margin-bottom:12px">
+            <label class="label">Your Name</label>
+            <input type="text" class="input" id="c-name" placeholder="Kwame Asante"/>
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="label">Email</label>
+            <input type="email" class="input" id="c-email" placeholder="kwame@tarsco.edu"/>
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="label">Subject</label>
+            <select class="input" id="c-subject" style="cursor:pointer">
+              <option value="">Select a topic…</option>
+              <option>Club membership question</option>
+              <option>Platform issue or bug</option>
+              <option>Workshop / event question</option>
+              <option>Project collaboration</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div style="margin-bottom:16px">
+            <label class="label">Message</label>
+            <textarea class="input" id="c-message" placeholder="Write your message here…" style="resize:vertical;min-height:100px"></textarea>
+          </div>
+          <button class="btn-primary" onclick="sendContact()" style="width:100%;justify-content:center">Send Message</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAQ -->
+  <div class="reveal" style="margin-top:40px;max-width:600px">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px">Quick Answers</p>
+    <div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do I need school equipment to join? <svg class="w-4 h-4 text-muted transition-transform flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+        <div class="faq-a">No equipment needed to create an account or start learning. For physical builds, the club provides components to verified members during lab sessions.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is TRC free? <svg class="w-4 h-4 text-muted transition-transform flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+        <div class="faq-a">Yes. The platform, lessons, community, and resources are completely free for all TARSCO students. Club membership is by application — there are no fees.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">I'm not good at electronics. Can I still join? <svg class="w-4 h-4 text-muted transition-transform flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+        <div class="faq-a">Absolutely. The Beginner path starts from absolute zero. No prior electronics, coding, or maths knowledge is assumed. If you can follow instructions and ask questions, you can build robots.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {opacity:1, y:0, duration:.6, ease:'power2.out',
+    scrollTrigger:{trigger:el, start:'top 92%', toggleActions:'play none none none'}});
+});
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  // Re-trigger animations
+  document.querySelectorAll('#page-'+name+' .reveal').forEach(el => {
+    el.style.opacity='0'; el.style.transform='translateY(18px)';
+    setTimeout(()=>{ el.style.opacity='1'; el.style.transform='none'; el.style.transition='.5s'; },50);
+  });
+}
+
+function toggleFaq(el) {
+  const ans = el.nextElementSibling;
+  const svg = el.querySelector('svg');
+  ans.classList.toggle('open');
+  svg.style.transform = ans.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+async function sendContact() {
+  const name    = document.getElementById('c-name').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value;
+  const message = document.getElementById('c-message').value.trim();
+  if(!name||!email||!message) { alert('Please fill in all required fields.'); return; }
+
+  try {
+    await fetch('/api/contact', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name,email,subject,message})
+    });
+  } catch(e) {}
+
+  document.getElementById('contact-form').style.display='none';
+  document.getElementById('contact-success').style.display='block';
+}
+</script>
+</body>
+</html>

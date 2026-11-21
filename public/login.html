@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh;
+         display:grid;grid-template-columns:1fr 1fr}
+
+    /* Left panel */
+    #left{background:#081E12;border-right:1px solid #285438;display:flex;flex-direction:column;
+          justify-content:space-between;padding:40px;position:relative;overflow:hidden}
+    #circuit{position:absolute;inset:0;pointer-events:none;opacity:.12}
+
+    /* Right panel */
+    #right{display:flex;align-items:center;justify-content:center;padding:40px;background:#071B11}
+    .form-wrap{width:100%;max-width:420px}
+
+    /* Input */
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:.78rem;font-weight:500;color:#BDCCBF;margin-bottom:6px;
+                 letter-spacing:.04em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+    .input{width:100%;background:#0C2818;border:1px solid #285438;border-radius:3px;
+           padding:11px 14px;color:#F1F5EE;font-family:Inter;font-size:.92rem;outline:none;transition:.2s}
+    .input:focus{border-color:#E8BE1666;box-shadow:0 0 0 3px #E8BE160D}
+    .input::placeholder{color:#77947D}
+    .input.error{border-color:#FF3B3066}
+
+    /* Btn */
+    .btn-primary{width:100%;font-family:Rajdhani;font-weight:700;font-size:1rem;letter-spacing:.1em;
+                 text-transform:uppercase;background:#E8BE16;color:#071B11;padding:13px;
+                 border-radius:2px;border:none;cursor:pointer;transition:.2s;margin-top:4px}
+    .btn-primary:hover{background:#F7D94A;box-shadow:0 8px 24px #E8BE1633}
+    .btn-primary:active{transform:scale(.99)}
+
+    /* Divider */
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#77947D;font-size:.8rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:#285438}
+
+    /* Error msg */
+    .err-msg{background:#FF3B3010;border:1px solid #FF3B3033;border-radius:3px;padding:10px 14px;
+             font-size:.82rem;color:#FF3B30;margin-bottom:14px;display:none}
+
+    /* Success */
+    .success-msg{background:#69A66A10;border:1px solid #69A66A33;border-radius:3px;padding:10px 14px;
+                 font-size:.82rem;color:#69A66A;margin-bottom:14px;display:none}
+
+    /* Tabs */
+    .auth-tab{font-family:Rajdhani;font-weight:700;font-size:1rem;letter-spacing:.06em;
+              padding:10px 24px;border-radius:3px 3px 0 0;border:none;cursor:pointer;transition:.2s;flex:1}
+    .auth-tab.active{background:#0C2818;color:#E8BE16;border-bottom:2px solid #E8BE16}
+    .auth-tab:not(.active){background:transparent;color:#77947D}
+
+    /* Strength bar */
+    .strength-bar{height:3px;background:#285438;border-radius:2px;margin-top:6px;overflow:hidden}
+    .strength-fill{height:100%;border-radius:2px;transition:width .4s,background .4s;width:0%}
+
+    /* Glow dot */
+    .glow-dot{width:8px;height:8px;border-radius:50%;background:#E8BE16;
+              box-shadow:0 0 12px #E8BE16,0 0 24px #E8BE1655;animation:pulse 2s infinite;display:inline-block}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* Feature list */
+    .feat{display:flex;align-items:center;gap:10px;padding:10px 0;
+          border-bottom:1px solid #28543811;font-size:.9rem;color:#BDCCBF}
+    .feat:last-child{border-bottom:none}
+    .feat-icon{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;
+               justify-content:center;font-size:1rem;flex-shrink:0}
+
+    @media(max-width:768px){
+      body{grid-template-columns:1fr}
+      #left{display:none}
+    }
+
+    /* Loading spinner */
+    .spinner{width:18px;height:18px;border:2px solid #071B1144;border-top-color:#071B11;
+             border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- ═══ LEFT PANEL ═══ -->
+<div id="left">
+  <canvas id="circuit"></canvas>
+
+  <!-- Logo -->
+  <div style="position:relative;z-index:1">
+    <a href="trc-home.html" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none">
+      <div style="width:40px;height:40px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1612">
+        <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:1rem">TRC</span>
+      </div>
+      <div>
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">TARSCO Robotics Club</div>
+        <div style="font-size:.7rem;font-family:'JetBrains Mono',monospace;color:#77947D">TARSCO School · Ghana</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Feature list -->
+  <div style="position:relative;z-index:1">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px">What you get</p>
+    <div class="feat">
+      <div class="feat-icon" style="background:#E8BE1615">📚</div>
+      <div><strong style="color:#F1F5EE">60+ Structured Lessons</strong><br/>From beginner electronics to AI robotics</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#F2CC2415">🔥</div>
+      <div><strong style="color:#F1F5EE">Streak Tracking & Badges</strong><br/>Stay motivated with daily learning goals</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#69A66A15">🤖</div>
+      <div><strong style="color:#F1F5EE">Real Project Documentation</strong><br/>Full schematics, code, and build steps</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#A855F715">💬</div>
+      <div><strong style="color:#F1F5EE">Community Q&A</strong><br/>Ask questions, get answers from fellow builders</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#E8BE1615">🏆</div>
+      <div><strong style="color:#F1F5EE">Club Membership Path</strong><br/>Apply to join, compete, and build with the team</div>
+    </div>
+  </div>
+
+  <!-- Bottom quote -->
+  <div style="position:relative;z-index:1">
+    <div style="border-left:2px solid #E8BE1644;padding-left:14px">
+      <p style="font-size:.9rem;color:#BDCCBF;line-height:1.7;font-style:italic">"The best way to learn robotics is to build something that breaks — and fix it."</p>
+      <p style="font-size:.75rem;color:#77947D;margin-top:6px;font-family:'JetBrains Mono',monospace">— TRC Founding Member</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RIGHT PANEL ═══ -->
+<div id="right">
+  <div class="form-wrap">
+
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid #285438;margin-bottom:28px">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- ─── LOGIN FORM ─── -->
+    <div id="login-form">
+      <h2 style="font-family:Rajdhani;font-weight:700;font-size:1.8rem;color:#F1F5EE;margin-bottom:6px">Welcome back</h2>
+      <p style="font-size:.88rem;color:#77947D;margin-bottom:24px">Sign in to continue building.</p>
+
+      <div class="err-msg" id="login-err">Invalid email or password. Please try again.</div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" class="input" id="l-email" placeholder="yourname@tarsco.edu" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div style="position:relative">
+          <input type="password" class="input" id="l-pass" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px"/>
+          <button onclick="togglePass('l-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#77947D;transition:.2s;padding:0" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:.82rem">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#BDCCBF">
+          <input type="checkbox" style="accent-color:#E8BE16"/>
+          Remember me
+        </label>
+        <a href="#" style="color:#E8BE16;text-decoration:none;transition:.2s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Forgot password?</a>
+      </div>
+
+      <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+
+      <p style="text-align:center;font-size:.82rem;color:#77947D;margin-top:20px">
+        Don't have an account?
+        <a href="#" onclick="switchTab('signup')" style="color:#E8BE16;text-decoration:none">Create one →</a>
+      </p>
+    </div>
+
+    <!-- ─── SIGNUP FORM ─── -->
+    <div id="signup-form" style="display:none">
+      <h2 style="font-family:Rajdhani;font-weight:700;font-size:1.8rem;color:#F1F5EE;margin-bottom:6px">Create your account</h2>
+      <p style="font-size:.88rem;color:#77947D;margin-bottom:24px">Free for every TARSCO student. No card needed.</p>
+
+      <div class="err-msg" id="signup-err">Please fill in all fields correctly.</div>
+      <div class="success-msg" id="signup-ok">Account created! Redirecting to your dashboard…</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field" style="margin-bottom:0">
+          <label>First Name</label>
+          <input type="text" class="input" id="s-fname" placeholder="Kwame"/>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Last Name</label>
+          <input type="text" class="input" id="s-lname" placeholder="Asante"/>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+
+      <div class="field">
+        <label>School Email</label>
+        <input type="email" class="input" id="s-email" placeholder="yourname@tarsco.edu"/>
+        <div style="font-size:.72rem;color:#77947D;margin-top:4px">Use your TARSCO school email address</div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div style="position:relative">
+          <input type="password" class="input" id="s-pass" placeholder="Min. 8 characters" oninput="checkStrength(this.value)" style="padding-right:44px"/>
+          <button onclick="togglePass('s-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#77947D;transition:.2s;padding:0">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <div style="font-size:.7rem;color:#77947D;margin-top:3px" id="strength-label">Enter a password</div>
+      </div>
+
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" class="input" id="s-pass2" placeholder="Repeat password"/>
+      </div>
+
+      <div class="field">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.82rem;color:#BDCCBF;font-family:Inter">
+          <input type="checkbox" id="s-agree" style="accent-color:#E8BE16;margin-top:2px;flex-shrink:0"/>
+          I am a current TARSCO School student and agree to the platform's community rules and terms of use.
+        </label>
+      </div>
+
+      <button class="btn-primary" id="signup-btn" onclick="doSignup()">Create Free Account</button>
+
+      <p style="text-align:center;font-size:.82rem;color:#77947D;margin-top:20px">
+        Already have an account?
+        <a href="#" onclick="switchTab('login')" style="color:#E8BE16;text-decoration:none">Log in →</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Tab switch ──
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('login-form').style.display  = isLogin ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+  document.title = isLogin ? 'Login — TRC' : 'Sign Up — TRC';
+}
+
+// Check URL param
+if(location.search.includes('signup')) switchTab('signup');
+
+// ── Show/hide password ──
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── Password strength ──
+function checkStrength(v) {
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if(v.length >= 8) score++;
+  if(/[A-Z]/.test(v)) score++;
+  if(/[0-9]/.test(v)) score++;
+  if(/[^A-Za-z0-9]/.test(v)) score++;
+  const configs = [
+    {w:'0%',c:'#285438',t:'Enter a password'},
+    {w:'25%',c:'#FF3B30',t:'Weak'},
+    {w:'50%',c:'#F2CC24',t:'Fair'},
+    {w:'75%',c:'#E8BE16',t:'Good'},
+    {w:'100%',c:'#69A66A',t:'Strong'},
+  ];
+  const cfg = configs[score];
+  fill.style.width = cfg.w;
+  fill.style.background = cfg.c;
+  label.textContent = cfg.t;
+  label.style.color = cfg.c;
+}
+
+// ── Login ──
+async function doLogin() {
+  const btn   = document.getElementById('login-btn');
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+
+  if(!email || !pass) { err.style.display='block'; return; }
+
+  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      localStorage.setItem('trc_token', data.token);
+      localStorage.setItem('trc_user', JSON.stringify(data.user));
+      // Redirect based on role
+      const role = data.user.role;
+      if(role === 'superadmin' || role === 'executive') {
+        location.href = 'admin.html';
+      } else {
+        location.href = 'dashboard.html';
+      }
+    } else {
+      err.textContent = data.message || 'Invalid email or password.';
+      err.style.display = 'block';
+      btn.innerHTML = 'Sign In';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    // Demo mode
+    err.style.display = 'none';
+    setTimeout(() => { location.href = 'dashboard.html'; }, 800);
+  }
+}
+
+// ── Signup ──
+async function doSignup() {
+  const btn  = document.getElementById('signup-btn');
+  const fn   = document.getElementById('s-fname').value.trim();
+  const ln   = document.getElementById('s-lname').value.trim();
+  const email= document.getElementById('s-email').value.trim();
+  const pass = document.getElementById('s-pass').value;
+  const pass2= document.getElementById('s-pass2').value;
+  const agree= document.getElementById('s-agree').checked;
+  const err  = document.getElementById('signup-err');
+  const ok   = document.getElementById('signup-ok');
+
+  err.style.display = 'none';
+  ok.style.display  = 'none';
+
+  if(!fn||!ln||!email||!pass||!pass2) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  if(pass !== pass2) { err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+  if(pass.length < 8) { err.textContent='Password must be at least 8 characters.'; err.style.display='block'; return; }
+  if(!agree) { err.textContent='You must confirm you are a TARSCO student.'; err.style.display='block'; return; }
+  if(!email.includes('@')) { err.textContent='Please enter a valid email address.'; err.style.display='block'; return; }
+
+  btn.innerHTML = '<span class="spinner"></span> Creating account…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: fn+' '+ln, email, password: pass })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      localStorage.setItem('trc_token', data.token);
+      localStorage.setItem('trc_user', JSON.stringify(data.user));
+      ok.textContent = 'Account created! Redirecting to your dashboard…';
+      ok.style.display = 'block';
+      setTimeout(() => location.href = 'dashboard.html', 1200);
+    } else {
+      err.textContent = data.message || 'Something went wrong. Try again.';
+      err.style.display = 'block';
+      btn.innerHTML = 'Create Free Account';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    ok.textContent = 'Account created! Redirecting…';
+    ok.style.display = 'block';
+    setTimeout(() => location.href = 'dashboard.html', 1200);
+  }
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter') {
+    if(document.getElementById('login-form').style.display !== 'none') doLogin();
+    else doSignup();
+  }
+});
+
+// ── Circuit canvas ──
+(function(){
+  const c = document.getElementById('circuit');
+  const ctx = c.getContext('2d');
+  function draw() {
+    c.width  = c.offsetWidth;
+    c.height = c.offsetHeight;
+    const nodes = [];
+    for(let i=0;i<30;i++) nodes.push({x:Math.random()*c.width, y:Math.random()*c.height});
+    ctx.strokeStyle='#E8BE16'; ctx.lineWidth=1;
+    nodes.forEach((n,i) => {
+      ctx.beginPath(); ctx.arc(n.x,n.y,2,0,Math.PI*2); ctx.fillStyle='#E8BE16'; ctx.fill();
+      nodes.slice(i+1,i+3).forEach(m => {
+        const d=Math.hypot(m.x-n.x,m.y-n.y);
+        if(d<200){ctx.globalAlpha=1-d/200;ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,n.y);ctx.lineTo(m.x,m.y);ctx.stroke();}
+      });
+      ctx.globalAlpha=1;
+    });
+  }
+  new ResizeObserver(draw).observe(c.parentElement);
+  draw();
+})();
+
+// ── GSAP entrance ──
+gsap.from('#right .form-wrap', {opacity:0, x:30, duration:.6, ease:'power2.out', delay:.1});
+gsap.from('#left > *', {opacity:0, y:20, duration:.7, stagger:.12, ease:'power2.out'});
+</script>
+</body>
+</html>

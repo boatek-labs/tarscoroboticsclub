@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Community — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    /* Nav reuse */
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.92);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover{color:#E8BE16}
+
+    /* Layout */
+    #layout{max-width:1100px;margin:0 auto;padding:88px 20px 48px;display:grid;grid-template-columns:1fr 300px;gap:24px}
+
+    /* Card */
+    .trc-card{background:#0C2818;border:1px solid #285438;border-radius:4px}
+
+    /* Thread card */
+    .thread{background:#0C2818;border:1px solid #285438;border-radius:4px;padding:18px;transition:.2s;cursor:pointer}
+    .thread:hover{border-color:#E8BE1633;transform:translateY(-2px)}
+
+    /* Vote btn */
+    .vote-btn{display:flex;flex-direction:column;align-items:center;gap:4px;
+              min-width:40px;color:#77947D;cursor:pointer;transition:.2s;border:none;background:none}
+    .vote-btn:hover{color:#E8BE16}
+    .vote-btn.voted{color:#E8BE16}
+    .vote-count{font-family:Rajdhani;font-weight:700;font-size:1rem;line-height:1}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500}
+    .b-member{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .b-answered{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-open{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .b-tag{background:#285438;color:#BDCCBF;border:1px solid #285438;cursor:pointer}
+    .b-tag:hover{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1633}
+
+    /* Avatar */
+    .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+            justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+
+    /* Post form */
+    .post-form{background:#0C2818;border:1px solid #285438;border-radius:4px;padding:20px;margin-bottom:20px}
+    .input{width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;
+           padding:10px 14px;color:#F1F5EE;font-family:Inter;font-size:.9rem;outline:none;transition:.2s}
+    .input:focus{border-color:#E8BE1644}
+    .textarea{width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;
+              padding:10px 14px;color:#F1F5EE;font-family:Inter;font-size:.9rem;outline:none;
+              resize:vertical;min-height:90px;transition:.2s}
+    .textarea:focus{border-color:#E8BE1644}
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;font-weight:700;
+                 font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;background:#E8BE16;
+                 color:#071B11;padding:9px 20px;border-radius:2px;border:none;cursor:pointer;transition:.2s}
+    .btn-primary:hover{background:#F7D94A}
+
+    /* Filter tabs */
+    .filter-btn{font-family:Rajdhani;font-weight:600;font-size:.85rem;padding:6px 14px;
+                border-radius:3px;border:1px solid #285438;color:#BDCCBF;background:transparent;
+                cursor:pointer;transition:.2s;letter-spacing:.04em}
+    .filter-btn.active{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1644}
+
+    /* Reply area */
+    .reply{display:flex;gap:10px;padding:14px 0;border-bottom:1px solid #28543811}
+    .reply:last-child{border-bottom:none}
+
+    @media(max-width:768px){#layout{grid-template-columns:1fr}}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="learn.html"     class="nav-link">Learn</a>
+    <a href="projects.html"  class="nav-link">Projects</a>
+    <a href="community.html" class="nav-link" style="color:#E8BE16">Community</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="messages.html"  style="position:relative;color:#BDCCBF;text-decoration:none;padding:4px">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <div style="width:7px;height:7px;border-radius:50%;background:#E8BE16;position:absolute;top:2px;right:2px;box-shadow:0 0 8px #E8BE16"></div>
+    </a>
+  </div>
+</nav>
+
+<div id="layout">
+
+  <!-- Left: feed -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:gap:8px">
+      <h1 style="font-family:Rajdhani;font-weight:700;font-size:1.8rem;color:#F1F5EE">Community Q&amp;A</h1>
+      <button onclick="togglePostForm()" class="btn-primary">+ Ask a Question</button>
+    </div>
+
+    <!-- Post form (hidden by default) -->
+    <div class="post-form" id="post-form" style="display:none">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:14px">Ask a Question</div>
+      <div style="margin-bottom:10px">
+        <input type="text" class="input" placeholder="Question title — be specific, e.g. 'Why does my HC-SR04 read 0cm?'" id="q-title"/>
+      </div>
+      <div style="margin-bottom:10px">
+        <textarea class="textarea" placeholder="Describe your problem in detail. Include what you've tried, your setup, and any error messages..." id="q-body"></textarea>
+      </div>
+      <div style="margin-bottom:14px">
+        <input type="text" class="input" placeholder="Tags (comma separated): arduino, sensors, motors..." id="q-tags"/>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" onclick="postQuestion()">Post Question</button>
+        <button onclick="togglePostForm()" style="font-family:Rajdhani;font-weight:600;font-size:.88rem;background:none;border:1px solid #285438;color:#BDCCBF;padding:8px 16px;border-radius:2px;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="filter-btn active" onclick="setFilter(this,'newest')">Newest</button>
+      <button class="filter-btn" onclick="setFilter(this,'top')">Top Voted</button>
+      <button class="filter-btn" onclick="setFilter(this,'unanswered')">Unanswered</button>
+      <button class="filter-btn" onclick="setFilter(this,'answered')">Answered</button>
+    </div>
+
+    <!-- Thread list -->
+    <div id="threads" style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- Thread 1 -->
+      <div class="thread" onclick="openThread(1)">
+        <div style="display:flex;gap:14px">
+          <div>
+            <button class="vote-btn voted" onclick="event.stopPropagation();toggleVote(this)">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+              <span class="vote-count">14</span>
+            </button>
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <span class="badge b-answered">✓ Answered</span>
+              <span class="badge b-tag">arduino</span>
+              <span class="badge b-tag">sensors</span>
+              <span class="badge b-tag">HC-SR04</span>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">My HC-SR04 ultrasonic sensor reads 0 even when objects are right in front of it</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">I've wired it with VCC→5V, GND→GND, Trig→Pin 9, Echo→Pin 10. The serial monitor shows 0cm even when I put my hand 5cm away. I've tested the code from the lesson and it didn't help...</p>
+            <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="avatar" style="width:24px;height:24px;background:#E8BE1622;color:#E8BE16;font-size:.7rem">K</div>
+                <span><strong style="color:#BDCCBF">Kwame A.</strong> <span class="badge b-member" style="font-size:.55rem">Member</span></span>
+              </div>
+              <span>2 hours ago</span>
+              <span>·</span>
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>7 replies</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thread 2 -->
+      <div class="thread" onclick="openThread(2)">
+        <div style="display:flex;gap:14px">
+          <div>
+            <button class="vote-btn" onclick="event.stopPropagation();toggleVote(this)">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+              <span class="vote-count">6</span>
+            </button>
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <span class="badge b-open">Open</span>
+              <span class="badge b-tag">servo</span>
+              <span class="badge b-tag">joystick</span>
+              <span class="badge b-tag">pan-tilt</span>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">How do I control 2 servos simultaneously using a joystick module?</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">I want to build a pan-tilt camera mount. The X-axis of the joystick should control the horizontal servo and Y-axis should control the vertical. What's the cleanest way to wire and code this?</p>
+            <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="avatar" style="width:24px;height:24px;background:#F2CC2422;color:#F2CC24;font-size:.7rem">E</div>
+                <span><strong style="color:#BDCCBF">Esi M.</strong></span>
+              </div>
+              <span>5 hours ago</span>
+              <span>·</span>
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>3 replies</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thread 3 -->
+      <div class="thread" onclick="openThread(3)">
+        <div style="display:flex;gap:14px">
+          <div>
+            <button class="vote-btn" onclick="event.stopPropagation();toggleVote(this)">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+              <span class="vote-count">22</span>
+            </button>
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <span class="badge b-answered">✓ Answered</span>
+              <span class="badge b-tag">electronics</span>
+              <span class="badge b-tag">PWM</span>
+              <span class="badge b-tag">beginner</span>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">What's the actual difference between PWM and a regular digital signal?</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">Lesson 5 mentioned PWM but I don't really get it. A regular HIGH signal is just 5V, right? How is PWM different and why do we need it for servos and motor speed?</p>
+            <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="avatar" style="width:24px;height:24px;background:#69A66A22;color:#69A66A;font-size:.7rem">J</div>
+                <span><strong style="color:#BDCCBF">Junior T.</strong></span>
+              </div>
+              <span>1 day ago</span>
+              <span>·</span>
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>11 replies</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thread 4 -->
+      <div class="thread" onclick="openThread(4)">
+        <div style="display:flex;gap:14px">
+          <div>
+            <button class="vote-btn" onclick="event.stopPropagation();toggleVote(this)">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+              <span class="vote-count">3</span>
+            </button>
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <span class="badge b-open">Open</span>
+              <span class="badge b-tag">motors</span>
+              <span class="badge b-tag">L298N</span>
+              <span class="badge b-tag">bot</span>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">L298N motor driver gets very hot after 2 minutes — is this normal?</div>
+            <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">Building the obstacle avoidance car from Module 3. The L298N heatsink gets hot enough to burn after about 2 minutes of running. I'm using 4 AA batteries (6V) and 2 DC geared motors at 100RPM.</p>
+            <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="avatar" style="width:24px;height:24px;background:#A855F722;color:#A855F7;font-size:.7rem">A</div>
+                <span><strong style="color:#BDCCBF">Abena O.</strong></span>
+              </div>
+              <span>2 days ago</span>
+              <span>·</span>
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>1 reply</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: sidebar -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- Search -->
+    <div class="trc-card p-4">
+      <input type="text" placeholder="Search discussions..." style="width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;padding:9px 12px;color:#F1F5EE;font-family:Inter;font-size:.85rem;outline:none;transition:.2s" onfocus="this.style.borderColor='#E8BE1644'" onblur="this.style.borderColor='#285438'"/>
+    </div>
+
+    <!-- Top contributors -->
+    <div class="trc-card p-4">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:12px">Top Contributors</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:#E8BE1622;color:#E8BE16">K</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Kwame A. <span class="badge b-member" style="font-size:.55rem">Member</span></div>
+            <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">142 pts · 28 answers</div>
+          </div>
+          <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.9rem">#1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:#F2CC2422;color:#F2CC24">E</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Esi D.</div>
+            <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">98 pts · 19 answers</div>
+          </div>
+          <span style="font-family:Rajdhani;font-weight:700;color:#F2CC24;font-size:.9rem">#2</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:#69A66A22;color:#69A66A">J</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:500;color:#F1F5EE">Junior T.</div>
+            <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">64 pts · 12 answers</div>
+          </div>
+          <span style="font-family:Rajdhani;font-weight:700;color:#69A66A;font-size:.9rem">#3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular tags -->
+    <div class="trc-card p-4">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:10px">Browse by Tag</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span class="badge b-tag">arduino</span>
+        <span class="badge b-tag">sensors</span>
+        <span class="badge b-tag">motors</span>
+        <span class="badge b-tag">servo</span>
+        <span class="badge b-tag">L298N</span>
+        <span class="badge b-tag">PWM</span>
+        <span class="badge b-tag">ESP32</span>
+        <span class="badge b-tag">bluetooth</span>
+        <span class="badge b-tag">beginner</span>
+        <span class="badge b-tag">code</span>
+        <span class="badge b-tag">competition</span>
+        <span class="badge b-tag">AI</span>
+      </div>
+    </div>
+
+    <!-- Message exec -->
+    <div class="trc-card p-4" style="border-color:#E8BE1622">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:8px">Need Direct Help?</div>
+      <p style="font-size:.82rem;color:#BDCCBF;line-height:1.7;margin-bottom:12px">Message a club executive or admin directly for urgent issues.</p>
+      <a href="messages.html" style="display:block;text-align:center;font-family:Rajdhani;font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633;padding:8px;border-radius:2px;text-decoration:none;transition:.2s">Message Executives →</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function togglePostForm() {
+  const f = document.getElementById('post-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function postQuestion() {
+  const title = document.getElementById('q-title').value.trim();
+  const body  = document.getElementById('q-body').value.trim();
+  if(!title) { document.getElementById('q-title').style.borderColor='#FF3B30'; return; }
+
+  const thread = document.createElement('div');
+  thread.className = 'thread';
+  thread.innerHTML = `
+    <div style="display:flex;gap:14px">
+      <div>
+        <button class="vote-btn" onclick="event.stopPropagation();toggleVote(this)">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
+          <span class="vote-count">0</span>
+        </button>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="badge b-open">Open</span>
+        </div>
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">${title}</div>
+        <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">${body}</p>
+        <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="avatar" style="width:24px;height:24px;background:#E8BE1622;color:#E8BE16;font-size:.7rem">K</div>
+            <span><strong style="color:#BDCCBF">Kwame A.</strong></span>
+          </div>
+          <span>Just now</span>
+          <span>· 0 replies</span>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('threads').prepend(thread);
+  document.getElementById('q-title').value = '';
+  document.getElementById('q-body').value = '';
+  document.getElementById('q-tags').value = '';
+  togglePostForm();
+}
+
+function toggleVote(btn) {
+  const count = btn.querySelector('.vote-count');
+  const v = parseInt(count.textContent);
+  if(btn.classList.contains('voted')) {
+    btn.classList.remove('voted');
+    count.textContent = v - 1;
+  } else {
+    btn.classList.add('voted');
+    count.textContent = v + 1;
+  }
+}
+
+function setFilter(btn, filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function openThread(id) {
+  // In full build this would navigate to thread detail
+  console.log('Open thread', id);
+}
+</script>
+</body>
+</html>

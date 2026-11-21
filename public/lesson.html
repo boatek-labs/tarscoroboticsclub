@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    /* Top lesson bar */
+    #lesson-bar{position:fixed;top:0;left:0;right:0;height:56px;background:#0C2818;
+                border-bottom:1px solid #285438;display:flex;align-items:center;
+                justify-content:space-between;padding:0 20px;z-index:100}
+    .lesson-prog{height:3px;background:#285438;position:fixed;top:56px;left:0;right:0;z-index:99}
+    .lesson-prog-fill{height:100%;background:linear-gradient(90deg,#E8BE16,#69A66A);transition:width .5s ease}
+
+    /* Layout */
+    #layout{display:grid;grid-template-columns:260px 1fr 260px;gap:0;padding-top:59px;min-height:100vh}
+
+    /* Left - lesson list */
+    #lesson-list{border-right:1px solid #285438;background:#0A2114;position:sticky;top:59px;height:calc(100vh - 59px);overflow-y:auto}
+    .lesson-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #28543811;cursor:pointer;transition:.2s;text-decoration:none}
+    .lesson-item:hover{background:#28543833}
+    .lesson-item.active{background:#E8BE160D;border-left:2px solid #E8BE16}
+    .lesson-check{width:20px;height:20px;border-radius:50%;border:1.5px solid #285438;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem}
+    .lesson-check.done{background:#69A66A;border-color:#69A66A;color:#071B11}
+    .lesson-check.active{background:#E8BE1622;border-color:#E8BE16;color:#E8BE16}
+
+    /* Center - lesson content */
+    #lesson-content{padding:40px 48px;max-width:780px;margin:0 auto}
+
+    /* Right - quick nav */
+    #lesson-nav{border-left:1px solid #285438;background:#0A2114;position:sticky;top:59px;height:calc(100vh - 59px);overflow-y:auto;padding:20px}
+
+    /* Content styles */
+    .lesson-body h2{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.5rem;color:#F1F5EE;margin:28px 0 12px}
+    .lesson-body h3{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:1.1rem;color:#E8BE16;margin:20px 0 8px}
+    .lesson-body p{color:#BDCCBF;line-height:1.8;margin-bottom:14px;font-size:.95rem}
+    .lesson-body ul{color:#BDCCBF;line-height:1.9;margin-bottom:14px;padding-left:20px;font-size:.95rem}
+    .lesson-body ul li{margin-bottom:4px}
+    .lesson-body code{font-family:'JetBrains Mono',monospace;background:#12351F;color:#E8BE16;
+                       padding:2px 6px;border-radius:3px;font-size:.85em}
+
+    /* Code block */
+    .code-block{background:#071B11;border:1px solid #285438;border-radius:4px;
+                margin:20px 0;overflow:hidden}
+    .code-header{background:#0C2818;border-bottom:1px solid #285438;padding:10px 16px;
+                 display:flex;justify-content:space-between;align-items:center}
+    .code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:.82rem;
+               line-height:1.8;overflow-x:auto}
+
+    /* Info boxes */
+    .info-box{border-radius:4px;padding:16px 20px;margin:20px 0;border-left:3px solid}
+    .info-tip{background:#E8BE160D;border-color:#E8BE16}
+    .info-warn{background:#F2CC240D;border-color:#F2CC24}
+    .info-note{background:#69A66A0D;border-color:#69A66A}
+
+    /* Materials list */
+    .materials{background:#0C2818;border:1px solid #285438;border-radius:4px;padding:20px;margin:20px 0}
+    .mat-item{display:flex;align-items:center;gap:10px;padding:8px 0;
+              border-bottom:1px solid #28543811;font-size:.9rem;color:#BDCCBF}
+    .mat-item:last-child{border-bottom:none}
+    .mat-item::before{content:'□';color:#285438;font-size:1rem}
+
+    /* Objectives */
+    .obj-list li{padding:6px 0;color:#BDCCBF;font-size:.9rem;display:flex;gap:8px}
+    .obj-list li::before{content:'→';color:#E8BE16;flex-shrink:0}
+
+    /* Quiz button */
+    .quiz-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;
+              font-weight:700;font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+              background:#E8BE16;color:#071B11;padding:12px 28px;border-radius:2px;
+              border:none;cursor:pointer;transition:.2s;text-decoration:none;margin-top:8px}
+    .quiz-btn:hover{background:#F7D94A;transform:translateY(-2px)}
+
+    /* Responsive */
+    @media(max-width:1100px){#lesson-nav{display:none}}
+    @media(max-width:768px){
+      #layout{grid-template-columns:1fr}
+      #lesson-list{display:none}
+      #lesson-content{padding:20px}
+    }
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- Lesson top bar -->
+<div id="lesson-bar">
+  <div class="flex items-center gap-4">
+    <a href="my-learning.html" style="display:flex;align-items:center;gap:6px;color:#77947D;text-decoration:none;font-size:.85rem;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      My Learning
+    </a>
+    <div style="width:1px;height:16px;background:#285438"></div>
+    <div>
+      <span style="font-size:.7rem;font-family:'JetBrains Mono',monospace;color:#77947D;text-transform:uppercase;letter-spacing:.1em">Basic Electronics</span>
+      <span style="font-size:.7rem;color:#285438;margin:0 6px">›</span>
+      <span style="font-size:.8rem;color:#BDCCBF;font-weight:500">Lesson 7: Breadboards &amp; Circuits</span>
+    </div>
+  </div>
+  <div class="flex items-center gap-3">
+    <span style="font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#77947D">7 / 10</span>
+    <button onclick="markDone()" style="font-family:Rajdhani;font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;background:#69A66A;color:#071B11;padding:7px 14px;border-radius:2px;border:none;cursor:pointer">Mark Complete</button>
+  </div>
+</div>
+<div class="lesson-prog"><div class="lesson-prog-fill" id="lp" style="width:70%"></div></div>
+
+<!-- Layout -->
+<div id="layout">
+
+  <!-- Left: lesson list -->
+  <div id="lesson-list">
+    <div style="padding:14px 16px;border-bottom:1px solid #285438">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;text-transform:uppercase;letter-spacing:.15em;margin-bottom:4px">Module</div>
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Basic Electronics</div>
+      <div style="margin-top:6px">
+        <div style="height:4px;background:#285438;border-radius:2px;overflow:hidden">
+          <div style="width:70%;height:100%;background:linear-gradient(90deg,#E8BE16,#69A66A);border-radius:2px"></div>
+        </div>
+        <div style="font-size:.7rem;color:#77947D;margin-top:3px;font-family:'JetBrains Mono',monospace">70% · 7 of 10 done</div>
+      </div>
+    </div>
+    <div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 1: What is Electricity?</div></div>
+      </div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 2: Voltage, Current &amp; Resistance</div></div>
+      </div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 3: Ohm's Law</div></div>
+      </div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 4: Series vs Parallel</div></div>
+      </div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 5: Resistors &amp; LEDs</div></div>
+      </div>
+      <div class="lesson-item" onclick="location.href='lesson.html'">
+        <div class="lesson-check done">✓</div>
+        <div><div style="font-size:.85rem;color:#BDCCBF">Lesson 6: Capacitors</div></div>
+      </div>
+      <div class="lesson-item active">
+        <div class="lesson-check active">7</div>
+        <div><div style="font-size:.85rem;color:#F1F5EE;font-weight:500">Lesson 7: Breadboards &amp; Circuits</div></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-check">8</div>
+        <div style="opacity:.6"><div style="font-size:.85rem;color:#BDCCBF">Lesson 8: Transistors</div></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-check">9</div>
+        <div style="opacity:.6"><div style="font-size:.85rem;color:#BDCCBF">Lesson 9: Diodes</div></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-check">10</div>
+        <div style="opacity:.6"><div style="font-size:.85rem;color:#BDCCBF">Lesson 10: Final Quiz</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Lesson content -->
+  <div id="lesson-content">
+
+    <!-- Header -->
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633;font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:2px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:.1em">Beginner</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#77947D">Lesson 7 of 10 · ~30 min</span>
+      </div>
+      <h1 style="font-family:Rajdhani;font-weight:700;font-size:2.2rem;color:#F1F5EE;line-height:1.1;margin-bottom:10px">Breadboards &amp; Building Your First Circuit</h1>
+      <p style="color:#BDCCBF;font-size:.95rem;line-height:1.7">In this lesson you will learn how a breadboard works, how to read a simple circuit diagram, and how to wire your first real circuit — an LED with a current-limiting resistor.</p>
+    </div>
+
+    <div class="lesson-body">
+
+      <!-- Objectives -->
+      <div style="background:#0C2818;border:1px solid #285438;border-radius:4px;padding:20px;margin-bottom:28px">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:12px">🎯 Learning Objectives</div>
+        <ul class="obj-list" style="list-style:none;padding:0">
+          <li>Understand the internal structure of a breadboard</li>
+          <li>Read a basic schematic diagram</li>
+          <li>Calculate the correct resistor for an LED circuit</li>
+          <li>Wire and test a working LED circuit</li>
+          <li>Understand what a short circuit is and how to avoid it</li>
+        </ul>
+      </div>
+
+      <!-- Materials -->
+      <h2>Materials Needed</h2>
+      <div class="materials">
+        <div class="mat-item">Half-size or full breadboard</div>
+        <div class="mat-item">Arduino Uno (as 5V power source) or 9V battery + connector</div>
+        <div class="mat-item">2× LED (any colour)</div>
+        <div class="mat-item">2× 220Ω resistor (red-red-brown-gold)</div>
+        <div class="mat-item">6× male-to-male jumper wires</div>
+        <div class="mat-item">Multimeter (optional but recommended)</div>
+      </div>
+
+      <!-- Section 1 -->
+      <h2>1. How a Breadboard Works</h2>
+      <p>A breadboard is a reusable prototyping tool that lets you connect electronic components without soldering. The holes are connected underneath by metal strips — understanding this layout is critical before wiring anything.</p>
+
+      <div class="info-box info-tip">
+        <strong style="color:#E8BE16;font-family:Rajdhani;font-size:1rem">TIP</strong>
+        <p style="margin:6px 0 0;font-size:.9rem;color:#BDCCBF">The two long rails on the sides (marked + and −) are power rails — every hole in each rail is connected horizontally. The centre rows are connected vertically in groups of 5, separated by the middle gap.</p>
+      </div>
+
+      <p>The centre gap separates the two halves — this is where ICs (chips) sit, bridging both sides. Each 5-hole row on one side is internally connected, but the row across the gap is <strong>not</strong> connected to it.</p>
+
+      <!-- Section 2 -->
+      <h2>2. Reading the Schematic</h2>
+      <p>Before you build, always read the circuit diagram. The schematic below shows a simple LED circuit:</p>
+
+      <!-- Schematic placeholder -->
+      <div style="background:#0C2818;border:1px solid #285438;border-radius:4px;padding:32px;margin:16px 0;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#77947D;line-height:2.2">
+          <div>5V ──┬── [220Ω] ──┬── LED (+) ──(LED)── LED (-) ──┬── GND</div>
+          <div style="margin-top:8px;color:#E8BE16;font-size:.75rem">Schematic: LED with current-limiting resistor</div>
+        </div>
+      </div>
+
+      <p>The triangle with a bar is the LED symbol. Current flows from + (anode) to − (cathode). The flat edge on the LED and the shorter leg are the cathode (negative side).</p>
+
+      <!-- Section 3 -->
+      <h2>3. Calculating the Resistor Value</h2>
+      <p>Without a resistor, too much current flows through the LED and it burns out immediately. Use Ohm's Law:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#77947D">Formula</span>
+        </div>
+        <div class="code-body">
+          <div style="color:#77947D">// R = (Vs - Vf) / If</div>
+          <div style="margin-top:8px">
+            <span style="color:#E8BE16">R</span> <span style="color:#F1F5EE">= (Vs − Vf) / If</span>
+          </div>
+          <div style="color:#77947D;margin-top:4px">// For a standard red LED:</div>
+          <div>
+            <span style="color:#E8BE16">Vs</span> <span style="color:#F1F5EE">= 5V  (supply voltage)</span>
+          </div>
+          <div>
+            <span style="color:#E8BE16">Vf</span> <span style="color:#F1F5EE">= 2V  (LED forward voltage)</span>
+          </div>
+          <div>
+            <span style="color:#E8BE16">If</span> <span style="color:#F1F5EE">= 0.02A  (20mA — safe LED current)</span>
+          </div>
+          <div style="margin-top:8px;color:#69A66A">R = (5 - 2) / 0.02 = 150Ω → use 220Ω (next standard value up)</div>
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <h2>4. Wiring the Circuit</h2>
+      <p>Follow these steps carefully. Double-check each connection before powering on.</p>
+      <ul>
+        <li>Connect the <strong style="color:#E8BE16">5V pin</strong> on your Arduino to the <strong>+ power rail</strong> of the breadboard using a red jumper wire.</li>
+        <li>Connect <strong style="color:#E8BE16">GND</strong> to the <strong>− power rail</strong> using a black wire.</li>
+        <li>Insert the LED so the long leg (anode) goes into row 10, column e; and the short leg into row 12, column e.</li>
+        <li>Insert a 220Ω resistor between the + rail and row 10, column a.</li>
+        <li>Use a jumper wire from row 12, column a to the − power rail.</li>
+      </ul>
+
+      <div class="info-box info-warn">
+        <strong style="color:#F2CC24;font-family:Rajdhani;font-size:1rem">⚠ WARNING</strong>
+        <p style="margin:6px 0 0;font-size:.9rem;color:#BDCCBF">Never connect power directly to the − rail without a load (resistor or component) in between. Always check polarity before powering on. A short circuit can damage your Arduino permanently.</p>
+      </div>
+
+      <!-- Code snippet -->
+      <h2>5. Testing with Arduino (Optional)</h2>
+      <p>If you want to blink the LED using your Arduino instead of just powering it directly, upload this sketch:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#77947D">arduino · led_blink.ino</span>
+          <button onclick="copyCode()" style="font-family:Rajdhani;font-size:.75rem;color:#77947D;background:none;border:none;cursor:pointer;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">Copy</button>
+        </div>
+        <div class="code-body" id="code1">
+<span style="color:#77947D">// TRC Lesson 7 — Blink an LED</span>
+<span style="color:#E8BE16">const int</span> <span style="color:#F1F5EE">LED_PIN = </span><span style="color:#F2CC24">9</span><span style="color:#F1F5EE">;</span>
+
+<span style="color:#77947D">void</span> <span style="color:#69A66A">setup</span><span style="color:#F1F5EE">() {</span>
+  <span style="color:#F1F5EE">pinMode(LED_PIN, </span><span style="color:#F2CC24">OUTPUT</span><span style="color:#F1F5EE">);</span>
+<span style="color:#F1F5EE">}</span>
+
+<span style="color:#77947D">void</span> <span style="color:#69A66A">loop</span><span style="color:#F1F5EE">() {</span>
+  <span style="color:#F1F5EE">digitalWrite(LED_PIN, </span><span style="color:#F2CC24">HIGH</span><span style="color:#F1F5EE">);  </span><span style="color:#77947D">// LED on</span>
+  <span style="color:#F1F5EE">delay(</span><span style="color:#F2CC24">500</span><span style="color:#F1F5EE">);               </span><span style="color:#77947D">// wait 500ms</span>
+  <span style="color:#F1F5EE">digitalWrite(LED_PIN, </span><span style="color:#F2CC24">LOW</span><span style="color:#F1F5EE">);   </span><span style="color:#77947D">// LED off</span>
+  <span style="color:#F1F5EE">delay(</span><span style="color:#F2CC24">500</span><span style="color:#F1F5EE">);</span>
+<span style="color:#F1F5EE">}</span>
+        </div>
+      </div>
+
+      <div class="info-box info-note">
+        <strong style="color:#69A66A;font-family:Rajdhani;font-size:1rem">✓ CHECK</strong>
+        <p style="margin:6px 0 0;font-size:.9rem;color:#BDCCBF">If your LED doesn't blink, first check: Is the LED in the right direction? Is the resistor connected between power and the LED's anode? Is pin 9 selected in your sketch and matching your physical wiring?</p>
+      </div>
+
+      <!-- Lesson complete -->
+      <div style="background:#0C2818;border:1px solid #69A66A33;border-radius:4px;padding:24px;margin-top:36px;text-align:center">
+        <div style="font-size:2rem;margin-bottom:8px">🎉</div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#F1F5EE;margin-bottom:6px">You've reached the end of Lesson 7</h3>
+        <p style="color:#BDCCBF;font-size:.9rem;margin-bottom:20px">Mark it complete to keep your streak going, or jump straight to the quiz.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button onclick="markDone()" class="quiz-btn" style="background:#69A66A">Mark Complete ✓</button>
+          <a href="quiz.html" class="quiz-btn" style="background:#E8BE16">Take the Quiz →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: page nav -->
+  <div id="lesson-nav">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;text-transform:uppercase;letter-spacing:.15em;margin-bottom:12px">On this page</div>
+    <div class="space-y-2">
+      <a href="#" style="display:block;font-size:.82rem;color:#BDCCBF;text-decoration:none;padding:4px 0;border-left:2px solid #E8BE16;padding-left:10px;color:#E8BE16">How a Breadboard Works</a>
+      <a href="#" style="display:block;font-size:.82rem;color:#77947D;text-decoration:none;padding:4px 0;padding-left:12px;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">Reading the Schematic</a>
+      <a href="#" style="display:block;font-size:.82rem;color:#77947D;text-decoration:none;padding:4px 0;padding-left:12px;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">Calculating the Resistor</a>
+      <a href="#" style="display:block;font-size:.82rem;color:#77947D;text-decoration:none;padding:4px 0;padding-left:12px;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">Wiring the Circuit</a>
+      <a href="#" style="display:block;font-size:.82rem;color:#77947D;text-decoration:none;padding:4px 0;padding-left:12px;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">Testing with Arduino</a>
+    </div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid #285438">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px">Navigation</div>
+      <a href="lesson.html" style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:#77947D;text-decoration:none;margin-bottom:8px;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">
+        ← Lesson 6: Capacitors
+      </a>
+      <a href="lesson.html" style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:#E8BE16;text-decoration:none;transition:.2s">
+        Lesson 8: Transistors →
+      </a>
+    </div>
+
+    <div style="margin-top:24px;padding:14px;background:#12351F;border:1px solid #285438;border-radius:4px">
+      <div style="font-size:.75rem;color:#F1F5EE;font-weight:500;margin-bottom:4px">Got stuck?</div>
+      <p style="font-size:.75rem;color:#77947D;line-height:1.6;margin-bottom:8px">Ask the TRC community — someone else has probably faced this exact problem.</p>
+      <a href="community.html" style="font-size:.75rem;color:#E8BE16;text-decoration:none">Ask a question →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function markDone() {
+  document.getElementById('lp').style.width = '80%';
+  const btn = document.querySelector('button[onclick="markDone()"]');
+  if(btn) { btn.textContent = '✓ Completed'; btn.style.background = '#69A66A'; }
+  setTimeout(() => { location.href = 'lesson.html'; }, 600);
+}
+function copyCode() {
+  const code = document.getElementById('code1').innerText;
+  navigator.clipboard.writeText(code).catch(()=>{});
+  event.target.textContent = 'Copied!';
+  setTimeout(() => event.target.textContent = 'Copy', 1500);
+}
+</script>
+</body>
+</html>

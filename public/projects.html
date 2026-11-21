@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Projects — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover,.nav-link.active{color:#E8BE16}
+
+    #content{max-width:1200px;margin:0 auto;padding:88px 20px 60px}
+
+    /* Project card */
+    .proj-card{background:#0C2818;border:1px solid #285438;border-radius:4px;overflow:hidden;
+               transition:.25s;cursor:pointer;display:block;text-decoration:none;color:inherit}
+    .proj-card:hover{border-color:#E8BE1633;transform:translateY(-5px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .proj-thumb{width:100%;height:200px;display:flex;align-items:center;justify-content:center;
+                font-size:3.5rem;background:linear-gradient(135deg,#081E12,#12351F)}
+    .proj-thumb img{width:100%;height:100%;object-fit:cover}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem}
+    .b-approved{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-auto{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .b-mech{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .b-iot{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-ai{background:#A855F715;color:#A855F7;border:1px solid #A855F733}
+    .b-comp{background:#FF3B3015;color:#FF3B30;border:1px solid #FF3B3033}
+
+    /* Filter */
+    .filter-btn{font-family:Rajdhani;font-weight:600;font-size:.85rem;padding:7px 16px;
+                border-radius:3px;border:1px solid #285438;color:#BDCCBF;background:transparent;
+                cursor:pointer;transition:.2s;letter-spacing:.04em}
+    .filter-btn.active{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1644}
+
+    /* Featured */
+    .featured-card{background:#0C2818;border:1px solid #F2CC2433;border-radius:4px;overflow:hidden;
+                   display:grid;grid-template-columns:2fr 3fr;transition:.2s}
+    .featured-card:hover{border-color:#F2CC2466;box-shadow:0 16px 48px rgba(0,0,0,.4)}
+    .featured-img{background:linear-gradient(135deg,#0A2114,#285438);display:flex;
+                  align-items:center;justify-content:center;font-size:5rem;min-height:260px}
+
+    /* Avatar stack */
+    .avatar-stack{display:flex}
+    .avatar-stack .av{width:26px;height:26px;border-radius:50%;border:2px solid #0C2818;
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:.7rem;font-weight:700;margin-left:-6px}
+    .avatar-stack .av:first-child{margin-left:0}
+
+    /* Submit CTA */
+    .submit-cta{background:linear-gradient(135deg,#0C2818,#12351F);border:1px solid #F2CC2433;
+                border-radius:4px;padding:32px;text-align:center}
+
+    .reveal{opacity:0;transform:translateY(20px)}
+
+    @media(max-width:640px){.featured-card{grid-template-columns:1fr}}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="learn.html"     class="nav-link">Learn</a>
+    <a href="projects.html"  class="nav-link active">Projects</a>
+    <a href="community.html" class="nav-link">Community</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+  </div>
+</nav>
+
+<div id="content">
+
+  <!-- Header -->
+  <div style="margin-bottom:36px" class="reveal">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">TRC Club Projects</p>
+    <h1 style="font-family:Rajdhani;font-weight:700;font-size:clamp(2rem,4vw,3rem);color:#F1F5EE;margin-bottom:10px">
+      Built by <span style="color:#F2CC24">TRC Members</span>
+    </h1>
+    <p style="color:#BDCCBF;max-width:580px;line-height:1.7">
+      Every project here has full documentation — schematics, code, components, and build steps. 
+      Club members can submit their own.
+    </p>
+  </div>
+
+  <!-- Featured project -->
+  <div class="featured-card reveal mb-10" style="margin-bottom:40px">
+    <div class="featured-img">🦾</div>
+    <div style="padding:28px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="background:#F2CC2422;color:#F2CC24;font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:3px 10px;border-radius:2px;border:1px solid #F2CC2433;font-weight:700">★ FEATURED</span>
+        <span class="badge b-mech">Mechanical</span>
+        <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2025</span>
+      </div>
+      <h2 style="font-family:Rajdhani;font-weight:700;font-size:1.7rem;color:#F1F5EE;margin-bottom:10px;line-height:1.2">3-DOF Robotic Arm with Inverse Kinematics</h2>
+      <p style="color:#BDCCBF;font-size:.9rem;line-height:1.7;margin-bottom:16px">A 3-degree-of-freedom robotic arm built from scratch using 3D-printed joints, MG996R servos, and an Arduino Mega. Implements inverse kinematics for smooth, precise end-effector positioning. Controlled via joystick with a serial monitor UI for angle readouts.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+        <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Arduino Mega</span>
+        <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">MG996R Servo ×3</span>
+        <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">3D Print</span>
+        <span style="background:#285438;color:#BDCCBF;font-size:.65rem;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace">Inverse Kinematics</span>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar-stack">
+            <div class="av" style="background:#E8BE1622;color:#E8BE16">E</div>
+            <div class="av" style="background:#F2CC2422;color:#F2CC24">J</div>
+            <div class="av" style="background:#69A66A22;color:#69A66A">M</div>
+          </div>
+          <span style="font-size:.8rem;color:#77947D">Esi D., Jerry D., Michael A.</span>
+        </div>
+        <a href="project.html" style="font-family:Rajdhani;font-weight:700;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;background:#F2CC24;color:#071B11;padding:9px 18px;border-radius:2px;text-decoration:none;transition:.2s" onmouseover="this.style.background='#FFB347'" onmouseout="this.style.background='#F2CC24'">View Project →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters + search -->
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap" class="reveal">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All Projects</button>
+      <button class="filter-btn" onclick="setFilter('autonomous',this)">Autonomous</button>
+      <button class="filter-btn" onclick="setFilter('iot',this)">IoT</button>
+      <button class="filter-btn" onclick="setFilter('mechanical',this)">Mechanical</button>
+      <button class="filter-btn" onclick="setFilter('ai',this)">AI</button>
+      <button class="filter-btn" onclick="setFilter('competition',this)">Competition</button>
+    </div>
+    <input type="text" placeholder="Search projects…" oninput="searchProjects(this.value)"
+      style="background:#0C2818;border:1px solid #285438;border-radius:3px;padding:7px 14px;color:#F1F5EE;font-family:Inter;font-size:.82rem;outline:none;width:200px;transition:.2s"
+      onfocus="this.style.borderColor='#E8BE1644'" onblur="this.style.borderColor='#285438'"/>
+  </div>
+
+  <!-- Project grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="projects-grid">
+
+    <a href="project.html" class="proj-card reveal" data-category="autonomous">
+      <div class="proj-thumb">🚗</div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <span class="badge b-auto">Autonomous</span>
+          <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2024</span>
+        </div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:6px">Obstacle Avoidance Car</h3>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:12px">HC-SR04 ultrasonic + L298N motor driver. Navigates autonomously without human input using bang-bang control.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">Arduino Uno</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">HC-SR04</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">L298N</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #285438">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar-stack">
+              <div class="av" style="background:#E8BE1622;color:#E8BE16">K</div>
+              <div class="av" style="background:#F2CC2422;color:#F2CC24">A</div>
+            </div>
+            <span style="font-size:.75rem;color:#77947D">2 members</span>
+          </div>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">View →</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="project.html" class="proj-card reveal" data-category="iot">
+      <div class="proj-thumb">🌿</div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <span class="badge b-iot">IoT</span>
+          <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2025</span>
+        </div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:6px">Smart Plant Monitor</h3>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:12px">ESP32-based soil moisture and temperature sensor with auto-watering relay. Sends alerts via local web dashboard over WiFi.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">ESP32</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">DHT22</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">Relay Module</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #285438">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar-stack">
+              <div class="av" style="background:#69A66A22;color:#69A66A">S</div>
+            </div>
+            <span style="font-size:.75rem;color:#77947D">1 member</span>
+          </div>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">View →</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="project.html" class="proj-card reveal" data-category="ai">
+      <div class="proj-thumb">👁️</div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <span class="badge b-ai">AI Vision</span>
+          <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2025</span>
+        </div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:6px">Trash Classification Bot</h3>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:12px">ESP32-CAM runs a TFLite model to classify trash as recyclable or organic. Claw robot sorts it into the correct bin automatically.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">ESP32-CAM</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">TFLite</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">Servo Claw</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #285438">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar-stack">
+              <div class="av" style="background:#A855F722;color:#A855F7">J</div>
+              <div class="av" style="background:#E8BE1622;color:#E8BE16">E</div>
+              <div class="av" style="background:#69A66A22;color:#69A66A">A</div>
+            </div>
+            <span style="font-size:.75rem;color:#77947D">3 members</span>
+          </div>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">View →</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="project.html" class="proj-card reveal" data-category="autonomous">
+      <div class="proj-thumb">🏁</div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <span class="badge b-auto">Autonomous</span>
+          <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2025</span>
+        </div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:6px">Line Follower Bot v2</h3>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:12px">PID-controlled line follower using IR sensor array. Optimised for speed on the school's competition track — currently fastest recorded time.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">Arduino Nano</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">IR Array ×5</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">PID</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #285438">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar-stack">
+              <div class="av" style="background:#69A66A22;color:#69A66A">E</div>
+            </div>
+            <span style="font-size:.75rem;color:#77947D">1 member</span>
+          </div>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">View →</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="project.html" class="proj-card reveal" data-category="iot">
+      <div class="proj-thumb">🔒</div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <span class="badge b-iot">IoT</span>
+          <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D">2025</span>
+        </div>
+        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:6px">Smart Door Lock</h3>
+        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:12px">RFID + keypad-based door lock with ESP32. Logs access attempts to SD card and sends alerts via Telegram bot when unauthorised entry is attempted.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">ESP32</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">MFRC522</span>
+          <span style="background:#285438;color:#BDCCBF;font-size:.62rem;padding:1px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace">Solenoid Lock</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid #285438">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar-stack">
+              <div class="av" style="background:#69A66A22;color:#69A66A">A</div>
+            </div>
+            <span style="font-size:.75rem;color:#77947D">1 member</span>
+          </div>
+          <span style="font-size:.78rem;color:#E8BE16;font-family:Rajdhani;font-weight:700">View →</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Submit CTA card -->
+    <div class="submit-cta reveal" data-category="cta">
+      <div style="font-size:2.5rem;margin-bottom:14px">🚀</div>
+      <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#F1F5EE;margin-bottom:8px">Have a project to share?</h3>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.7;margin-bottom:20px">Club members can submit their projects for review. Once approved, it gets a full project page here.</p>
+      <a href="my-projects.html" style="display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;font-weight:700;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;background:#F2CC24;color:#071B11;padding:10px 20px;border-radius:2px;text-decoration:none;transition:.2s" onmouseover="this.style.background='#FFB347'" onmouseout="this.style.background='#F2CC24'">
+        Submit a Project →
+      </a>
+      <div style="margin-top:12px;font-size:.75rem;color:#77947D">Club members only · Admin approval required</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {opacity:1, y:0, duration:.6, ease:'power2.out',
+    scrollTrigger:{trigger:el, start:'top 90%', toggleActions:'play none none none'}});
+});
+
+function setFilter(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[data-category]').forEach(c => {
+    if(cat==='all' || c.dataset.category===cat || c.dataset.category==='cta') {
+      c.style.display='';
+    } else {
+      c.style.display='none';
+    }
+  });
+}
+
+function searchProjects(val) {
+  val = val.toLowerCase();
+  document.querySelectorAll('.proj-card').forEach(c => {
+    const text = c.textContent.toLowerCase();
+    c.style.display = text.includes(val) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

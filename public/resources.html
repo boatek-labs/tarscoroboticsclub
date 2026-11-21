@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resources — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover,.nav-link.active{color:#E8BE16}
+
+    #content{max-width:1100px;margin:0 auto;padding:88px 20px 60px}
+
+    /* Resource card */
+    .res-card{background:#0C2818;border:1px solid #285438;border-radius:4px;
+              padding:16px 18px;display:flex;gap:14px;align-items:flex-start;
+              transition:.2s;cursor:pointer}
+    .res-card:hover{border-color:#E8BE1633;transform:translateX(3px)}
+    .res-icon{width:44px;height:44px;border-radius:4px;display:flex;align-items:center;
+              justify-content:center;font-size:1.4rem;flex-shrink:0}
+
+    /* Type badge */
+    .type-badge{font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:2px 7px;
+                border-radius:2px;display:inline-flex;align-items:center;gap:4px}
+    .t-pdf{background:#FF3B3015;color:#FF3B30;border:1px solid #FF3B3033}
+    .t-code{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .t-diagram{background:#A855F715;color:#A855F7;border:1px solid #A855F733}
+    .t-ebook{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .t-link{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .t-component{background:#77947D22;color:#BDCCBF;border:1px solid #285438}
+
+    /* Filter */
+    .filter-btn{font-family:Rajdhani;font-weight:600;font-size:.82rem;padding:6px 14px;
+                border-radius:3px;border:1px solid #285438;color:#BDCCBF;background:transparent;
+                cursor:pointer;transition:.2s}
+    .filter-btn.active{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1644}
+
+    /* Section header */
+    .sec-head{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;
+              text-transform:uppercase;letter-spacing:.16em;display:flex;align-items:center;gap:10px;
+              margin:28px 0 12px}
+    .sec-head::after{content:'';flex:1;height:1px;background:#285438}
+
+    /* Download btn */
+    .dl-btn{font-family:Rajdhani;font-weight:700;font-size:.78rem;letter-spacing:.06em;
+            text-transform:uppercase;background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633;
+            padding:5px 12px;border-radius:2px;cursor:pointer;transition:.2s;text-decoration:none;
+            display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+    .dl-btn:hover{background:#E8BE16;color:#071B11}
+
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+    .reveal.in{opacity:1;transform:none}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="trc-home.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="learn.html"      class="nav-link">Learn</a>
+    <a href="projects.html"   class="nav-link">Projects</a>
+    <a href="resources.html"  class="nav-link active">Resources</a>
+    <a href="dashboard.html"  class="nav-link">Dashboard</a>
+  </div>
+</nav>
+
+<div id="content">
+
+  <div style="margin-bottom:28px" class="reveal">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px">TRC Resource Library</p>
+    <h1 style="font-family:Rajdhani;font-weight:700;font-size:clamp(2rem,4vw,3rem);color:#F1F5EE;margin-bottom:8px">Downloads & References</h1>
+    <p style="color:#BDCCBF;max-width:560px;line-height:1.7;font-size:.92rem">PDFs, code files, circuit diagrams, component lists, and curated links. All resources are for logged-in TARSCO students.</p>
+  </div>
+
+  <!-- Search + Filter -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap" class="reveal">
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('pdf',this)">📄 PDFs</button>
+      <button class="filter-btn" onclick="setFilter('code',this)">💻 Code</button>
+      <button class="filter-btn" onclick="setFilter('diagram',this)">📐 Diagrams</button>
+      <button class="filter-btn" onclick="setFilter('ebook',this)">📚 Ebooks</button>
+      <button class="filter-btn" onclick="setFilter('link',this)">🔗 Links</button>
+      <button class="filter-btn" onclick="setFilter('component',this)">🔧 Components</button>
+    </div>
+    <input type="text" placeholder="Search resources…" oninput="searchRes(this.value)"
+      style="background:#0C2818;border:1px solid #285438;border-radius:3px;padding:7px 14px;color:#F1F5EE;font-family:Inter;font-size:.82rem;outline:none;margin-left:auto;width:200px;transition:.2s"
+      onfocus="this.style.borderColor='#E8BE1644'" onblur="this.style.borderColor='#285438'"/>
+  </div>
+
+  <!-- REFERENCE SHEETS -->
+  <div class="sec-head reveal">Reference Sheets</div>
+  <div style="display:flex;flex-direction:column;gap:8px" id="res-list">
+
+    <div class="res-card reveal" data-type="pdf" data-text="arduino quick reference sheet cheat commands pins">
+      <div class="res-icon" style="background:#FF3B3015">📄</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-pdf">PDF</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Arduino Quick Reference Sheet</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">All essential Arduino functions, pin mappings, data types, and common library calls on 2 pages. Print it and keep it at your workstation.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">2 pages · 480KB · Uploaded by TRC Admin</div>
+      </div>
+      <a href="/api/resources/arduino-ref/download" class="dl-btn" onclick="trackDownload(event,'arduino-ref')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download
+      </a>
+    </div>
+
+    <div class="res-card reveal" data-type="pdf" data-text="ohm law electronics formula reference cheat sheet">
+      <div class="res-icon" style="background:#FF3B3015">📄</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-pdf">PDF</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Electronics Formulae Cheat Sheet</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Ohm's Law, power formulas, capacitor charge/discharge, RC time constants, and voltage divider equations — all in one sheet.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">1 page · 210KB · Uploaded by TRC Admin</div>
+      </div>
+      <a href="#" class="dl-btn" onclick="trackDownload(event,'electronics-formulas')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download
+      </a>
+    </div>
+
+    <!-- CODE FILES section -->
+    <div class="sec-head reveal" style="margin-top:8px">Code Files</div>
+
+    <div class="res-card reveal" data-type="code" data-text="obstacle avoidance car arduino code sketch hcsr04">
+      <div class="res-icon" style="background:#E8BE1615">💻</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-code">Arduino</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Obstacle Avoidance Car — Full Sketch</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Complete Arduino sketch for the obstacle avoidance car project. HC-SR04 + L298N motor driver. Well commented and beginner-friendly.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">obstaclecar.ino · 4KB · Kwame A.</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        .ino
+      </a>
+    </div>
+
+    <div class="res-card reveal" data-type="code" data-text="servo joystick pan tilt camera control code">
+      <div class="res-icon" style="background:#E8BE1615">💻</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-code">Arduino</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Dual Servo Joystick Control</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Control two servos independently with a joystick module. X-axis maps to servo 1, Y-axis to servo 2. Perfect for pan-tilt camera mounts.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">dual_servo.ino · 2KB · TRC Admin</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        .ino
+      </a>
+    </div>
+
+    <!-- DIAGRAMS -->
+    <div class="sec-head reveal" style="margin-top:8px">Circuit Diagrams</div>
+
+    <div class="res-card reveal" data-type="diagram" data-text="l298n motor driver wiring diagram schematic">
+      <div class="res-icon" style="background:#A855F715">📐</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-diagram">Diagram</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">L298N Motor Driver Wiring Guide</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Full wiring diagram for connecting two DC motors to an Arduino using the L298N dual H-bridge driver. Includes enable pin jumper positions for PWM speed control.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">PNG · 820KB · TRC Admin</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        View
+      </a>
+    </div>
+
+    <div class="res-card reveal" data-type="diagram" data-text="hc-sr04 ultrasonic sensor wiring circuit arduino">
+      <div class="res-icon" style="background:#A855F715">📐</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-diagram">Diagram</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">HC-SR04 Ultrasonic Sensor Wiring</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Breadboard diagram and schematic for connecting an HC-SR04 to Arduino Uno. Shows 5V power, GND, Trig, and Echo pin connections with correct resistor voltage divider for 3.3V boards.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">PNG · 650KB · TRC Admin</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        View
+      </a>
+    </div>
+
+    <!-- EBOOKS -->
+    <div class="sec-head reveal" style="margin-top:8px">Ebooks & Guides</div>
+
+    <div class="res-card reveal" data-type="ebook" data-text="arduino programming beginners guide ebook pdf">
+      <div class="res-icon" style="background:#69A66A15">📚</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-ebook">Ebook</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Arduino Programming for Beginners</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">A curated 80-page guide compiled by TRC from open-source Arduino documentation. Covers setup, basic sketches, I/O, libraries, and 10 beginner projects.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">80 pages · 2.4MB · TRC Admin · 48 downloads</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        PDF
+      </a>
+    </div>
+
+    <!-- COMPONENT LISTS -->
+    <div class="sec-head reveal" style="margin-top:8px">Component Lists</div>
+
+    <div class="res-card reveal" data-type="component" data-text="starter kit component list parts electronics beginner">
+      <div class="res-icon" style="background:#77947D22">🔧</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-component">Component List</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TRC Beginner Starter Kit Parts List</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">All components in the club's beginner kit with specifications, typical prices in Ghana cedis, and Accra suppliers. Use this when buying your own components.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">PDF · 320KB · TRC Admin</div>
+      </div>
+      <a href="#" class="dl-btn">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download
+      </a>
+    </div>
+
+    <!-- EXTERNAL LINKS -->
+    <div class="sec-head reveal" style="margin-top:8px">Curated External Links</div>
+
+    <div class="res-card reveal" data-type="link" data-text="arduino official documentation reference tutorial online">
+      <div class="res-icon" style="background:#F2CC2415">🔗</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-link">External Link</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Arduino Official Reference</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">The official Arduino language reference. Every function, data type, and built-in library documented with examples. Bookmark this — you'll use it constantly.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">arduino.cc/reference · External</div>
+      </div>
+      <a href="https://www.arduino.cc/reference/en/" target="_blank" class="dl-btn" style="background:#F2CC2415;color:#F2CC24;border-color:#F2CC2433" onmouseover="this.style.background='#F2CC24';this.style.color='#071B11'" onmouseout="this.style.background='#F2CC2415';this.style.color='#F2CC24'">
+        Open ↗
+      </a>
+    </div>
+
+    <div class="res-card reveal" data-type="link" data-text="tinkercad circuit simulator virtual online free">
+      <div class="res-icon" style="background:#F2CC2415">🔗</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="type-badge t-link">External Link</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Tinkercad Circuits (Simulator)</span>
+        </div>
+        <p style="font-size:.82rem;color:#BDCCBF;line-height:1.6">Free browser-based circuit simulator. Build and test Arduino circuits virtually before wiring real components — great for debugging without burning anything.</p>
+        <div style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:5px">tinkercad.com · Free · No hardware needed</div>
+      </div>
+      <a href="https://www.tinkercad.com/circuits" target="_blank" class="dl-btn" style="background:#F2CC2415;color:#F2CC24;border-color:#F2CC2433" onmouseover="this.style.background='#F2CC24';this.style.color='#071B11'" onmouseout="this.style.background='#F2CC2415';this.style.color='#F2CC24'">
+        Open ↗
+      </a>
+    </div>
+
+  </div><!-- end res-list -->
+</div>
+
+<script>
+// Intersection observer for reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+function setFilter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.res-card').forEach(c => {
+    c.style.display = (type==='all' || c.dataset.type===type) ? '' : 'none';
+  });
+}
+
+function searchRes(val) {
+  val = val.toLowerCase();
+  document.querySelectorAll('.res-card').forEach(c => {
+    c.style.display = c.dataset.text.includes(val) || val==='' ? '' : 'none';
+  });
+}
+
+function trackDownload(e, id) {
+  e.preventDefault();
+  // POST /api/resources/:id/download then trigger download
+  fetch(`/api/resources/${id}/download`, {method:'POST'}).catch(()=>{});
+  // Simulate download
+  const link = e.currentTarget;
+  const orig = link.innerHTML;
+  link.textContent = 'Downloading…';
+  setTimeout(()=>{ link.innerHTML = orig; }, 1500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — TRC Control Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;display:flex;min-height:100vh}
+
+    #sidebar{width:220px;min-height:100vh;background:#081E12;border-right:1px solid #285438;
+             position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column}
+    .sidebar-logo{padding:18px 16px;border-bottom:1px solid #285438;display:flex;align-items:center;gap:8px}
+    .nav-sec{padding:10px 14px 4px;font-family:'JetBrains Mono',monospace;font-size:.58rem;
+             color:#77947D;letter-spacing:.18em;text-transform:uppercase}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:3px;
+              margin:1px 6px;font-family:Rajdhani;font-weight:600;font-size:.88rem;
+              letter-spacing:.03em;color:#BDCCBF;text-decoration:none;transition:.2s;cursor:pointer}
+    .nav-item:hover{background:#28543855;color:#F1F5EE}
+    .nav-item.active{background:#E8BE1612;color:#E8BE16;border-left:2px solid #E8BE16;margin-left:4px;padding-left:12px}
+    .nav-item svg{width:15px;height:15px;flex-shrink:0}
+    .nav-badge{margin-left:auto;background:#FF3B30;color:#fff;font-family:'JetBrains Mono',monospace;
+               font-size:.55rem;padding:1px 5px;border-radius:2px;font-weight:700}
+
+    #main{margin-left:220px;flex:1}
+    #topbar{height:56px;background:#081E12;border-bottom:1px solid #285438;
+            display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:40}
+    #content{padding:24px}
+
+    .trc-card{background:#0C2818;border:1px solid #285438;border-radius:4px}
+    .stat-card{background:#0C2818;border:1px solid #285438;border-radius:4px;padding:20px;transition:.2s}
+    .stat-card:hover{border-color:#E8BE1633}
+    .stat-val{font-family:Rajdhani;font-weight:700;font-size:2.2rem;line-height:1}
+    .stat-lbl{font-size:.72rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+    .stat-trend{font-size:.72rem;margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse}
+    th{font-family:Rajdhani;font-weight:700;font-size:.8rem;color:#77947D;text-transform:uppercase;
+       letter-spacing:.08em;padding:10px 14px;border-bottom:1px solid #285438;text-align:left}
+    td{padding:12px 14px;border-bottom:1px solid #28543811;font-size:.875rem;color:#BDCCBF}
+    tr:hover td{background:#28543822}
+    tr:last-child td{border-bottom:none}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500}
+    .b-member{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+    .b-student{background:#285438;color:#BDCCBF;border:1px solid #285438}
+    .b-pending{background:#F2CC2415;color:#F2CC24;border:1px solid #F2CC2433}
+    .b-approved{background:#69A66A15;color:#69A66A;border:1px solid #69A66A33}
+    .b-rejected{background:#FF3B3015;color:#FF3B30;border:1px solid #FF3B3033}
+    .b-admin{background:#A855F715;color:#A855F7;border:1px solid #A855F733}
+
+    /* Action buttons */
+    .btn-approve{font-family:Rajdhani;font-weight:700;font-size:.75rem;letter-spacing:.06em;
+                 background:#69A66A15;color:#69A66A;border:1px solid #69A66A33;padding:4px 10px;
+                 border-radius:2px;cursor:pointer;transition:.2s}
+    .btn-approve:hover{background:#69A66A;color:#071B11}
+    .btn-reject{font-family:Rajdhani;font-weight:700;font-size:.75rem;letter-spacing:.06em;
+                background:#FF3B3015;color:#FF3B30;border:1px solid #FF3B3033;padding:4px 10px;
+                border-radius:2px;cursor:pointer;transition:.2s}
+    .btn-reject:hover{background:#FF3B30;color:#fff}
+    .btn-sm{font-family:Rajdhani;font-weight:700;font-size:.75rem;letter-spacing:.06em;
+            background:#285438;color:#BDCCBF;border:1px solid #285438;padding:4px 10px;
+            border-radius:2px;cursor:pointer;transition:.2s}
+    .btn-sm:hover{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1633}
+
+    /* Admin primary */
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;font-family:Rajdhani;font-weight:700;
+                 font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;background:#E8BE16;
+                 color:#071B11;padding:8px 18px;border-radius:2px;border:none;cursor:pointer;
+                 transition:.2s;text-decoration:none}
+    .btn-primary:hover{background:#F7D94A}
+
+    /* Tab */
+    .tab-btn{font-family:Rajdhani;font-weight:600;font-size:.88rem;padding:7px 16px;
+             border-radius:3px;border:1px solid #285438;color:#BDCCBF;background:transparent;
+             cursor:pointer;transition:.2s;letter-spacing:.04em}
+    .tab-btn.active{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1644}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:#071B11}
+    ::-webkit-scrollbar-thumb{background:#285438;border-radius:2px}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div style="width:28px;height:28px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615;flex-shrink:0">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.8rem">TRC</span>
+    </div>
+    <div>
+      <div style="font-family:Rajdhani;font-weight:700;font-size:.9rem;color:#F1F5EE">Admin Panel</div>
+      <div style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:#77947D">Super Admin</div>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding-bottom:12px">
+    <div class="nav-sec">Overview</div>
+    <a href="admin.html" class="nav-item active">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-sec">Users</div>
+    <a href="#" class="nav-item" onclick="showTab('users')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      User Management
+    </a>
+    <a href="#" class="nav-item" onclick="showTab('membership')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      Membership Requests
+      <span class="nav-badge">5</span>
+    </a>
+
+    <div class="nav-sec">Content</div>
+    <a href="#" class="nav-item" onclick="showTab('lessons')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Lesson Manager
+    </a>
+    <a href="#" class="nav-item" onclick="showTab('projects')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Project Approvals
+      <span class="nav-badge">3</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Events
+    </a>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      Resources
+    </a>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Gallery
+    </a>
+
+    <div class="nav-sec">Community</div>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      Moderation
+    </a>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+      Announcements
+    </a>
+    <a href="#" class="nav-item">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      Internal Updates
+    </a>
+  </div>
+
+  <!-- Admin user -->
+  <div style="padding:14px;border-top:1px solid #285438">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#A855F722;color:#A855F7;border:1px solid #A855F733;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">J</div>
+      <div>
+        <div style="font-size:.85rem;font-weight:600;color:#F1F5EE">Jerry D.</div>
+        <div style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:#A855F7">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <h1 style="font-family:Rajdhani;font-weight:700;font-size:1.2rem;color:#F1F5EE;line-height:1">Admin Control Panel</h1>
+      <p style="font-size:.7rem;color:#77947D;font-family:'JetBrains Mono',monospace">TRC Platform — Super Admin View</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="trc-home.html" style="font-size:.8rem;color:#77947D;text-decoration:none;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">← View Site</a>
+      <a href="admin-lesson-new.html" class="btn-primary">+ New Lesson</a>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- Overview stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-lbl">Total Students</div>
+        <div class="stat-val" style="color:#E8BE16" id="a1">0</div>
+        <div class="stat-trend" style="color:#69A66A">↑ +8 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Club Members</div>
+        <div class="stat-val" style="color:#69A66A" id="a2">0</div>
+        <div class="stat-trend" style="color:#77947D">↑ +2 this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Pending Apps</div>
+        <div class="stat-val" style="color:#F2CC24" id="a3">0</div>
+        <div class="stat-trend" style="color:#F2CC24">Needs review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Projects Queue</div>
+        <div class="stat-val" style="color:#A855F7" id="a4">0</div>
+        <div class="stat-trend" style="color:#A855F7">Awaiting approval</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Lessons Published</div>
+        <div class="stat-val" style="color:#F1F5EE" id="a5">0</div>
+        <div class="stat-trend" style="color:#77947D">Across 6 modules</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Community Posts</div>
+        <div class="stat-val" style="color:#F1F5EE" id="a6">0</div>
+        <div class="stat-trend" style="color:#77947D">↑ +14 this week</div>
+      </div>
+    </div>
+
+    <!-- Tab navigation -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="tab-btn active" onclick="showAdminTab('overview', this)">Overview</button>
+      <button class="tab-btn" onclick="showAdminTab('membership', this)">Membership Requests <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace">5</span></button>
+      <button class="tab-btn" onclick="showAdminTab('users', this)">Users</button>
+      <button class="tab-btn" onclick="showAdminTab('projects', this)">Project Approvals <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace">3</span></button>
+      <button class="tab-btn" onclick="showAdminTab('lessons', this)">Lessons</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Recent signups -->
+        <div class="trc-card" style="overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Recent Signups</span>
+            <a href="#" onclick="showAdminTab('users',null)" style="font-size:.78rem;color:#E8BE16;text-decoration:none">View all →</a>
+          </div>
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Joined</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="color:#F1F5EE">Abena Owusu</td><td><span class="badge b-student">Student</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Today</td><td><button class="btn-sm">View</button></td></tr>
+              <tr><td style="color:#F1F5EE">Kofi Mensah</td><td><span class="badge b-student">Student</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Yesterday</td><td><button class="btn-sm">View</button></td></tr>
+              <tr><td style="color:#F1F5EE">Esi Darko</td><td><span class="badge b-member">Member</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">2d ago</td><td><button class="btn-sm">View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Recent membership apps -->
+        <div class="trc-card" style="overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Membership Queue</span>
+            <a href="#" onclick="showAdminTab('membership',null)" style="font-size:.78rem;color:#F2CC24;text-decoration:none">Review all →</a>
+          </div>
+          <table>
+            <thead><tr><th>Applicant</th><th>Applied</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="color:#F1F5EE">Kwame Asante</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Today</td>
+                <td><div style="display:flex;gap:6px"><button class="btn-approve">Approve</button><button class="btn-reject">Reject</button></div></td>
+              </tr>
+              <tr>
+                <td style="color:#F1F5EE">Akua Boateng</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Yesterday</td>
+                <td><div style="display:flex;gap:6px"><button class="btn-approve">Approve</button><button class="btn-reject">Reject</button></div></td>
+              </tr>
+              <tr>
+                <td style="color:#F1F5EE">Yaw Osei</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">2d ago</td>
+                <td><div style="display:flex;gap:6px"><button class="btn-approve">Approve</button><button class="btn-reject">Reject</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Project submissions -->
+        <div class="trc-card" style="overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Project Submissions</span>
+            <a href="#" onclick="showAdminTab('projects',null)" style="font-size:.78rem;color:#A855F7;text-decoration:none">Review all →</a>
+          </div>
+          <table>
+            <thead><tr><th>Project</th><th>Submitted by</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="color:#F1F5EE">Line Follower Bot</td>
+                <td>Esi Darko</td>
+                <td><span class="badge b-pending">Pending</span></td>
+                <td><button class="btn-sm">Review</button></td>
+              </tr>
+              <tr>
+                <td style="color:#F1F5EE">Water Level Alarm</td>
+                <td>Kofi Mensah</td>
+                <td><span class="badge b-pending">Pending</span></td>
+                <td><button class="btn-sm">Review</button></td>
+              </tr>
+              <tr>
+                <td style="color:#F1F5EE">Smart Door Lock</td>
+                <td>Abena Owusu</td>
+                <td><span class="badge b-approved">Approved</span></td>
+                <td><button class="btn-sm">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Moderation flags -->
+        <div class="trc-card" style="overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Moderation Queue</span>
+            <span style="font-size:.75rem;color:#77947D">0 flags</span>
+          </div>
+          <div style="padding:40px;text-align:center">
+            <div style="font-size:2rem;margin-bottom:8px">✅</div>
+            <div style="font-family:Rajdhani;font-weight:600;font-size:1rem;color:#F1F5EE">All clear</div>
+            <div style="font-size:.8rem;color:#77947D;margin-top:4px">No reported posts or flagged content.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MEMBERSHIP TAB -->
+    <div id="tab-membership" style="display:none">
+      <div class="trc-card" style="overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">Membership Applications</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#F2CC24">5 pending</span>
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Email</th><th>Applied</th><th>Lessons Done</th><th>Motivation</th><th>Actions</th></tr></thead>
+          <tbody id="membership-tbody">
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Kwame Asante</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">kwame@tarsco.edu</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Today</td>
+              <td style="color:#E8BE16">28</td>
+              <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">I want to join the competition team and...</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-approve" onclick="approveApp(this)">Approve</button><button class="btn-reject" onclick="rejectApp(this)">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Akua Boateng</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">akua@tarsco.edu</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Yesterday</td>
+              <td style="color:#E8BE16">15</td>
+              <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">I love robotics and want to build real...</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-approve" onclick="approveApp(this)">Approve</button><button class="btn-reject" onclick="rejectApp(this)">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Yaw Osei</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">yaw@tarsco.edu</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">2d ago</td>
+              <td style="color:#E8BE16">8</td>
+              <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">My friend is already a member and said...</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-approve" onclick="approveApp(this)">Approve</button><button class="btn-reject" onclick="rejectApp(this)">Reject</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="tab-users" style="display:none">
+      <div class="trc-card" style="overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #285438;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">All Users</span>
+          <input type="text" placeholder="Search users..." style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:6px 12px;color:#F1F5EE;font-size:.82rem;font-family:Inter;outline:none;width:220px" onfocus="this.style.borderColor='#E8BE1644'" onblur="this.style.borderColor='#285438'"/>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Lessons</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Jerry Dark</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">jerry@tarsco.edu</td>
+              <td><span class="badge b-admin">Super Admin</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jan 2024</td>
+              <td style="color:#77947D">—</td>
+              <td><button class="btn-sm">Edit</button></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Esi Darko</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">esi@tarsco.edu</td>
+              <td><span class="badge b-member">Member</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Mar 2024</td>
+              <td style="color:#E8BE16">45</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button><button class="btn-sm" style="color:#FF3B30;border-color:#FF3B3033">Suspend</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Kwame Asante</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">kwame@tarsco.edu</td>
+              <td><span class="badge b-student">Student</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jun 2025</td>
+              <td style="color:#E8BE16">28</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button><button class="btn-approve" onclick="promoteUser(this)">Make Member</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Akua Boateng</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">akua@tarsco.edu</td>
+              <td><span class="badge b-student">Student</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jun 2025</td>
+              <td style="color:#E8BE16">15</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="tab-projects" style="display:none">
+      <div class="trc-card" style="overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #285438">
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">Project Approval Queue</span>
+        </div>
+        <table>
+          <thead><tr><th>Project Title</th><th>Submitted by</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Line Follower Bot v2</td>
+              <td>Esi Darko</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jun 25</td>
+              <td><span class="badge b-pending">Pending</span></td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Preview</button><button class="btn-approve">Publish</button><button class="btn-reject">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Water Level Alarm</td>
+              <td>Kofi Mensah</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jun 24</td>
+              <td><span class="badge b-pending">Pending</span></td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Preview</button><button class="btn-approve">Publish</button><button class="btn-reject">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Obstacle Avoidance Car</td>
+              <td>Kwame Asante</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">Jun 20</td>
+              <td><span class="badge b-approved">Published</span></td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">View</button><button class="btn-sm" style="color:#FF3B30;border-color:#FF3B3033">Unpublish</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LESSONS TAB -->
+    <div id="tab-lessons" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">Lesson Manager</div>
+        <a href="admin-lesson-new.html" class="btn-primary">+ New Lesson</a>
+      </div>
+      <div class="trc-card" style="overflow:hidden">
+        <table>
+          <thead><tr><th>Lesson Title</th><th>Module</th><th>Level</th><th>Status</th><th>Completions</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Intro to Robotics</td>
+              <td style="font-size:.8rem;color:#BDCCBF">Module 1</td>
+              <td><span class="badge" style="background:#69A66A15;color:#69A66A;border-color:#69A66A33">Beginner</span></td>
+              <td><span class="badge b-approved">Published</span></td>
+              <td style="color:#E8BE16;font-family:'JetBrains Mono',monospace">142</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button><button class="btn-sm" style="color:#FF3B30;border-color:#FF3B3033">Unpublish</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">Basic Electronics</td>
+              <td style="font-size:.8rem;color:#BDCCBF">Module 2</td>
+              <td><span class="badge" style="background:#69A66A15;color:#69A66A;border-color:#69A66A33">Beginner</span></td>
+              <td><span class="badge b-approved">Published</span></td>
+              <td style="color:#E8BE16;font-family:'JetBrains Mono',monospace">128</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button><button class="btn-sm" style="color:#FF3B30;border-color:#FF3B3033">Unpublish</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:#F1F5EE;font-weight:500">AI in Robotics — Draft</td>
+              <td style="font-size:.8rem;color:#BDCCBF">Module 6</td>
+              <td><span class="badge" style="background:#F2CC2415;color:#F2CC24;border-color:#F2CC2433">Advanced</span></td>
+              <td><span class="badge b-pending">Draft</span></td>
+              <td style="color:#77947D;font-family:'JetBrains Mono',monospace">—</td>
+              <td><div style="display:flex;gap:6px"><button class="btn-sm">Edit</button><button class="btn-approve">Publish</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Tab switching
+function showAdminTab(name, btn) {
+  ['overview','membership','users','projects','lessons'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = 'none';
+  });
+  document.getElementById('tab-'+name).style.display = 'block';
+  if(btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+// Approve / reject membership
+function approveApp(btn) {
+  const row = btn.closest('tr');
+  const name = row.cells[0].textContent;
+  row.cells[row.cells.length-1].innerHTML = '<span class="badge b-approved">✓ Approved</span>';
+  updateBadgeCount();
+}
+function rejectApp(btn) {
+  const row = btn.closest('tr');
+  row.cells[row.cells.length-1].innerHTML = '<span class="badge b-rejected">✕ Rejected</span>';
+  updateBadgeCount();
+}
+function updateBadgeCount() {
+  const pending = document.querySelectorAll('#membership-tbody tr td:last-child .btn-approve').length;
+  document.querySelectorAll('.nav-badge')[0].textContent = pending;
+}
+function promoteUser(btn) {
+  const row = btn.closest('tr');
+  row.cells[2].innerHTML = '<span class="badge b-member">Member</span>';
+  btn.remove();
+}
+
+// Counters
+function animCount(id, target) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  let v = 0; const step = target/40;
+  const t = setInterval(() => { v = Math.min(v+step,target); el.textContent = Math.round(v); if(v>=target) clearInterval(t); }, 25);
+}
+setTimeout(() => {
+  animCount('a1',142); animCount('a2',12); animCount('a3',5);
+  animCount('a4',3); animCount('a5',60); animCount('a6',88);
+}, 200);
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover{color:#E8BE16}
+
+    #content{max-width:900px;margin:0 auto;padding:88px 20px 60px}
+
+    /* Profile header */
+    .profile-header{background:#0C2818;border:1px solid #285438;border-radius:4px;
+                    padding:28px;margin-bottom:20px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+    .avatar-lg{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;
+               justify-content:center;font-size:1.8rem;font-weight:700;flex-shrink:0;
+               border:3px solid #E8BE1644}
+
+    /* Card */
+    .trc-card{background:#0C2818;border:1px solid #285438;border-radius:4px}
+
+    /* Stats */
+    .stat-val{font-family:Rajdhani;font-weight:700;font-size:1.8rem;line-height:1;color:#E8BE16}
+    .stat-lbl{font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+    /* Progress */
+    .prog-bar{height:5px;background:#285438;border-radius:3px;overflow:hidden}
+    .prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#E8BE16,#69A66A)}
+
+    /* Badge tile */
+    .badge-tile{background:#071B11;border:1px solid #285438;border-radius:4px;padding:14px 10px;
+                text-align:center;transition:.2s}
+    .badge-tile:hover{border-color:#E8BE1633;transform:translateY(-2px)}
+    .badge-tile.locked{opacity:.35;filter:grayscale(1)}
+    .badge-icon{font-size:1.8rem;margin-bottom:6px}
+    .badge-name{font-family:Rajdhani;font-weight:700;font-size:.82rem;color:#F1F5EE}
+    .badge-desc{font-size:.7rem;color:#77947D;margin-top:2px;line-height:1.4}
+
+    /* Tab */
+    .tab-btn{font-family:Rajdhani;font-weight:600;font-size:.9rem;padding:9px 18px;
+             border:none;background:transparent;color:#77947D;cursor:pointer;transition:.2s;
+             border-bottom:2px solid transparent;letter-spacing:.04em}
+    .tab-btn.active{color:#E8BE16;border-bottom-color:#E8BE16}
+    .tab-btn:hover:not(.active){color:#BDCCBF}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block}
+
+    /* Role badge */
+    .role-pill{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:3px 10px;
+               border-radius:2px;display:inline-block}
+    .rp-student{background:#285438;color:#BDCCBF;border:1px solid #285438}
+    .rp-member{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+
+    /* Form input */
+    .input{width:100%;background:#071B11;border:1px solid #285438;border-radius:3px;
+           padding:10px 14px;color:#F1F5EE;font-family:Inter;font-size:.9rem;outline:none;transition:.2s}
+    .input:focus{border-color:#E8BE1644}
+    .btn-save{font-family:Rajdhani;font-weight:700;font-size:.9rem;letter-spacing:.08em;
+              text-transform:uppercase;background:#E8BE16;color:#071B11;padding:10px 22px;
+              border-radius:2px;border:none;cursor:pointer;transition:.2s}
+    .btn-save:hover{background:#F7D94A}
+
+    /* Activity dot */
+    .act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+    /* Streak grid */
+    .streak-cell{width:12px;height:12px;border-radius:2px;background:#285438;transition:.2s}
+    .streak-cell.done{background:#E8BE16}
+    .streak-cell.today{background:#69A66A;box-shadow:0 0 8px #69A66A}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="dashboard.html"   class="nav-link">Dashboard</a>
+    <a href="my-learning.html" class="nav-link">My Learning</a>
+    <a href="notifications.html" class="nav-link">Notifications</a>
+  </div>
+</nav>
+
+<div id="content">
+
+  <!-- Profile header -->
+  <div class="profile-header">
+    <div style="position:relative">
+      <div class="avatar-lg" style="background:#E8BE1622;color:#E8BE16">K</div>
+      <button onclick="document.getElementById('avatar-upload').click()"
+        style="position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:#E8BE16;border:2px solid #071B11;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#071B11" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z"/></svg>
+      </button>
+      <input type="file" id="avatar-upload" accept="image/*" style="display:none"/>
+    </div>
+
+    <div style="flex:1;min-width:220px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+        <h1 style="font-family:Rajdhani;font-weight:700;font-size:1.7rem;color:#F1F5EE;line-height:1">Kwame Asante</h1>
+        <span class="role-pill rp-student">Student</span>
+      </div>
+      <p style="font-size:.85rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-bottom:8px">kwame@tarsco.edu · Joined June 2025</p>
+      <p style="font-size:.9rem;color:#BDCCBF;line-height:1.7;max-width:480px">Robotics enthusiast passionate about autonomous systems and IoT. Currently learning Basic Electronics. Aiming to join the competition team.</p>
+    </div>
+
+    <!-- Quick stats -->
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div class="text-center">
+        <div class="stat-val" id="ps1">0</div>
+        <div class="stat-lbl">Lessons</div>
+      </div>
+      <div class="text-center">
+        <div class="stat-val" style="color:#F2CC24" id="ps2">0</div>
+        <div class="stat-lbl">Day Streak</div>
+      </div>
+      <div class="text-center">
+        <div class="stat-val" style="color:#A855F7" id="ps3">0</div>
+        <div class="stat-lbl">Badges</div>
+      </div>
+      <div class="text-center">
+        <div class="stat-val" style="color:#69A66A" id="ps4">0</div>
+        <div class="stat-lbl">Points</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Membership CTA -->
+  <div style="background:#0C2818;border:1px dashed #F2CC2466;border-radius:4px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F2CC24;margin-bottom:2px">Club Membership: Pending Review</div>
+      <p style="font-size:.82rem;color:#BDCCBF">Your application was submitted. An executive will review it within 2–5 days.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:8px;height:8px;border-radius:50%;background:#F2CC24;animation:pulse 2s infinite;box-shadow:0 0 8px #F2CC24"></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#F2CC24">Under review</span>
+    </div>
+  </div>
+  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+  <!-- Tabs -->
+  <div style="border-bottom:1px solid #285438;margin-bottom:24px;display:flex;gap:0">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('badges',this)">Badges</button>
+    <button class="tab-btn" onclick="switchTab('activity',this)">Activity</button>
+    <button class="tab-btn" onclick="switchTab('settings',this)">Settings</button>
+  </div>
+
+  <!-- OVERVIEW TAB -->
+  <div id="tab-overview" class="tab-pane active">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- Module progress -->
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Learning Progress</div>
+        <div class="space-y-4">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px">
+              <span style="color:#F1F5EE">🤖 Intro to Robotics</span>
+              <span style="color:#69A66A;font-family:'JetBrains Mono',monospace">100%</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px">
+              <span style="color:#F1F5EE">⚡ Basic Electronics</span>
+              <span style="color:#E8BE16;font-family:'JetBrains Mono',monospace">70%</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:70%"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px">
+              <span style="color:#BDCCBF">🔌 Arduino Basics</span>
+              <span style="color:#77947D;font-family:'JetBrains Mono',monospace">0%</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+        <a href="learn.html" style="display:block;text-align:center;font-family:Rajdhani;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:#E8BE16;margin-top:16px;text-decoration:none">View All Modules →</a>
+      </div>
+
+      <!-- Streak heatmap -->
+      <div class="trc-card p-5">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">Activity Streak</span>
+          <span style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#F2CC24">🔥 7 days</span>
+        </div>
+        <!-- 4-week heatmap -->
+        <div id="heatmap" style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px"></div>
+        <div style="display:flex;gap:4px;align-items:center;margin-top:8px">
+          <span style="font-size:.68rem;color:#77947D">Less</span>
+          <div style="width:10px;height:10px;border-radius:2px;background:#285438"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:#E8BE1655"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:#E8BE16"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:#69A66A"></div>
+          <span style="font-size:.68rem;color:#77947D">More</span>
+        </div>
+      </div>
+
+      <!-- Recent quiz scores -->
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Quiz History</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.88rem;color:#F1F5EE">Electronics Quiz 2</div>
+              <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">Yesterday · 3:10 PM</div>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#69A66A">92%</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.88rem;color:#F1F5EE">Electronics Quiz 1</div>
+              <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">3 days ago</div>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#69A66A">88%</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.88rem;color:#F1F5EE">Intro to Robotics Quiz</div>
+              <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">1 week ago</div>
+            </div>
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.3rem;color:#E8BE16">76%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community stats -->
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Community</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:12px;text-align:center">
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.5rem;color:#E8BE16">4</div>
+            <div style="font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em">Posts</div>
+          </div>
+          <div style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:12px;text-align:center">
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.5rem;color:#F2CC24">28</div>
+            <div style="font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em">Upvotes</div>
+          </div>
+          <div style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:12px;text-align:center">
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.5rem;color:#69A66A">12</div>
+            <div style="font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em">Answers</div>
+          </div>
+          <div style="background:#071B11;border:1px solid #285438;border-radius:3px;padding:12px;text-align:center">
+            <div style="font-family:Rajdhani;font-weight:700;font-size:1.5rem;color:#A855F7">380</div>
+            <div style="font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.08em">Points</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BADGES TAB -->
+  <div id="tab-badges" class="tab-pane">
+    <div style="margin-bottom:16px">
+      <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">Earned Badges</h3>
+      <p style="font-size:.82rem;color:#77947D">5 of 20 badges earned</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
+      <div class="badge-tile"><div class="badge-icon">👣</div><div class="badge-name">First Step</div><div class="badge-desc">Complete your first lesson</div></div>
+      <div class="badge-tile"><div class="badge-icon">⚡</div><div class="badge-name">Circuit Starter</div><div class="badge-desc">Complete Basic Electronics</div></div>
+      <div class="badge-tile"><div class="badge-icon">🔥</div><div class="badge-name">Week Warrior</div><div class="badge-desc">7-day learning streak</div></div>
+      <div class="badge-tile"><div class="badge-icon">🤝</div><div class="badge-name">Helpful</div><div class="badge-desc">Get 10 upvotes on answers</div></div>
+      <div class="badge-tile"><div class="badge-icon">🎯</div><div class="badge-name">Quiz Ace</div><div class="badge-desc">Score 90%+ on any quiz</div></div>
+
+      <!-- Locked badges -->
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Project Builder</div><div class="badge-desc">Have a project approved</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Dedicated Learner</div><div class="badge-desc">14-day streak</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Competitor</div><div class="badge-desc">Participate in a competition</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Module Master</div><div class="badge-desc">Complete all modules</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Team Player</div><div class="badge-desc">Join a project team</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">30-Day Legend</div><div class="badge-desc">30-day streak</div></div>
+      <div class="badge-tile locked"><div class="badge-icon">🔒</div><div class="badge-name">Club Member</div><div class="badge-desc">Get approved as a member</div></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY TAB -->
+  <div id="tab-activity" class="tab-pane">
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811">
+        <div class="act-dot" style="background:#E8BE16;box-shadow:0 0 6px #E8BE16"></div>
+        <div>
+          <div style="font-size:.9rem;color:#F1F5EE">Completed <strong>Lesson 7: Breadboards & Circuits</strong></div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:2px">Today · 11:24 AM</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811">
+        <div class="act-dot" style="background:#69A66A;box-shadow:0 0 6px #69A66A"></div>
+        <div>
+          <div style="font-size:.9rem;color:#F1F5EE">Scored <strong style="color:#69A66A">92%</strong> on Electronics Quiz 2</div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:2px">Yesterday · 3:10 PM</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811">
+        <div class="act-dot" style="background:#F2CC24;box-shadow:0 0 6px #F2CC24"></div>
+        <div>
+          <div style="font-size:.9rem;color:#F1F5EE">Answered community post about PWM signals</div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:2px">Yesterday · 1:05 PM</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811">
+        <div class="act-dot" style="background:#A855F7;box-shadow:0 0 6px #A855F7"></div>
+        <div>
+          <div style="font-size:.9rem;color:#F1F5EE">Earned badge: <strong>Circuit Starter</strong> ⚡</div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:2px">2 days ago · 4:20 PM</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #28543811">
+        <div class="act-dot" style="background:#E8BE16;box-shadow:0 0 6px #E8BE16"></div>
+        <div>
+          <div style="font-size:.9rem;color:#F1F5EE">Applied for Club Membership</div>
+          <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace;margin-top:2px">2 days ago · 12:00 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div id="tab-settings" class="tab-pane">
+    <div style="display:grid;gap:20px;max-width:520px">
+
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:16px">Edit Profile</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:.75rem;color:#BDCCBF;text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:5px">Display Name</label>
+            <input class="input" value="Kwame Asante"/>
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:#BDCCBF;text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:5px">Email</label>
+            <input class="input" value="kwame@tarsco.edu" readonly style="opacity:.6;cursor:not-allowed"/>
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:#BDCCBF;text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:5px">Bio</label>
+            <textarea class="input" style="resize:vertical;min-height:80px">Robotics enthusiast passionate about autonomous systems and IoT. Currently learning Basic Electronics. Aiming to join the competition team.</textarea>
+          </div>
+          <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:16px">Change Password</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:.75rem;color:#BDCCBF;text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:5px">Current Password</label>
+            <input type="password" class="input" placeholder="••••••••"/>
+          </div>
+          <div>
+            <label style="font-size:.75rem;color:#BDCCBF;text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;display:block;margin-bottom:5px">New Password</label>
+            <input type="password" class="input" placeholder="Min. 8 characters"/>
+          </div>
+          <button class="btn-save" style="background:#285438;color:#BDCCBF" onmouseover="this.style.background='#E8BE1615';this.style.color='#E8BE16'" onmouseout="this.style.background='#285438';this.style.color='#BDCCBF'">Update Password</button>
+        </div>
+      </div>
+
+      <div class="trc-card p-5">
+        <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:14px">Notifications</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <div>
+              <div style="font-size:.9rem;color:#F1F5EE">Quiz results & lesson completions</div>
+              <div style="font-size:.75rem;color:#77947D">Get notified when you pass a quiz</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:#E8BE16;width:16px;height:16px"/>
+          </label>
+          <div style="height:1px;background:#285438"></div>
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <div>
+              <div style="font-size:.9rem;color:#F1F5EE">Community replies & upvotes</div>
+              <div style="font-size:.75rem;color:#77947D">When someone replies to your posts</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:#E8BE16;width:16px;height:16px"/>
+          </label>
+          <div style="height:1px;background:#285438"></div>
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <div>
+              <div style="font-size:.9rem;color:#F1F5EE">New events & announcements</div>
+              <div style="font-size:.75rem;color:#77947D">Club events and TRC updates</div>
+            </div>
+            <input type="checkbox" checked style="accent-color:#E8BE16;width:16px;height:16px"/>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Tab switch
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Counters
+function animCount(id, target) {
+  const el = document.getElementById(id);
+  let v=0; const step=target/40;
+  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=Math.round(v);if(v>=target)clearInterval(t);},30);
+}
+setTimeout(()=>{animCount('ps1',28);animCount('ps2',7);animCount('ps3',5);animCount('ps4',380);},300);
+
+// Heatmap
+(function(){
+  const hm = document.getElementById('heatmap');
+  const days = 28;
+  const active = [22,23,24,25,26,27,28];
+  for(let i=1;i<=days;i++){
+    const d = document.createElement('div');
+    d.className = 'streak-cell';
+    if(i===days) d.classList.add('today');
+    else if(active.includes(i)) d.classList.add('done');
+    else if(Math.random()>0.6) d.style.background='#E8BE1633';
+    hm.appendChild(d);
+  }
+})();
+
+// Save profile
+function saveProfile() {
+  const btn = event.target;
+  btn.textContent = '✓ Saved!';
+  btn.style.background = '#69A66A';
+  setTimeout(()=>{btn.textContent='Save Changes';btn.style.background='#E8BE16';},2000);
+}
+</script>
+</body>
+</html>

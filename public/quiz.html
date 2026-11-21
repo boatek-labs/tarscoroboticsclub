@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    /* Quiz bar */
+    #quiz-bar{position:fixed;top:0;left:0;right:0;height:56px;background:#0C2818;
+              border-bottom:1px solid #285438;display:flex;align-items:center;
+              justify-content:space-between;padding:0 24px;z-index:100}
+    .time-bar{position:fixed;top:56px;left:0;right:0;height:3px;background:#285438}
+    .time-fill{height:100%;background:linear-gradient(90deg,#69A66A,#E8BE16);
+               transition:width .3s linear}
+
+    /* Content */
+    #content{padding:80px 20px 40px;max-width:720px;margin:0 auto}
+
+    /* Question card */
+    .q-card{background:#0C2818;border:1px solid #285438;border-radius:4px;padding:32px;margin-bottom:24px}
+
+    /* Option button */
+    .option{display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;
+            border:1px solid #285438;border-radius:3px;background:#071B11;
+            cursor:pointer;transition:.2s;margin-bottom:10px;text-align:left;
+            font-family:Inter;font-size:.95rem;color:#BDCCBF}
+    .option:hover:not(.disabled){border-color:#E8BE1644;background:#E8BE1608;color:#F1F5EE}
+    .option.selected{border-color:#E8BE16;background:#E8BE1612;color:#F1F5EE}
+    .option.correct{border-color:#69A66A;background:#69A66A10;color:#69A66A}
+    .option.wrong{border-color:#FF3B30;background:#FF3B3010;color:#FF3B30}
+    .option.disabled{cursor:default}
+    .option-letter{width:28px;height:28px;border-radius:3px;border:1px solid #285438;
+                   display:flex;align-items:center;justify-content:center;
+                   font-family:'JetBrains Mono',monospace;font-size:.8rem;flex-shrink:0;
+                   font-weight:700;background:#12351F}
+    .option.selected  .option-letter{background:#E8BE16;border-color:#E8BE16;color:#071B11}
+    .option.correct   .option-letter{background:#69A66A;border-color:#69A66A;color:#071B11}
+    .option.wrong     .option-letter{background:#FF3B30;border-color:#FF3B30;color:#fff}
+
+    /* Explanation box */
+    .explanation{border-radius:3px;padding:14px 18px;margin-top:14px;font-size:.88rem;line-height:1.7;display:none}
+    .expl-correct{background:#69A66A10;border:1px solid #69A66A33;color:#BDCCBF}
+    .expl-wrong{background:#FF3B3010;border:1px solid #FF3B3033;color:#BDCCBF}
+
+    /* Progress dots */
+    .q-dot{width:10px;height:10px;border-radius:50%;background:#285438;transition:.3s;flex-shrink:0}
+    .q-dot.done{background:#E8BE16}
+    .q-dot.correct{background:#69A66A}
+    .q-dot.wrong{background:#FF3B30}
+    .q-dot.current{background:#E8BE16;box-shadow:0 0 10px #E8BE16}
+
+    /* Btn */
+    .btn-primary{display:inline-flex;align-items:center;gap:8px;font-family:Rajdhani;
+                 font-weight:700;font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+                 background:#E8BE16;color:#071B11;padding:12px 28px;border-radius:2px;
+                 border:none;cursor:pointer;transition:.2s}
+    .btn-primary:hover{background:#F7D94A;transform:translateY(-2px)}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+    /* Score card */
+    #score-screen{display:none;text-align:center;padding:48px 20px}
+    .score-ring{width:140px;height:140px;border-radius:50%;border:4px solid #285438;
+                display:flex;align-items:center;justify-content:center;margin:0 auto 24px;position:relative}
+    .score-val{font-family:Rajdhani;font-weight:700;font-size:2.5rem;line-height:1}
+
+    /* Code block in question */
+    .q-code{background:#071B11;border:1px solid #285438;border-radius:3px;padding:14px;
+            font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;
+            margin:12px 0;overflow-x:auto}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<!-- Quiz topbar -->
+<div id="quiz-bar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="lesson.html" style="color:#77947D;text-decoration:none;font-size:.82rem;transition:.2s" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">← Back to Lesson</a>
+    <div style="width:1px;height:16px;background:#285438"></div>
+    <div>
+      <span style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#77947D;letter-spacing:.1em;text-transform:uppercase">Basic Electronics</span>
+      <span style="color:#285438;margin:0 6px">·</span>
+      <span style="font-size:.82rem;color:#BDCCBF">Module Quiz</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <!-- Question counter -->
+    <div style="display:flex;gap:5px;align-items:center" id="dots-bar"></div>
+    <!-- Timer -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.88rem;display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#77947D" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+      <span id="timer-display" style="color:#BDCCBF">10:00</span>
+    </div>
+  </div>
+</div>
+<div class="time-bar"><div class="time-fill" id="time-fill" style="width:100%"></div></div>
+
+<!-- Main content -->
+<div id="content">
+
+  <!-- Quiz header -->
+  <div style="margin-bottom:28px" id="quiz-header">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px">Module Quiz</p>
+    <h1 style="font-family:Rajdhani;font-weight:700;font-size:2rem;color:#F1F5EE;margin-bottom:4px">Basic Electronics</h1>
+    <p style="font-size:.88rem;color:#BDCCBF">5 questions · 10 minutes · You need 70% to pass</p>
+  </div>
+
+  <!-- Question area -->
+  <div id="question-area">
+    <div class="q-card" id="q-card">
+      <!-- Filled by JS -->
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#77947D" id="q-counter">Question 1 of 5</span>
+      <button class="btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+        Next Question →
+      </button>
+    </div>
+  </div>
+
+  <!-- Score screen (hidden until done) -->
+  <div id="score-screen">
+    <div class="score-ring" id="score-ring">
+      <div>
+        <div class="score-val" id="score-val">0%</div>
+        <div style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">score</div>
+      </div>
+    </div>
+
+    <h2 id="score-title" style="font-family:Rajdhani;font-weight:700;font-size:2rem;color:#F1F5EE;margin-bottom:8px">Quiz Complete!</h2>
+    <p id="score-msg" style="color:#BDCCBF;margin-bottom:28px"></p>
+
+    <!-- Result breakdown -->
+    <div id="breakdown" style="background:#0C2818;border:1px solid #285438;border-radius:4px;padding:20px;max-width:400px;margin:0 auto 28px;text-align:left">
+      <div style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:12px">Results</div>
+      <div id="breakdown-list"></div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button onclick="retryQuiz()" style="font-family:Rajdhani;font-weight:700;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;background:#285438;color:#BDCCBF;border:1px solid #285438;padding:11px 22px;border-radius:2px;cursor:pointer;transition:.2s">Retry Quiz</button>
+      <a href="lesson.html" class="btn-primary">Next Lesson →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "What does Ohm's Law state?",
+    options: ["V = I × R", "V = I + R", "V = I / R", "V = I² × R"],
+    correct: 0,
+    explanation: "Ohm's Law is V = I × R (Voltage = Current × Resistance). It's the most fundamental law in electronics and the basis for calculating resistor values in any circuit."
+  },
+  {
+    text: "You have a 5V power supply and an LED with a forward voltage of 2V. The maximum safe LED current is 20mA. Which resistor value should you choose?",
+    options: ["100Ω", "220Ω", "10Ω", "1kΩ"],
+    correct: 1,
+    explanation: "Using Ohm's Law: R = (Vs - Vf) / If = (5 - 2) / 0.02 = 150Ω. The nearest standard value above 150Ω is 220Ω. Going lower risks burning the LED."
+  },
+  {
+    text: "Look at the code snippet below. What will this program do?\n\nCode: digitalWrite(9, HIGH); delay(1000); digitalWrite(9, LOW); delay(1000);",
+    code: `void loop() {\n  digitalWrite(9, HIGH);\n  delay(1000);\n  digitalWrite(9, LOW);\n  delay(1000);\n}`,
+    options: [
+      "Turn pin 9 on permanently",
+      "Blink pin 9 on and off every 1 second",
+      "Blink pin 9 every 2 seconds total (1s on, 1s off)",
+      "Read the value from pin 9"
+    ],
+    correct: 2,
+    explanation: "HIGH for 1000ms (1 second), then LOW for 1000ms (1 second) = one complete blink cycle every 2 seconds. Many beginners count the delay wrong — remember: delay(1000) = 1 second."
+  },
+  {
+    text: "On a breadboard, which connections are internally linked?",
+    options: [
+      "All holes in the same column (a–e or f–j) on the same row",
+      "All holes in the same row across both halves",
+      "The holes across the middle gap",
+      "Only the power rail holes"
+    ],
+    correct: 0,
+    explanation: "Each half-row of 5 holes (a-e or f-j) is internally connected by a metal strip underneath. The centre gap separates the two halves — they are NOT connected across it. The power rails are connected along their entire length."
+  },
+  {
+    text: "What is the purpose of a capacitor in a DC circuit?",
+    options: [
+      "Limit current like a resistor",
+      "Store and release electrical energy to smooth voltage fluctuations",
+      "Convert AC to DC power",
+      "Increase resistance at high frequencies"
+    ],
+    correct: 1,
+    explanation: "Capacitors store charge and release it when voltage drops. In DC circuits this smooths out voltage spikes and noise from motors or other inductive loads — which is why you often see a capacitor across motor terminals in robotics."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+let answered = false;
+let timerSeconds = 600;
+let timerInterval;
+
+// Build dots
+const dotsBar = document.getElementById('dots-bar');
+questions.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'q-dot' + (i===0?' current':'');
+  d.id = `dot-${i}`;
+  dotsBar.appendChild(d);
+});
+
+// Timer
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    const m = Math.floor(timerSeconds/60);
+    const s = timerSeconds%60;
+    document.getElementById('timer-display').textContent = `${m}:${s<10?'0':''}${s}`;
+    document.getElementById('time-fill').style.width = (timerSeconds/600*100)+'%';
+    if(timerSeconds <= 60) document.getElementById('timer-display').style.color = '#F2CC24';
+    if(timerSeconds <= 0) { clearInterval(timerInterval); showScore(); }
+  }, 1000);
+}
+
+// Render question
+function renderQuestion(idx) {
+  const q = questions[idx];
+  answered = false;
+  document.getElementById('q-counter').textContent = `Question ${idx+1} of ${questions.length}`;
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('next-btn').textContent = idx===questions.length-1 ? 'See Results →' : 'Next Question →';
+
+  // Update dots
+  for(let i=0;i<questions.length;i++) {
+    const d = document.getElementById(`dot-${i}`);
+    d.className = 'q-dot';
+    if(i<idx && answers[i]!==null) {
+      d.classList.add(answers[i]===questions[i].correct?'correct':'wrong');
+    } else if(i===idx) {
+      d.classList.add('current');
+    }
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#77947D;text-transform:uppercase;letter-spacing:.12em">Question ${idx+1}</span>
+    </div>
+    <p style="font-size:1.05rem;color:#F1F5EE;line-height:1.7;font-weight:500;margin-bottom:${q.code?'8px':'20px'}">${q.text.split('\n')[0]}</p>
+  `;
+
+  if(q.code) {
+    html += `<div class="q-code">${q.code.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;')}</div>`;
+  }
+
+  const letters = ['A','B','C','D'];
+  q.options.forEach((opt,i) => {
+    html += `<button class="option" id="opt-${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </button>`;
+  });
+
+  html += `<div class="explanation" id="explanation"></div>`;
+  document.getElementById('q-card').innerHTML = html;
+
+  gsap.from('#q-card', {opacity:0, x:20, duration:.35, ease:'power2.out'});
+}
+
+// Select option
+function selectOption(idx) {
+  if(answered) return;
+  answered = true;
+  answers[current] = idx;
+
+  const q = questions[current];
+  const letters = ['A','B','C','D'];
+
+  q.options.forEach((_,i) => {
+    const btn = document.getElementById(`opt-${i}`);
+    btn.classList.add('disabled');
+    if(i === q.correct) btn.classList.add('correct');
+    else if(i === idx) btn.classList.add('wrong');
+  });
+
+  const expl = document.getElementById('explanation');
+  const isCorrect = idx === q.correct;
+  expl.className = `explanation ${isCorrect?'expl-correct':'expl-wrong'}`;
+  expl.style.display = 'block';
+  expl.innerHTML = `<strong style="color:${isCorrect?'#69A66A':'#FF3B30'}">${isCorrect?'✓ Correct!':'✗ Not quite.'}</strong> ${q.explanation}`;
+
+  document.getElementById('next-btn').disabled = false;
+
+  // Dot flash
+  const d = document.getElementById(`dot-${current}`);
+  d.classList.remove('current');
+  d.classList.add(isCorrect?'correct':'wrong');
+}
+
+// Next
+function nextQuestion() {
+  if(!answered && answers[current]===null) {
+    // Allow skip (counts as wrong)
+    answers[current] = -1;
+  }
+  if(current < questions.length-1) {
+    current++;
+    renderQuestion(current);
+  } else {
+    clearInterval(timerInterval);
+    showScore();
+  }
+}
+
+// Score
+function showScore() {
+  document.getElementById('question-area').style.display = 'none';
+  document.getElementById('quiz-header').style.display = 'none';
+  const screen = document.getElementById('score-screen');
+  screen.style.display = 'block';
+
+  const correct = answers.filter((a,i) => a===questions[i].correct).length;
+  const pct = Math.round(correct/questions.length*100);
+  const passed = pct >= 70;
+
+  // Animate score ring
+  const ring = document.getElementById('score-ring');
+  ring.style.borderColor = passed ? '#69A66A' : '#F2CC24';
+  ring.style.boxShadow = passed ? '0 0 32px #69A66A44' : '0 0 32px #F2CC2444';
+
+  let v = 0;
+  const t = setInterval(() => {
+    v = Math.min(v+2, pct);
+    document.getElementById('score-val').textContent = v+'%';
+    document.getElementById('score-val').style.color = passed ? '#69A66A' : '#F2CC24';
+    if(v>=pct) clearInterval(t);
+  }, 20);
+
+  document.getElementById('score-title').textContent = passed ? '🎉 Quiz Passed!' : 'Almost There!';
+  document.getElementById('score-msg').textContent = passed
+    ? `You scored ${pct}% (${correct}/${questions.length}) — great work! This module is now marked complete.`
+    : `You scored ${pct}% (${correct}/${questions.length}). You need 70% to pass. Review the lesson and try again.`;
+
+  // Breakdown
+  const breakdown = document.getElementById('breakdown-list');
+  questions.forEach((q,i) => {
+    const isRight = answers[i] === q.correct;
+    breakdown.innerHTML += `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #28543811">
+        <span style="color:${isRight?'#69A66A':'#FF3B30'};flex-shrink:0">${isRight?'✓':'✗'}</span>
+        <span style="font-size:.82rem;color:#BDCCBF;flex:1">Q${i+1}: ${q.text.substring(0,50)}…</span>
+      </div>`;
+  });
+
+  // Update dots
+  questions.forEach((_,i) => {
+    const d = document.getElementById(`dot-${i}`);
+    d.className = 'q-dot';
+    d.classList.add(answers[i]===questions[i].correct?'correct':'wrong');
+  });
+
+  gsap.from('#score-screen', {opacity:0, y:20, duration:.5, ease:'power2.out'});
+}
+
+// Retry
+function retryQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  timerSeconds = 600;
+  document.getElementById('timer-display').style.color = '#BDCCBF';
+  document.getElementById('time-fill').style.width = '100%';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('question-area').style.display = 'block';
+  document.getElementById('quiz-header').style.display = 'block';
+  document.getElementById('breakdown-list').innerHTML = '';
+  questions.forEach((_,i) => {
+    const d = document.getElementById(`dot-${i}`);
+    d.className = 'q-dot'+(i===0?' current':'');
+  });
+  renderQuestion(0);
+  startTimer();
+}
+
+// Init
+renderQuestion(0);
+startTimer();
+</script>
+</body>
+</html>

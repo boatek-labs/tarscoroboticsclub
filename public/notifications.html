@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notifications — TRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#071B11;color:#F1F5EE;font-family:'Inter',sans-serif;min-height:100vh}
+
+    #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,15,30,.93);
+         backdrop-filter:blur(14px);border-bottom:1px solid #285438;height:60px;
+         display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .nav-link{font-family:Rajdhani;font-weight:600;font-size:.88rem;letter-spacing:.08em;
+              color:#BDCCBF;text-transform:uppercase;text-decoration:none;transition:.2s}
+    .nav-link:hover{color:#E8BE16}
+
+    #content{max-width:700px;margin:0 auto;padding:88px 20px 60px}
+
+    .notif-item{display:flex;gap:14px;padding:16px;border-radius:4px;
+                border:1px solid #285438;background:#0C2818;margin-bottom:10px;
+                transition:.2s;cursor:pointer;position:relative}
+    .notif-item:hover{border-color:#E8BE1622;background:#12351F}
+    .notif-item.unread{border-left:3px solid #E8BE16;background:#E8BE1605}
+    .notif-item.unread::before{content:'';width:8px;height:8px;border-radius:50%;
+                               background:#E8BE16;box-shadow:0 0 8px #E8BE16;
+                               position:absolute;top:16px;right:14px}
+
+    .notif-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+                justify-content:center;font-size:1.1rem;flex-shrink:0}
+
+    .badge{display:inline-flex;padding:2px 8px;border-radius:2px;
+           font-family:'JetBrains Mono',monospace;font-size:.6rem}
+    .b-unread{background:#E8BE1615;color:#E8BE16;border:1px solid #E8BE1633}
+
+    .filter-btn{font-family:Rajdhani;font-weight:600;font-size:.82rem;padding:6px 14px;
+                border-radius:3px;border:1px solid #285438;color:#BDCCBF;background:transparent;
+                cursor:pointer;transition:.2s}
+    .filter-btn.active{background:#E8BE1615;color:#E8BE16;border-color:#E8BE1644}
+
+    .date-group{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#77947D;
+                text-transform:uppercase;letter-spacing:.14em;margin:20px 0 10px;
+                display:flex;align-items:center;gap:10px}
+    .date-group::after{content:'';flex:1;height:1px;background:#285438}
+  </style>
+  <link rel="stylesheet" href="assets/trc-brand.css" />
+  <meta name="theme-color" content="#071B11" />
+</head>
+<body>
+
+<nav id="nav">
+  <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <div style="width:32px;height:32px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1615">
+      <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:.85rem">TRC</span>
+    </div>
+    <span style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE">TARSCO Robotics</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="messages.html"  class="nav-link">Messages</a>
+    <a href="profile.html"   class="nav-link">Profile</a>
+  </div>
+</nav>
+
+<div id="content">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-family:Rajdhani;font-weight:700;font-size:2rem;color:#F1F5EE">Notifications</h1>
+      <p style="font-size:.82rem;color:#77947D;margin-top:2px">3 unread notifications</p>
+    </div>
+    <button onclick="markAllRead()" style="font-family:Rajdhani;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;background:none;border:1px solid #285438;color:#BDCCBF;padding:8px 14px;border-radius:2px;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='#E8BE1644';this.style.color='#E8BE16'" onmouseout="this.style.borderColor='#285438';this.style.color='#BDCCBF'">Mark All Read</button>
+  </div>
+
+  <!-- Filters -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="filter-btn active" onclick="filterNotif('all',this)">All</button>
+    <button class="filter-btn" onclick="filterNotif('unread',this)">Unread</button>
+    <button class="filter-btn" onclick="filterNotif('learning',this)">Learning</button>
+    <button class="filter-btn" onclick="filterNotif('community',this)">Community</button>
+    <button class="filter-btn" onclick="filterNotif('system',this)">System</button>
+  </div>
+
+  <!-- TODAY -->
+  <div class="date-group">Today</div>
+
+  <div class="notif-item unread" data-type="learning" onclick="markRead(this);location.href='lesson.html'">
+    <div class="notif-icon" style="background:#69A66A22">🔥</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Badge Earned: Week Warrior</span>
+        <span class="badge b-unread">New</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">You've maintained a 7-day learning streak! Keep it going — 14 days unlocks the <strong style="color:#F1F5EE">Dedicated Learner</strong> badge.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">Today · 11:30 AM</span>
+    </div>
+  </div>
+
+  <div class="notif-item unread" data-type="community" onclick="markRead(this);location.href='community.html'">
+    <div class="notif-icon" style="background:#E8BE1622">💬</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Reply on your post</span>
+        <span class="badge b-unread">New</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6"><strong style="color:#F1F5EE">Esi Darko</strong> replied to your question: <em>"My HC-SR04 reads 0cm even with objects close"</em> — Check your Echo pin, the issue might be…</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">Today · 10:02 AM</span>
+    </div>
+  </div>
+
+  <div class="notif-item unread" data-type="community" onclick="markRead(this);location.href='community.html'">
+    <div class="notif-icon" style="background:#F2CC2422">👍</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">6 upvotes on your answer</span>
+        <span class="badge b-unread">New</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Your answer to <em>"What's the difference between PWM and a digital signal?"</em> received 6 upvotes. +30 community points.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">Today · 8:45 AM</span>
+    </div>
+  </div>
+
+  <!-- YESTERDAY -->
+  <div class="date-group">Yesterday</div>
+
+  <div class="notif-item" data-type="learning" onclick="location.href='quiz.html'">
+    <div class="notif-icon" style="background:#E8BE1622">🎯</div>
+    <div style="flex:1">
+      <div style="margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Quiz Score: 92%</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">You scored <strong style="color:#69A66A">92%</strong> on the Basic Electronics Quiz 2. You passed — next quiz unlocked.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">Yesterday · 3:10 PM</span>
+    </div>
+  </div>
+
+  <div class="notif-item" data-type="system" onclick="location.href='join-club.html'">
+    <div class="notif-icon" style="background:#A855F722">📋</div>
+    <div style="flex:1">
+      <div style="margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Membership Application Received</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Your club membership application has been received and is under review. An executive will respond within 2–5 days.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">Yesterday · 12:00 PM</span>
+    </div>
+  </div>
+
+  <!-- 2 DAYS AGO -->
+  <div class="date-group">2 Days Ago</div>
+
+  <div class="notif-item" data-type="learning" onclick="location.href='learn.html'">
+    <div class="notif-icon" style="background:#E8BE1622">⚡</div>
+    <div style="flex:1">
+      <div style="margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Badge Earned: Circuit Starter</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">You completed the <strong style="color:#F1F5EE">Basic Electronics</strong> module intro. Badge added to your profile.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">2 days ago · 4:20 PM</span>
+    </div>
+  </div>
+
+  <div class="notif-item" data-type="system" onclick="location.href='events.html'">
+    <div class="notif-icon" style="background:#69A66A22">📅</div>
+    <div style="flex:1">
+      <div style="margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">New Event: Free Arduino Workshop</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">A free Arduino workshop has been scheduled for <strong style="color:#F1F5EE">July 21st, 2:00 PM</strong> in Computer Lab B. Open to all students.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">2 days ago · 9:00 AM</span>
+    </div>
+  </div>
+
+  <div class="notif-item" data-type="system">
+    <div class="notif-icon" style="background:#E8BE1622">👋</div>
+    <div style="flex:1">
+      <div style="margin-bottom:4px">
+        <span style="font-family:Rajdhani;font-weight:700;font-size:.95rem;color:#F1F5EE">Welcome to TRC Platform!</span>
+      </div>
+      <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6">Your account is active. Start with <strong style="color:#F1F5EE">Introduction to Robotics</strong> — it's free and takes about 3 hours. Good luck!</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;margin-top:6px;display:block">2 days ago · 8:00 AM</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function markRead(el) {
+  el.classList.remove('unread');
+  const badge = el.querySelector('.badge');
+  if(badge) badge.remove();
+  updateCount();
+}
+
+function markAllRead() {
+  document.querySelectorAll('.notif-item.unread').forEach(el => {
+    el.classList.remove('unread');
+    const badge = el.querySelector('.badge');
+    if(badge) badge.remove();
+  });
+  updateCount();
+}
+
+function updateCount() {
+  const n = document.querySelectorAll('.notif-item.unread').length;
+  document.querySelector('p[style*="unread"]').textContent = n === 0 ? 'All caught up!' : `${n} unread notification${n>1?'s':''}`;
+}
+
+function filterNotif(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.notif-item').forEach(el => {
+    if(type === 'all') { el.style.display=''; return; }
+    if(type === 'unread') { el.style.display = el.classList.contains('unread') ? '' : 'none'; return; }
+    el.style.display = el.dataset.type === type ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
