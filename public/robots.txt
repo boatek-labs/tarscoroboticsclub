@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /messages.html
+Disallow: /notifications.html
+Disallow: /profile.html
+
+Sitemap: https://tarscoroboticsclub.vercel.app/sitemap.xml
