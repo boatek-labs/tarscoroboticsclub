@@ -5,12 +5,9 @@
  * so the platform isn't empty on first run.
  */
 
-const { Low }      = require('lowdb');
-const { JSONFile }  = require('lowdb/node');
+const db = require('./db');
 const { v4: uuid }  = require('uuid');
 
-const adapter = new JSONFile('db.json');
-const db = new Low(adapter, {});
 
 async function seed() {
   await db.read();
