@@ -6,8 +6,7 @@
  */
 
 const express     = require('express');
-const { Low }     = require('lowdb');
-const { JSONFile } = require('lowdb/node');
+const db = require('./db');
 const bcrypt      = require('bcryptjs');
 const jwt         = require('jsonwebtoken');
 const multer      = require('multer');
@@ -18,43 +17,14 @@ require('dotenv').config();
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'trc_secret_change_this';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'trc_secret_change_this');
+if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is required in production.');
 
 // ──────────────────────────────
-// DB SETUP
+// DATABASE INITIALIZATION
+// Neon PostgreSQL stores the platform state durably between serverless invocations.
+// The data shape is retained to avoid breaking the existing API routes during migration.
 // ──────────────────────────────
-const adapter = new JSONFile('db.json');
-const db = new Low(adapter, {
-  users: [],
-  membershipApplications: [],
-  modules: [],
-  lessons: [],
-  quizzes: [],
-  quizAttempts: [],
-  lessonProgress: [],
-  projects: [],
-  projectComments: [],
-  communityPosts: [],
-  communityReplies: [],
-  messages: [],
-  events: [],
-  resources: [],
-  gallery: [],
-  notifications: [],
-  internalUpdates: [],
-  badges: [
-    { id:'first-lesson',    name:'First Step',       icon:'👣', description:'Complete your first lesson' },
-    { id:'circuit-starter', name:'Circuit Starter',  icon:'⚡', description:'Complete Basic Electronics module' },
-    { id:'week-warrior',    name:'Week Warrior',     icon:'🔥', description:'Maintain a 7-day streak' },
-    { id:'quiz-ace',        name:'Quiz Ace',         icon:'🎯', description:'Score 90%+ on any quiz' },
-    { id:'project-builder', name:'Project Builder',  icon:'🏗️', description:'Have a project approved' },
-    { id:'helper',          name:'Helpful',          icon:'🤝', description:'Get 10 upvotes on answers' },
-    { id:'competitor',      name:'Competitor',       icon:'🏆', description:'Participate in a competition' },
-    { id:'dedicated',       name:'Dedicated Learner',icon:'📅', description:'Maintain a 14-day streak' },
-    { id:'module-master',   name:'Module Master',    icon:'🎓', description:'Complete all modules' },
-  ]
-});
-
 async function initDB() {
   await db.read();
 
@@ -65,36 +35,35 @@ async function initDB() {
     messages: [], events: [], resources: [], gallery: [],
     notifications: [], internalUpdates: [],
     badges: [
-      { id:'first-lesson',    name:'First Step',       icon:'👣', description:'Complete your first lesson' },
-      { id:'circuit-starter', name:'Circuit Starter',  icon:'⚡', description:'Complete Basic Electronics module' },
-      { id:'week-warrior',    name:'Week Warrior',     icon:'🔥', description:'Maintain a 7-day streak' },
-      { id:'quiz-ace',        name:'Quiz Ace',         icon:'🎯', description:'Score 90%+ on any quiz' },
-      { id:'project-builder', name:'Project Builder',  icon:'🏗️', description:'Have a project approved' },
-      { id:'helper',          name:'Helpful',          icon:'🤝', description:'Get 10 upvotes on answers' },
-      { id:'competitor',      name:'Competitor',       icon:'🏆', description:'Participate in a competition' },
-      { id:'dedicated',       name:'Dedicated Learner',icon:'📅', description:'Maintain a 14-day streak' },
-      { id:'module-master',   name:'Module Master',    icon:'🎓', description:'Complete all modules' },
+      { id:'first-lesson', name:'First Step', icon:'👣', description:'Complete your first lesson' },
+      { id:'circuit-starter', name:'Circuit Starter', icon:'⚡', description:'Complete Basic Electronics module' },
+      { id:'week-warrior', name:'Week Warrior', icon:'🔥', description:'Maintain a 7-day streak' },
+      { id:'quiz-ace', name:'Quiz Ace', icon:'🎯', description:'Score 90%+ on any quiz' },
+      { id:'project-builder', name:'Project Builder', icon:'🏗️', description:'Have a project approved' },
+      { id:'helper', name:'Helpful', icon:'🤝', description:'Get 10 upvotes on answers' },
+      { id:'competitor', name:'Competitor', icon:'🏆', description:'Participate in a competition' },
+      { id:'dedicated', name:'Dedicated Learner', icon:'📅', description:'Maintain a 14-day streak' },
+      { id:'module-master', name:'Module Master', icon:'🎓', description:'Complete all modules' }
     ]
   };
 
-  // db.data can be null/undefined on a brand-new db.json — apply defaults safely
   db.data = db.data && Object.keys(db.data).length ? db.data : defaults;
   for (const key of Object.keys(defaults)) {
     if (!db.data[key]) db.data[key] = defaults[key];
   }
   await db.write();
 
-  // Seed super admin if no users exist
+  // Keep the legacy first-run admin account for compatibility.
+  // Change its password immediately after first login.
   if (!db.data.users.length) {
-    const hash = await bcrypt.hash('admin123', 10);
+    const hash = await bcrypt.hash(process.env.INITIAL_ADMIN_PASSWORD || 'admin123', 10);
     db.data.users.push({
-      id: uuid(), name: 'TRC Admin', email: 'admin@tarsco.edu',
-      passwordHash: hash, role: 'superadmin',
-      joinedAt: new Date().toISOString(), streak: 0,
-      lastActiveDate: null, badges: [], totalPoints: 0, suspended: false
+      id: uuid(), name: 'TRC Admin', email: process.env.INITIAL_ADMIN_EMAIL || 'admin@tarsco.edu',
+      passwordHash: hash, role: 'superadmin', joinedAt: new Date().toISOString(),
+      streak: 0, lastActiveDate: null, badges: [], totalPoints: 0, suspended: false
     });
     await db.write();
-    console.log('✓ Seeded default super admin — admin@tarsco.edu / admin123');
+    console.log('TRC initial administrator account created');
   }
 }
 
@@ -104,10 +73,11 @@ async function initDB() {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Uploads dir
+// Local uploads are served only for local development. Vercel's filesystem is ephemeral.
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-app.use('/uploads', express.static(uploadsDir));
+if (process.env.NODE_ENV !== 'production' && fs.existsSync(uploadsDir)) {
+  app.use('/uploads', express.static(uploadsDir));
+}
 
 // Multer config
 const storage = multer.diskStorage({
@@ -920,19 +890,26 @@ app.get('*', (req, res) => {
 });
 
 // ──────────────────────────────
-// START
+// SERVERLESS + LOCAL STARTUP
 // ──────────────────────────────
-initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`\n✅ TRC Platform running on http://localhost:${PORT}`);
-    console.log(`   Environment : ${process.env.NODE_ENV || 'development'}`);
-    console.log(`   DB file     : db.json`);
-    console.log(`   Uploads     : ./uploads/`);
-    console.log(`\n📋 Pages:`);
-    console.log(`   Home        → http://localhost:${PORT}/trc-home.html`);
-    console.log(`   Dashboard   → http://localhost:${PORT}/dashboard.html`);
-    console.log(`   Admin       → http://localhost:${PORT}/admin.html`);
-    console.log(`\n🔑 Default admin: admin@tarsco.edu / admin123`);
-    console.log(`   ⚠  Change the password immediately after first login!\n`);
-  });
+let initialization;
+app.use(async (req, res, next) => {
+  try {
+    if (!initialization) initialization = initDB();
+    await initialization;
+    next();
+  } catch (error) {
+    console.error('TRC initialization failed:', error);
+    res.status(500).json({
+      message: 'The platform could not initialize. Check DATABASE_URL and Neon connectivity.'
+    });
+  }
 });
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`TRC Platform running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
