@@ -225,3 +225,97 @@ body:has(#left){background:#111214!important}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+
+/* TRC global visual system: restrained monochrome, consistent layout */
+:root{
+ --trc-forest:#171717;--trc-forest-2:#202020;--trc-panel:#242424;
+ --trc-line:#3b3b3b;--trc-gold:#ededed;--trc-gold-soft:#fff;
+ --trc-green:#c8c8c8;--trc-muted:#a5a5a5;--trc-silver:#d2d2d2;--trc-white:#f7f7f7;
+ --trc-page-width:1160px;--trc-page-gutter:clamp(18px,4vw,40px);
+}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{background:#171717!important;color:#f5f5f5!important;background-image:none!important;font-family:Inter,Arial,sans-serif;line-height:1.65;overflow-x:hidden}
+::selection{background:#dedede;color:#111}
+:focus-visible{outline:2px solid #eee!important;outline-offset:3px}
+#nav{min-height:68px;height:auto!important;padding:0 clamp(16px,3vw,36px)!important;display:flex;align-items:center;gap:22px;background:rgba(20,20,20,.97)!important;border-bottom:1px solid #383838!important;box-shadow:0 6px 24px rgba(0,0,0,.14);backdrop-filter:blur(16px)}
+#nav>a{flex-shrink:0}
+#nav>div{gap:clamp(12px,2vw,25px)}
+.nav-link{color:#c9c9c9!important;font-size:.82rem;letter-spacing:.025em;white-space:nowrap}
+.nav-link:hover,.nav-link.active{color:#fff!important}
+.nav-link:after{background:#eee!important}
+#mobile-menu{background:#1d1d1d!important;border-color:#3a3a3a!important}
+.btn-primary,.home-btn-primary{background:#eee!important;color:#151515!important;border:1px solid #eee!important;box-shadow:none!important}
+.btn-primary:hover,.home-btn-primary:hover{background:#fff!important;color:#000!important}
+.btn-outline,.home-btn-secondary{background:transparent!important;color:#f4f4f4!important;border:1px solid #686868!important}
+.btn-outline:hover,.home-btn-secondary:hover{border-color:#fff!important;color:#fff!important}
+.trc-card,.module-card,.proj-card,.evt-card,.announce-card,.res-card,.featured-card,.exec-card,.submit-cta{
+ background:#222!important;border:1px solid #393939!important;border-radius:10px!important;box-shadow:0 8px 24px rgba(0,0,0,.12)
+}
+.trc-card:hover,.module-card:hover,.proj-card:hover,.evt-card:hover,.res-card:hover{border-color:#777!important}
+.section-title,.faq-q,h1,h2,h3{letter-spacing:-.025em}
+.section-title .c,.section-title .a,.hero-title .accent,.hero-title .amber,.stat-val,.evt-date,.cd-val,.home-hero-copy h1 em{color:#f1f1f1!important}
+.section-label,.sec-label,.sec-head,.stat-lbl,.text-muted{color:#aaa!important}
+.prog-bar,.strength-bar{background:#414141!important}
+.prog-fill,.lesson-prog-fill,.card-accent,.accent-beginner,.accent-intermediate,.accent-advanced{background:#c9c9c9!important}
+.badge,.b-beg,.b-int,.b-adv,.b-done,.b-inprog,.b-lock,.b-approved,.b-auto,.b-mech,.b-iot,.b-ai,.b-comp,.t-comp,.t-workshop,.t-build,.t-talk,.t-announce,.t-pdf,.t-code,.t-diagram,.t-ebook,.t-link,.t-component{
+ background:#303030!important;color:#e1e1e1!important;border-color:#555!important
+}
+/* Shared content alignment across public pages */
+#content,#layout{width:min(var(--trc-page-width),calc(100% - 2*var(--trc-page-gutter)))!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;padding:clamp(96px,9vw,116px) 0 76px!important}
+#main #content{width:100%!important;max-width:var(--trc-page-width)!important;padding:30px clamp(18px,3vw,38px) 64px!important;margin:0 auto!important}
+#progress-bar{background:#1d1d1d!important;border-color:#3b3b3b!important;padding:14px var(--trc-page-gutter)!important;gap:20px}
+section:not(#hero){scroll-margin-top:92px}
+#hero.trc-home-hero{background:linear-gradient(135deg,#151515,#1d1d1d 58%,#151515)!important}
+.home-hero-copy h1 em{color:#fff!important}
+.home-hero-logo,.home-mark-logo,.trc-nav-seal,.hero-mini-seal,.footer-seal{border-color:#777!important;box-shadow:none!important}
+.home-mark-ring{border-color:rgba(255,255,255,.16)!important}
+.home-hero-meta{border-color:#3b3b3b!important;color:#bbb!important}
+.home-hero-meta i,.home-eyebrow span{color:#fff!important;background:#ddd!important}
+footer{background:#111!important;border-color:#383838!important}
+#sidebar,#topbar{background:#1d1d1d!important;border-color:#393939!important}
+#sidebar .nav-item{color:#c9c9c9!important}
+#sidebar .nav-item:hover,#sidebar .nav-item.active{background:#303030!important;color:#fff!important;border-color:#ddd!important}
+#main{background:#171717!important}
+input,textarea,select{accent-color:#ddd}
+.input,input,textarea,select{background:#242424!important;color:#f5f5f5!important;border-color:#4a4a4a!important;border-radius:7px!important}
+.input:focus,input:focus,textarea:focus,select:focus{border-color:#aaa!important;box-shadow:0 0 0 3px #fff1!important}
+::placeholder{color:#929292!important}
+@media(min-width:1000px){
+ #content>.reveal:first-child,#layout>.reveal:first-child{margin-bottom:38px!important}
+}
+@media(max-width:900px){
+ #nav{gap:12px;padding-inline:18px!important}
+ #nav>div{gap:12px}
+ #content,#layout{width:calc(100% - 36px)!important;padding-top:92px!important}
+}
+@media(max-width:640px){
+ #nav{min-height:60px;padding-inline:14px!important}
+ #nav>div{gap:10px;overflow-x:auto;max-width:70vw}
+ .nav-link{font-size:.72rem}
+ #content,#layout{width:calc(100% - 32px)!important;padding:84px 0 48px!important}
+ #main #content{padding:22px 16px 48px!important}
+ .trc-card,.module-card,.proj-card,.evt-card,.res-card{border-radius:9px!important}
+}
+/* Neutral light theme */
+html[data-theme="light"] body{background:#f4f4f4!important;color:#202020!important}
+html[data-theme="light"] #nav{background:rgba(250,250,250,.97)!important;border-color:#ddd!important}
+html[data-theme="light"] .nav-link{color:#444!important}
+html[data-theme="light"] .nav-link:hover,html[data-theme="light"] .nav-link.active{color:#111!important}
+html[data-theme="light"] #hero.trc-home-hero{background:linear-gradient(135deg,#f7f7f7,#ececec 58%,#f7f7f7)!important}
+html[data-theme="light"] .home-hero-copy h1,html[data-theme="light"] .home-hero-copy h1 em{color:#181818!important}
+html[data-theme="light"] .home-hero-copy>p,html[data-theme="light"] .home-hero-meta{color:#555!important}
+html[data-theme="light"] .home-hero-meta{border-color:#ddd!important}
+html[data-theme="light"] .home-mark-ring{border-color:rgba(0,0,0,.14)!important}
+html[data-theme="light"] .trc-card,html[data-theme="light"] .module-card,html[data-theme="light"] .proj-card,html[data-theme="light"] .evt-card,html[data-theme="light"] .announce-card,html[data-theme="light"] .res-card,html[data-theme="light"] .featured-card,html[data-theme="light"] .exec-card{
+ background:#fff!important;border-color:#dedede!important;color:#222!important;box-shadow:0 5px 18px rgba(0,0,0,.045)!important
+}
+html[data-theme="light"] #content,html[data-theme="light"] #layout,html[data-theme="light"] #main{color:#222!important}
+html[data-theme="light"] footer{background:#eaeaea!important;border-color:#ddd!important}
+html[data-theme="light"] #sidebar,html[data-theme="light"] #topbar,html[data-theme="light"] #mobile-menu{background:#f7f7f7!important;border-color:#ddd!important}
+html[data-theme="light"] #sidebar .nav-item{color:#444!important}
+html[data-theme="light"] #sidebar .nav-item:hover,html[data-theme="light"] #sidebar .nav-item.active{background:#e8e8e8!important;color:#111!important}
+html[data-theme="light"] input,html[data-theme="light"] textarea,html[data-theme="light"] select{background:#fff!important;color:#222!important;border-color:#ccc!important}
+html[data-theme="light"] .btn-outline,html[data-theme="light"] .home-btn-secondary{color:#222!important;border-color:#999!important}
+html[data-theme="light"] .section-title .c,html[data-theme="light"] .section-title .a,html[data-theme="light"] .stat-val,html[data-theme="light"] .evt-date,html[data-theme="light"] .cd-val{color:#222!important}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
