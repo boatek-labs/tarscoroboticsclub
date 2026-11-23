@@ -487,3 +487,37 @@ body{
 @media(prefers-reduced-motion:reduce){
   #nav.trc-home-nav,#nav.trc-home-nav *{transition:none!important}
 }
+
+
+/* Site-wide rounded controls: no sharp, boxed CTA treatment. */
+a.btn-primary,a.btn-outline,a.home-btn-primary,a.home-btn-secondary,
+button,.btn-primary,.btn-outline,.home-btn,.home-btn-primary,.home-btn-secondary,
+.btn-sm,.btn-approve,.btn-reject,.filter-btn,.page-tab,.tab-btn,.vote-btn{
+  border-radius:999px!important;
+}
+.btn-primary,.home-btn-primary,.btn-approve{
+  background:#e8be16!important;color:#102416!important;border:1px solid #e8be16!important;
+  box-shadow:none!important;
+}
+.btn-primary:hover,.home-btn-primary:hover,.btn-approve:hover{
+  background:#f5d34a!important;color:#102416!important;border-color:#f5d34a!important;
+  transform:translateY(-1px);
+}
+.btn-outline,.home-btn-secondary,.btn-sm,.btn-reject{
+  background:transparent!important;border:1px solid rgba(210,224,210,.4)!important;
+  color:var(--trc-text)!important;box-shadow:none!important;
+}
+.btn-outline:hover,.home-btn-secondary:hover,.btn-sm:hover,.btn-reject:hover{
+  background:rgba(232,190,22,.08)!important;border-color:#e8be16!important;color:#f5d34a!important;
+}
+button,.btn-primary,.btn-outline,.home-btn,.home-btn-primary,.home-btn-secondary,
+.btn-sm,.btn-approve,.btn-reject,.filter-btn,.page-tab,.tab-btn,.vote-btn{
+  min-height:38px;transition:background-color .16s ease,color .16s ease,border-color .16s ease,
+    box-shadow .16s ease,transform .16s ease!important;
+}
+button:active,.btn-primary:active,.btn-outline:active,.home-btn:active,
+.btn-sm:active,.btn-approve:active,.btn-reject:active{transform:scale(.98)!important}
+button:focus-visible,.btn-primary:focus-visible,.btn-outline:focus-visible,
+.home-btn:focus-visible,.btn-sm:focus-visible,.btn-approve:focus-visible,.btn-reject:focus-visible{
+  outline:3px solid rgba(232,190,22,.45)!important;outline-offset:3px!important;
+}
