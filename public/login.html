@@ -532,11 +532,11 @@ async function initializeGoogleSignIn() {
     });
     google.accounts.id.renderButton(host, {
       type: 'standard',
-      theme: 'outline',
+      theme: 'outline_dark',
       size: 'large',
       text: 'continue_with',
       shape: 'pill',
-      width: Math.min(380, Math.max(240, host.clientWidth || 320))
+      width: Math.min(420, Math.max(240, host.clientWidth || 320))
     });
   } catch (error) {
     console.error('Google sign-in initialization failed:', error);
