@@ -134,8 +134,12 @@ function safeUser(u) {
 }
 
 function createNotification(userId, type, message, link = '/notifications.html') {
+  const recipient = db.data.users.find(user => user.id === userId);
+  const preferences = recipient?.notificationPreferences || {};
+  const category = ['learning', 'community', 'events', 'system'].includes(type) ? type : 'system';
+  if (preferences[category] === false) return;
   db.data.notifications.push({
-    id: uuid(), userId, type, message, link,
+    id: uuid(), userId, type: category, message, link,
     read: false, createdAt: new Date().toISOString()
   });
 }
