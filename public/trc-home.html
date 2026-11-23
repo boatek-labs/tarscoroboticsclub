@@ -372,7 +372,7 @@ html[data-theme="light"] footer{background:#eae6f0!important}
     </div>
 
     <!-- Hamburger -->
-    <button id="hamburger" onclick="toggleMenu()"
+    <button id="hamburger" type="button" onclick="toggleMenu()" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu"
       class="flex flex-col gap-1.5 p-2 cursor-pointer border border-border rounded-sm">
       <span class="block w-5 h-0.5 bg-silver"></span>
       <span class="block w-5 h-0.5 bg-silver"></span>
@@ -1245,5 +1245,76 @@ window.addEventListener('scroll', () => {
   });
 })();
 </script>
+
+<script id="trc-navbar-interactions">
+(() => {
+  const nav = document.getElementById('nav');
+  const menu = document.getElementById('mobile-menu');
+  const toggle = document.getElementById('hamburger');
+  if (!nav || !menu || !toggle || nav.dataset.enhanced === 'true') return;
+  nav.dataset.enhanced = 'true';
+
+  const setMenu = (open) => {
+    menu.classList.toggle('open', open);
+    toggle.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    document.body.classList.toggle('trc-menu-open', open);
+  };
+  window.toggleMenu = () => setMenu(!menu.classList.contains('open'));
+
+  menu.querySelectorAll('a[href]').forEach(link => {
+    link.addEventListener('click', () => setMenu(false));
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') setMenu(false);
+  });
+  document.addEventListener('click', event => {
+    if (menu.classList.contains('open') && !nav.contains(event.target)) setMenu(false);
+  });
+
+  const links = [...nav.querySelectorAll('.nav-links a[href^="#"], #mobile-menu a[href^="#"]')];
+  const desktopLinks = [...nav.querySelectorAll('.nav-links a[href^="#"]')];
+  const sections = [...new Set(links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean))];
+  const activate = id => {
+    links.forEach(link => {
+      const active = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  if ('IntersectionObserver' in window && sections.length) {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio-a.intersectionRatio)[0];
+      if (visible) activate(visible.target.id);
+    }, { rootMargin: '-22% 0px -62% 0px', threshold: [0, .15, .35, .6] });
+    sections.forEach(section => observer.observe(section));
+  }
+  links.forEach(link => link.addEventListener('click', () => {
+    const id = link.getAttribute('href').slice(1);
+    activate(id);
+    setMenu(false);
+  }));
+
+  let ticking = false;
+  const updateScroll = () => {
+    nav.classList.toggle('is-scrolled', window.scrollY > 12);
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateScroll);
+      ticking = true;
+    }
+  }, { passive: true });
+  updateScroll();
+
+  window.addEventListener('resize', () => {
+    if (window.matchMedia('(min-width: 769px)').matches) setMenu(false);
+  });
+})();
+</script>
+
 </body>
 </html>
