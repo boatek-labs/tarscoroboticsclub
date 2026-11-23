@@ -96,31 +96,7 @@
   </div>
 
   <!-- Next event hero -->
-  <div class="next-hero reveal">
-    <div style="position:absolute;top:0;right:0;bottom:0;width:40%;background:radial-gradient(ellipse at right,#F2CC2410,transparent);pointer-events:none"></div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#F2CC24;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <div style="width:7px;height:7px;border-radius:50%;background:#F2CC24;animation:pulse 2s infinite;box-shadow:0 0 8px #F2CC24"></div>
-      NEXT EVENT
-    </div>
-    <h2 style="font-family:Rajdhani;font-weight:700;font-size:1.8rem;color:#F1F5EE;margin-bottom:6px">Regional Robotics Championship</h2>
-    <p style="color:#BDCCBF;font-size:.9rem;margin-bottom:14px">TRC sends 3 competition teams. Open spectating for all students. Cheer us on!</p>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:.82rem;color:#77947D;margin-bottom:16px">
-      <span style="display:flex;align-items:center;gap:6px">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Monday, July 14 · 9:00 AM
-      </span>
-      <span style="display:flex;align-items:center;gap:6px">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        TARSCO Assembly Hall
-      </span>
-    </div>
-    <div class="countdown" id="countdown">
-      <div class="cd-block"><div class="cd-val" id="cd-d">15</div><div class="cd-lbl">Days</div></div>
-      <div class="cd-block"><div class="cd-val" id="cd-h">08</div><div class="cd-lbl">Hrs</div></div>
-      <div class="cd-block"><div class="cd-val" id="cd-m">30</div><div class="cd-lbl">Min</div></div>
-      <div class="cd-block"><div class="cd-val" id="cd-s">00</div><div class="cd-lbl">Sec</div></div>
-    </div>
-  </div>
+  <div class="next-hero reveal"><div class="next-event-kicker">Loading next event…</div></div>
 
   <!-- Filters -->
   <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap" class="reveal">
@@ -134,148 +110,12 @@
   <!-- Upcoming events -->
   <div class="sec-label reveal">Upcoming Events</div>
 
-  <div id="events-list">
-
-    <div class="evt-card reveal" data-type="competition">
-      <div class="evt-date-col">
-        <div class="evt-day">14</div>
-        <div class="evt-month">Jul</div>
-      </div>
-      <div class="evt-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-          <span class="type-badge t-comp">🏆 Competition</span>
-          <span style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">9:00 AM · All day</span>
-          <span style="background:#69A66A15;color:#69A66A;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:1px 6px;border-radius:2px;border:1px solid #69A66A33">Open to All</span>
-        </div>
-        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">Regional Robotics Championship</h3>
-        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:10px">TRC competes in the Line Follower, Obstacle Course, and Sumo Robot categories. Three teams qualified after our internal trials. Come support!</p>
-        <div style="display:flex;gap:16px;font-size:.78rem;color:#77947D;flex-wrap:wrap">
-          <span>📍 TARSCO Assembly Hall</span>
-          <span>👥 Open spectating</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="evt-card reveal" data-type="workshop">
-      <div class="evt-date-col">
-        <div class="evt-day">21</div>
-        <div class="evt-month">Jul</div>
-      </div>
-      <div class="evt-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-          <span class="type-badge t-workshop">🛠 Workshop</span>
-          <span style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">2:00 PM · 2 hrs</span>
-          <span style="background:#69A66A15;color:#69A66A;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:1px 6px;border-radius:2px;border:1px solid #69A66A33">Free · Open to All</span>
-        </div>
-        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">Intro to Arduino — Free Workshop</h3>
-        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:10px">No experience needed. Bring a notebook — the club provides all components. You'll leave with a working blink circuit and an understanding of how microcontrollers work.</p>
-        <div style="display:flex;gap:16px;font-size:.78rem;color:#77947D;flex-wrap:wrap">
-          <span>📍 Computer Lab B</span>
-          <span>📦 Components provided</span>
-          <span>🎯 Beginner friendly</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="evt-card reveal" data-type="build">
-      <div class="evt-date-col">
-        <div class="evt-day">28</div>
-        <div class="evt-month">Jul</div>
-      </div>
-      <div class="evt-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-          <span class="type-badge t-build">🔧 Build Day</span>
-          <span style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">10:00 AM · 4 hrs</span>
-          <span style="background:#F2CC2415;color:#F2CC24;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:1px 6px;border-radius:2px;border:1px solid #F2CC2433">Members Only</span>
-        </div>
-        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">Monthly Club Build Session</h3>
-        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:10px">Project teams work on active builds. Equipment and components available. Club executives and mentors will be present for technical support. Bring your project files and any notes.</p>
-        <div style="display:flex;gap:16px;font-size:.78rem;color:#77947D;flex-wrap:wrap">
-          <span>📍 Robotics Lab</span>
-          <span>🔒 Club members only</span>
-          <span>🛠 Bring your project</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="evt-card reveal" data-type="talk">
-      <div class="evt-date-col">
-        <div class="evt-day">05</div>
-        <div class="evt-month">Aug</div>
-      </div>
-      <div class="evt-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-          <span class="type-badge t-talk">🎤 Guest Talk</span>
-          <span style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">3:00 PM · 1 hr</span>
-          <span style="background:#69A66A15;color:#69A66A;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:1px 6px;border-radius:2px;border:1px solid #69A66A33">Open to All</span>
-        </div>
-        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">AI & The Future of Robotics</h3>
-        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:10px">Guest speaker from KNUST's Computer Engineering department. Topics include autonomous systems, edge AI, computer vision in robotics, and career paths in the field. Q&A session after.</p>
-        <div style="display:flex;gap:16px;font-size:.78rem;color:#77947D;flex-wrap:wrap">
-          <span>📍 TARSCO Main Hall</span>
-          <span>👥 All students welcome</span>
-          <span>❓ Q&A included</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="evt-card reveal" data-type="workshop">
-      <div class="evt-date-col">
-        <div class="evt-day">18</div>
-        <div class="evt-month">Aug</div>
-      </div>
-      <div class="evt-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-          <span class="type-badge t-workshop">🛠 Workshop</span>
-          <span style="font-size:.72rem;color:#77947D;font-family:'JetBrains Mono',monospace">2:00 PM · 3 hrs</span>
-          <span style="background:#69A66A15;color:#69A66A;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:1px 6px;border-radius:2px;border:1px solid #69A66A33">Free · Open to All</span>
-        </div>
-        <h3 style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE;margin-bottom:4px">Sensors Deep Dive: HC-SR04, IR & DHT22</h3>
-        <p style="font-size:.85rem;color:#BDCCBF;line-height:1.6;margin-bottom:10px">Hands-on workshop covering the three most commonly used sensors in beginner robotics projects. Wire them, read their data, and troubleshoot common issues.</p>
-        <div style="display:flex;gap:16px;font-size:.78rem;color:#77947D;flex-wrap:wrap">
-          <span>📍 Computer Lab B</span>
-          <span>📦 Components provided</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
+  <div id="events-list"><div class="live-placeholder">Loading published events…</div></div>
 
   <!-- Announcements -->
   <div class="sec-label reveal">Announcements</div>
 
-  <div class="announce-card reveal">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="type-badge t-announce">📢 Announcement</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D">June 26, 2025</span>
-      </div>
-      <span style="background:#F2CC2415;color:#F2CC24;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:2px 7px;border-radius:2px;border:1px solid #F2CC2433">📌 Pinned</span>
-    </div>
-    <h3 style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">Competition Registration — Deadline July 7</h3>
-    <p style="font-size:.85rem;color:#BDCCBF;line-height:1.7">All club members who want to be considered for the Regional Championship competition team must register their interest by July 7. Send a message to Jerry Dark or fill in the form in the Robotics Lab. Team placements will be announced July 10.</p>
   </div>
-
-  <div class="announce-card reveal" style="border-color:#69A66A33;border-left-color:#69A66A">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span class="type-badge t-announce">📢 Announcement</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D">June 20, 2025</span>
-    </div>
-    <h3 style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">New Module Published: Sensors & Actuators</h3>
-    <p style="font-size:.85rem;color:#BDCCBF;line-height:1.7">Module 4 — Sensors & Actuators is now live on the platform. 14 lessons covering HC-SR04, DHT22, IR sensors, DC motors, servo motors, and stepper motors. Accessible to all students who have completed Module 3.</p>
-    <a href="learn.html" style="font-size:.82rem;color:#69A66A;text-decoration:none;display:inline-block;margin-top:8px">Go to Module 4 →</a>
-  </div>
-
-  <div class="announce-card reveal" style="border-color:#285438;border-left-color:#77947D">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span class="type-badge t-announce">📢 Announcement</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D">June 10, 2025</span>
-    </div>
-    <h3 style="font-family:Rajdhani;font-weight:700;font-size:1rem;color:#F1F5EE;margin-bottom:6px">Robotics Lab Now Open Wednesdays 12–2 PM</h3>
-    <p style="font-size:.85rem;color:#BDCCBF;line-height:1.7">The lab will be open every Wednesday during lunch break for club members to use equipment and work on projects. An executive will always be present. Book a bench in advance by messaging a club executive.</p>
-  </div>
-
-</div>
 
 <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
 
