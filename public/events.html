@@ -320,6 +320,17 @@ function setFilter(type, btn) {
  try{
   const res=await fetch('/api/events');if(!res.ok)throw new Error('Could not load events');
   const items=await res.json();
+  const upcoming=items.filter(x=>!x.date||new Date(x.date)>=new Date()).sort((a,b)=>new Date(a.date||0)-new Date(b.date||0));
+  const hero=document.querySelector('.next-hero');
+  const next=upcoming[0];
+  if(hero){
+   if(next){
+    hero.innerHTML='<div class="next-event-kicker">NEXT EVENT</div><h2>'+esc(next.title||'Club event')+'</h2><p>'+esc(next.description||'')+'</p><div class="next-event-meta">'+(next.date?new Date(next.date).toLocaleString():'Date to be announced')+(next.location?' · '+esc(next.location):'')+'</div>';
+   }else{
+    hero.innerHTML='<div class="next-event-kicker">EVENTS</div><h2>No upcoming events</h2><p>New club events will appear here when they are published.</p>';
+   }
+  }
+  document.querySelectorAll('.announce-card').forEach(card=>card.remove());
   if(!items.length){list.innerHTML='<div class="empty-state" style="padding:42px 20px;text-align:center;color:#9aab9e">There are no published events yet. New club events will appear here when announced.</div>';return;}
   list.innerHTML=items.map(x=>{
    const date=x.date?new Date(x.date):null,valid=date&&!Number.isNaN(date.getTime());
