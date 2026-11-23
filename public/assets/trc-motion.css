@@ -1,0 +1,25 @@
+/* TARSCO motion system — shared across every public page */
+:root{--trc-motion-gold:#e8be16;--trc-motion-green:#69a66a;--trc-motion-ease:cubic-bezier(.2,.78,.22,1)}
+html{scroll-behavior:smooth}
+.trc-motion-progress{position:fixed;inset:0 auto auto 0;height:3px;width:100%;transform:scaleX(0);transform-origin:left center;background:linear-gradient(90deg,var(--trc-motion-green),var(--trc-motion-gold));z-index:9999;pointer-events:none}
+.trc-motion-orb{position:fixed;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:0;opacity:.075;filter:blur(55px);background:var(--trc-motion-gold);left:var(--mx,70%);top:var(--my,35%);transform:translate(-50%,-50%);transition:left .65s var(--trc-motion-ease),top .65s var(--trc-motion-ease)}
+.trc-motion-ready [data-motion="reveal"],.trc-motion-ready .trc-motion-reveal{opacity:0;transform:translate3d(0,38px,0) scale(.985);clip-path:inset(0 0 5% 0 round 18px);transition:opacity .8s var(--trc-motion-ease),transform .9s var(--trc-motion-ease),clip-path .9s var(--trc-motion-ease)}
+.trc-motion-ready [data-motion="reveal"].is-visible,.trc-motion-ready .trc-motion-reveal.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1);clip-path:inset(0 0 0 0 round 0)}
+.trc-motion-ready .trc-motion-stagger>*{opacity:0;transform:translateY(26px) scale(.98);transition:opacity .7s var(--trc-motion-ease),transform .8s var(--trc-motion-ease)}
+.trc-motion-ready .trc-motion-stagger.is-visible>*{opacity:1;transform:none}
+.trc-motion-ready .trc-motion-stagger.is-visible>*:nth-child(2){transition-delay:90ms}
+.trc-motion-ready .trc-motion-stagger.is-visible>*:nth-child(3){transition-delay:180ms}
+.trc-motion-ready .trc-motion-stagger.is-visible>*:nth-child(4){transition-delay:270ms}
+.trc-motion-ready .trc-motion-stagger.is-visible>*:nth-child(5){transition-delay:360ms}
+.trc-motion-card{transform:perspective(900px) translateZ(0);transform-style:preserve-3d;transition:transform .45s var(--trc-motion-ease),box-shadow .45s var(--trc-motion-ease),border-color .35s ease}
+.trc-motion-card:hover{transform:perspective(900px) translateY(-7px) rotateX(1.2deg) rotateY(-1.2deg);box-shadow:0 24px 55px #0005}
+.trc-motion-button{position:relative;overflow:hidden;isolation:isolate;transition:transform .3s var(--trc-motion-ease),box-shadow .3s ease}
+.trc-motion-button:after{content:"";position:absolute;inset:-120% auto -120% -35%;width:25%;transform:rotate(22deg) translateX(-220%);background:linear-gradient(90deg,transparent,#ffffff55,transparent);transition:transform .75s var(--trc-motion-ease);z-index:-1}
+.trc-motion-button:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 28px #0004}
+.trc-motion-button:hover:after{transform:rotate(22deg) translateX(700%)}
+.trc-motion-ghost{position:fixed!important;z-index:10000!important;pointer-events:none!important;margin:0!important;will-change:transform,width,height,left,top,border-radius,opacity}
+.trc-motion-page-enter{animation:trcPageEnter .75s var(--trc-motion-ease) both}
+@keyframes trcPageEnter{from{opacity:.4;transform:translateY(14px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes trcCircuitPulse{0%,100%{box-shadow:0 0 0 0 #e8be1600}50%{box-shadow:0 0 0 8px #e8be1618}}
+.trc-motion-active{animation:trcCircuitPulse 2.8s ease-in-out infinite}
+@media(hover:none){.trc-motion-card:hover{transform:none}.trc-motion-orb{display:none}}
