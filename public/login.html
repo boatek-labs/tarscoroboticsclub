@@ -192,9 +192,11 @@ a{transition:color .16s ease,opacity .16s ease}
 /* Google Identity button + tighter auth rhythm */
 .google-auth-block{margin:0 0 18px!important;padding:0 0 17px!important;border-bottom:1px solid #383838}
 .google-auth-block .divider{margin:0 0 12px!important;line-height:1.2}
-#google-signin{width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;overflow:visible;border-radius:999px}
-#google-signin>div{margin:0 auto!important;max-width:100%}
+#google-signin{width:100%;min-height:54px;display:flex;align-items:center;justify-content:center;overflow:visible;border-radius:999px}
+#google-signin>div{margin:0 auto!important;max-width:100%;transform:scale(1.12);transform-origin:center}
 #google-signin iframe{max-width:100%!important}
+#google-signin iframe{display:block}
+.google-auth-block{overflow:visible}
 .google-auth-note{margin:8px 0 0!important;line-height:1.4}
 .form-wrap>div:first-child{margin-bottom:20px!important}
 #login-form>p:first-of-type,#signup-form>p:first-of-type{margin-bottom:19px!important}
@@ -524,12 +526,17 @@ async function initializeGoogleSignIn() {
     const response = await fetch('/api/auth/google/config');
     const config = await response.json();
     if (!response.ok || !config.clientId) throw new Error(config.message || 'Google sign-in is unavailable.');
+    // Keep Google's non-personalized medium button, then enlarge it visually with CSS.
+    // Large Google buttons can switch to the returning-account personalized layout.
+    host.replaceChildren();
     google.accounts.id.initialize({
       client_id: config.clientId,
       callback: handleGoogleCredential,
       auto_select: false,
-      cancel_on_tap_outside: true
+      cancel_on_tap_outside: true,
+      use_fedcm_for_button: false
     });
+    const buttonWidth = Math.floor(Math.min(380, Math.max(240, host.clientWidth || 320)));
     google.accounts.id.renderButton(host, {
       type: 'standard',
       theme: 'filled_black',
@@ -537,7 +544,7 @@ async function initializeGoogleSignIn() {
       text: 'signin_with',
       shape: 'pill',
       logo_alignment: 'left',
-      width: Math.min(380, Math.max(240, host.clientWidth || 320))
+      width: buttonWidth
     });
   } catch (error) {
     console.error('Google sign-in initialization failed:', error);
