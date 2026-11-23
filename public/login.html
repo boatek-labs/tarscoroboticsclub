@@ -4,7 +4,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login — TRC</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
@@ -86,6 +87,73 @@
     .spinner{width:18px;height:18px;border:2px solid #071B1144;border-top-color:#071B11;
              border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
     @keyframes spin{to{transform:rotate(360deg)}}
+  
+/* Authentication layout refinement */
+body{min-height:100svh;grid-template-columns:minmax(300px,.88fr) minmax(0,1.12fr);background:#171717!important;color:#f5f5f5}
+#left{padding:clamp(26px,4vw,54px);background:#1c1c1c;border-right:1px solid #373737;gap:30px}
+#left>a,#left>div{min-width:0}
+#left .feat{gap:14px;padding:13px 0;border-bottom-color:#ffffff10;line-height:1.55}
+#left .feat-icon{width:42px;height:42px;flex:0 0 42px;border:1px solid #ffffff12;border-radius:12px;color:#e8be16;font-size:1rem}
+#left .feat-icon i{font-size:1rem}
+#left .feat strong{font-size:.91rem;letter-spacing:.005em}
+#right{min-width:0;min-height:100svh;padding:clamp(24px,5vw,64px);background:#171717}
+.form-wrap{width:min(100%,460px);max-width:460px;padding:clamp(22px,3vw,36px);border:1px solid #383838!important;border-radius:18px!important;background:#202020!important;box-shadow:0 22px 70px #0005!important}
+.form-wrap>div:first-child{gap:8px;padding:5px;background:#191919;border:1px solid #343434!important;border-radius:999px;margin-bottom:24px!important}
+.auth-tab{min-height:44px;padding:10px 16px;border:0!important;border-radius:999px!important;background:transparent!important;color:#aaa!important;font-family:Inter,sans-serif;font-size:.85rem;font-weight:650;letter-spacing:0;text-transform:none}
+.auth-tab.active{background:#e8be16!important;color:#171717!important;border:0!important;box-shadow:0 3px 12px #0003}
+.google-auth-block{margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid #383838}
+.google-auth-block .divider{margin:0 0 14px;font-size:.75rem;color:#999}
+.google-auth-block .divider:before,.google-auth-block .divider:after{background:#424242}
+#google-signin{width:100%;min-height:44px;overflow:hidden;border-radius:999px}
+#google-signin>div{margin:0 auto}
+.google-auth-note{margin-top:9px;color:#999;font-size:.72rem}
+#login-form h2,#signup-form h2{font-family:Inter,sans-serif!important;font-size:clamp(1.55rem,3vw,1.9rem)!important;line-height:1.2;letter-spacing:-.045em;margin-bottom:7px!important}
+#login-form>p:first-of-type,#signup-form>p:first-of-type{color:#aaa!important;margin-bottom:23px!important;line-height:1.55}
+.field{margin:0 0 17px!important;min-width:0}
+.field label{margin:0 0 8px!important;color:#d0d0d0!important;font-family:Inter,sans-serif!important;font-size:.76rem!important;font-weight:650!important;letter-spacing:.035em!important;text-transform:none!important}
+.input{display:block;width:100%;min-height:48px;padding:12px 15px!important;border:1px solid #484848!important;border-radius:10px!important;background:#191919!important;color:#f5f5f5!important;font-size:.9rem!important;line-height:1.35;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease!important}
+.input:focus{border-color:#d4ad19!important;background:#1c1c1c!important;box-shadow:0 0 0 3px #e8be161b!important}
+.input::placeholder{color:#777!important}
+#login-form .field>div[style*="position:relative"],#signup-form .field>div[style*="position:relative"]{position:relative}
+#login-form .field>div>button,#signup-form .field>div>button{width:38px;min-height:38px;display:grid;place-items:center;right:6px!important;top:50%!important;transform:translateY(-50%)!important;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;color:#aaa!important}
+#login-form .field>div>button:hover,#signup-form .field>div>button:hover{color:#e8be16!important;background:#ffffff0b!important}
+#login-form .field>div>button i,#signup-form .field>div>button i{font-size:.9rem}
+#login-form>div[style*="justify-content:space-between"]{gap:12px;flex-wrap:wrap;margin:2px 0 20px!important;color:#aaa!important}
+#login-form>div[style*="justify-content:space-between"] label{font-size:.8rem!important}
+#login-form input[type=checkbox],#signup-form input[type=checkbox]{width:16px;height:16px;accent-color:#e8be16}
+.btn-primary{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:49px;margin:8px 0 0!important;padding:13px 20px!important;border:1px solid #e8be16!important;border-radius:999px!important;background:#e8be16!important;color:#171717!important;font-family:Inter,sans-serif!important;font-size:.88rem!important;font-weight:750!important;letter-spacing:.01em!important;text-transform:none!important;box-shadow:none!important;transition:transform .16s ease,background .16s ease,box-shadow .16s ease!important}
+.btn-primary:hover{background:#f4d34b!important;box-shadow:0 8px 22px #e8be1622!important;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.65;cursor:wait;transform:none}
+#login-form>p:last-child,#signup-form>p:last-child{margin-top:22px!important;line-height:1.6}
+#signup-form>div[style*="grid-template-columns"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important;margin-bottom:17px}
+#signup-form>div[style*="height:16px"]{display:none}
+#signup-form .field>div[style*="font-size:.72rem"]{margin-top:7px!important;color:#999!important;line-height:1.45}
+#signup-form .strength-bar{height:4px;margin-top:9px;border-radius:99px;background:#3c3c3c}
+#signup-form .strength-fill{border-radius:99px}
+#signup-form .field:has(#s-agree){margin:5px 0 16px!important}
+#signup-form #s-agree{margin-top:3px!important}
+.err-msg,.success-msg{padding:12px 14px;border-radius:10px;line-height:1.5}
+.err-msg{background:#e5484812;border:1px solid #e5484840;color:#ff8b8b}
+.success-msg{background:#69a66a12;border:1px solid #69a66a40;color:#a8d7aa}
+.divider{color:#999}
+.spinner{width:17px;height:17px;border:2px solid #17171744;border-top-color:#171717;border-radius:50%}
+a{transition:color .16s ease,opacity .16s ease}
+@media(max-width:900px){
+ body{grid-template-columns:1fr}
+ #left{display:none}
+ #right{min-height:100svh;padding:clamp(18px,5vw,40px)}
+ .form-wrap{max-width:480px}
+}
+@media(max-width:520px){
+ #right{padding:16px 13px;align-items:flex-start}
+ .form-wrap{margin:auto 0;padding:21px 17px;border-radius:15px!important}
+ #signup-form>div[style*="grid-template-columns"]{gap:10px!important}
+ #signup-form .input{font-size:16px!important}
+ .auth-tab{font-size:.82rem;padding-inline:10px}
+ #login-form>div[style*="justify-content:space-between"]{align-items:flex-start!important}
+}
+@media(prefers-reduced-motion:reduce){.form-wrap *,.form-wrap{transition:none!important;animation:none!important}}
+
   </style>
   <link rel="stylesheet" href="assets/trc-brand.css?v=20261123-4" />
   <meta name="theme-color" content="#071B11" />
@@ -113,23 +181,23 @@
   <div style="position:relative;z-index:1">
     <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#77947D;letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px">What you get</p>
     <div class="feat">
-      <div class="feat-icon" style="background:#E8BE1615">📚</div>
+      <div class="feat-icon" style="background:#E8BE1615"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
       <div><strong style="color:#F1F5EE">60+ Structured Lessons</strong><br/>From beginner electronics to AI robotics</div>
     </div>
     <div class="feat">
-      <div class="feat-icon" style="background:#F2CC2415">🔥</div>
+      <div class="feat-icon" style="background:#F2CC2415"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
       <div><strong style="color:#F1F5EE">Streak Tracking & Badges</strong><br/>Stay motivated with daily learning goals</div>
     </div>
     <div class="feat">
-      <div class="feat-icon" style="background:#69A66A15">🤖</div>
+      <div class="feat-icon" style="background:#69A66A15"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
       <div><strong style="color:#F1F5EE">Real Project Documentation</strong><br/>Full schematics, code, and build steps</div>
     </div>
     <div class="feat">
-      <div class="feat-icon" style="background:#A855F715">💬</div>
+      <div class="feat-icon" style="background:#A855F715"><i class="fa-regular fa-comments" aria-hidden="true"></i></div>
       <div><strong style="color:#F1F5EE">Community Q&A</strong><br/>Ask questions, get answers from fellow builders</div>
     </div>
     <div class="feat">
-      <div class="feat-icon" style="background:#E8BE1615">🏆</div>
+      <div class="feat-icon" style="background:#E8BE1615"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
       <div><strong style="color:#F1F5EE">Club Membership Path</strong><br/>Apply to join, compete, and build with the team</div>
     </div>
   </div>
@@ -173,9 +241,9 @@
       <div class="field">
         <label>Password</label>
         <div style="position:relative">
-          <input type="password" class="input" id="l-pass" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px"/>
+          <input type="password" class="input" id="l-pass" placeholder="Enter your password" autocomplete="current-password" style="padding-right:44px"/>
           <button onclick="togglePass('l-pass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#77947D;transition:.2s;padding:0" onmouseover="this.style.color='#BDCCBF'" onmouseout="this.style.color='#77947D'">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <i class="fa-regular fa-eye" aria-hidden="true"></i>
           </button>
         </div>
       </div>
