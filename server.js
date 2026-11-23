@@ -409,6 +409,23 @@ app.post('/api/admin/users/:id/suspend', verifyToken, requireRole('superadmin'),
 });
 
 // ──────────────────────────────
+// MEMBER DIRECTORY
+// ──────────────────────────────
+app.get('/api/members', verifyToken, async (req, res) => {
+  await db.read();
+  const q = String(req.query.q || '').trim().toLowerCase();
+  const role = String(req.query.role || '').trim().toLowerCase();
+  const members = db.data.users
+    .filter(u => !u.suspended && ['member','executive','superadmin'].includes(u.role))
+    .filter(u => !role || u.role === role)
+    .filter(u => !q || [u.name, u.bio, u.role].some(v => String(v || '').toLowerCase().includes(q)))
+    .sort((a,b) => String(a.name || '').localeCompare(String(b.name || '')))
+    .map(u => ({ id:u.id, name:u.name, role:u.role, bio:u.bio || '', avatar:u.avatarDataUrl || u.picture || u.avatar || null, joinedAt:u.joinedAt || null, badges:(u.badges || []).length }));
+  res.set('Cache-Control', 'private, no-store');
+  res.json(members);
+});
+
+// ──────────────────────────────
 // MEMBERSHIP
 // ──────────────────────────────
 app.post('/api/membership/apply', verifyToken, async (req, res) => {
@@ -585,6 +602,36 @@ app.get('/api/progress/me', verifyToken, async (req, res) => {
     recentActivity,
     upcomingEvents
   });
+});
+
+// ──────────────────────────────
+// PERSONALIZED ACTIVITY FEED
+// ──────────────────────────────
+app.get('/api/activity', verifyToken, async (req, res) => {
+  await db.read();
+  const userId = req.user.id;
+  const feed = [];
+  db.data.communityPosts.filter(p => !p.flagged).forEach(p => {
+    const author = db.data.users.find(u => u.id === p.userId);
+    feed.push({ id:'post-'+p.id, kind:'post', actor:author?.name || 'Member', actorId:p.userId, text:p.title || p.body || 'Shared a community post', detail:p.body || '', date:p.createdAt, href:'/community.html?post='+encodeURIComponent(p.id) });
+  });
+  db.data.communityReplies.filter(r => !r.flagged).forEach(r => {
+    const author = db.data.users.find(u => u.id === r.userId);
+    feed.push({ id:'reply-'+r.id, kind:'reply', actor:author?.name || 'Member', actorId:r.userId, text:'replied in the community', detail:r.body || '', date:r.createdAt, href:'/community.html?post='+encodeURIComponent(r.postId) });
+  });
+  db.data.projects.filter(p => p.status === 'approved').forEach(p => {
+    const author = db.data.users.find(u => u.id === p.submittedBy);
+    feed.push({ id:'project-'+p.id, kind:'project', actor:author?.name || 'Member', actorId:p.submittedBy, text:'published a project: '+(p.title || 'New project'), detail:p.description || '', date:p.approvedAt || p.submittedAt, href:'/project.html?id='+encodeURIComponent(p.id) });
+  });
+  db.data.lessonProgress.filter(p => p.completed).forEach(p => {
+    const author = db.data.users.find(u => u.id === p.userId);
+    const lesson = db.data.lessons.find(l => l.id === p.lessonId);
+    if (author && lesson) feed.push({ id:'lesson-'+p.id, kind:'learning', actor:author.name, actorId:author.id, text:'completed '+lesson.title, detail:'Learning progress', date:p.completedAt, href:'/my-learning.html' });
+  });
+  const visible = feed.filter(x => x.date && new Date(x.date).getTime() > Date.now()-30*86400000)
+    .sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,60);
+  res.set('Cache-Control','private, no-store');
+  res.json(visible);
 });
 
 // Admin: lesson management
