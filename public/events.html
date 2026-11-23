@@ -126,24 +126,6 @@ if (window.gsap && window.ScrollTrigger) gsap.utils.toArray('.reveal').forEach(e
     scrollTrigger:{trigger:el, start:'top 92%', toggleActions:'play none none none'}});
 });
 
-// Countdown to July 14 2025 09:00
-function updateCountdown() {
-  const target = new Date('2025-07-14T09:00:00');
-  const now    = new Date();
-  const diff   = target - now;
-  if(diff <= 0) { document.getElementById('countdown').innerHTML='<span style="color:#69A66A;font-family:Rajdhani;font-weight:700;font-size:1.2rem">Event is Live!</span>'; return; }
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
-  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
-  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
-  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
-}
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
 function setFilter(type, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
