@@ -603,6 +603,7 @@ html[data-theme="light"] footer{background:#eae6f0!important}
 @media(max-width:768px){.trc-morph-section.is-morphed{border-radius:16px}}
 @media(prefers-reduced-motion:reduce){.trc-morph-section{will-change:auto!important;transform:none!important;clip-path:none!important;opacity:1!important}}
 </style>
+  <link rel="stylesheet" href="assets/trc-motion.css">
 </head>
 <body class="trc-home-page">
 
@@ -1377,60 +1378,7 @@ window.addEventListener('scroll', () => {
   .catch(()=>{localStorage.removeItem('trc_token');localStorage.removeItem('trc_user');nodes.forEach(a=>{a.href='/login.html';a.classList.remove('is-authenticated');a.innerHTML='<i class="fa-regular fa-circle-user"></i><span>Account</span>';});});
 })();
 </script>
-<script id="trc-scroll-morph">
-(()=> {
- const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const sections=[...document.querySelectorAll('body.trc-home-page > section')].filter(s=>s.id!=='hero');
- if(!sections.length)return;
- sections.forEach(section=>{
-   section.classList.add('trc-morph-section');
-   if(!section.querySelector(':scope > .trc-morph-glow')){
-     const glow=document.createElement('span');glow.className='trc-morph-glow';
-     glow.setAttribute('aria-hidden','true');section.prepend(glow);
-   }
- });
- if(reduce||!window.gsap||!window.ScrollTrigger)return;
- gsap.registerPlugin(ScrollTrigger);
- sections.forEach(section=>{
-   const content=[...section.children].filter(el=>!el.classList.contains('trc-morph-glow'));
-   const cards=section.querySelectorAll('.trc-card');
-   gsap.fromTo(section,{y:34,scale:.985,opacity:.82,clipPath:'inset(3% 1.2% 0% round 22px)'},{
-     y:0,scale:1,opacity:1,clipPath:'inset(0% 0% 0% round 0px)',ease:'none',
-     scrollTrigger:{trigger:section,start:'top 92%',end:'top 42%',scrub:.65, invalidateOnRefresh:true}
-   });
-   if(cards.length)gsap.fromTo(cards,{y:24,scale:.975,opacity:.65},{
-     y:0,scale:1,opacity:1,stagger:.075,ease:'power2.out',
-     scrollTrigger:{trigger:section,start:'top 78%',end:'center 48%',scrub:.55}
-   });
-   const glow=section.querySelector(':scope > .trc-morph-glow');
-   if(glow)gsap.fromTo(glow,{opacity:0},{opacity:.85,ease:'none',
-     scrollTrigger:{trigger:section,start:'top 82%',end:'top 48%',scrub:.6}});
- });
- // A shared-element style transition: the hero's project link travels into
- // the Projects heading before the browser completes the section scroll.
- document.addEventListener('click',event=>{
-   const link=event.target.closest('a[href="#projects"]');
-   const target=document.querySelector('#projects .section-title, #projects h2');
-   if(!link||!target||reduce||!link.getClientRects().length)return;
-   const from=link.getBoundingClientRect(),to=target.getBoundingClientRect();
-   if(!from.width||!to.width)return;
-   event.preventDefault();
-   const ghost=link.cloneNode(true),style=getComputedStyle(link);
-   Object.assign(ghost.style,{position:'fixed',left:from.left+'px',top:from.top+'px',
-     width:from.width+'px',height:from.height+'px',margin:'0',zIndex:'2000',
-     pointerEvents:'none',overflow:'hidden',whiteSpace:'nowrap',
-     borderRadius:style.borderRadius,background:style.background,color:style.color,
-     border:style.border,display:'flex',alignItems:'center',justifyContent:'center'});
-   document.body.appendChild(ghost);
-   const destination={left:Math.max(12,to.left)+'px',top:(Math.max(12,to.top+to.height/2-22))+'px',
-     width:Math.min(to.width,Math.max(170,from.width))+'px',height:'44px',
-     borderRadius:'12px',opacity:.18,transform:'scale(.92)'};
-   ghost.animate([ {left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px',opacity:1,transform:'scale(1)'},
-     destination ],{duration:560,easing:'cubic-bezier(.2,.75,.2,1)',fill:'forwards'}).onfinish=()=>ghost.remove();
-   target.scrollIntoView({behavior:'smooth',block:'center'});
- });
- window.addEventListener('load',()=>ScrollTrigger.refresh(),{once:true});
-})();
-</script>
+
+  <script src="assets/trc-motion.js" defer></script>
 </body>
 </html>
