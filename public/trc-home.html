@@ -1559,5 +1559,54 @@ window.addEventListener('scroll', () => {
 })();
 </script>
 
+<script id="trc-live-home-content">
+(()=>{
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const empty=(msg)=>'<div style="grid-column:1/-1;padding:34px 18px;text-align:center;color:#9aab9e">'+msg+'</div>';
+ async function json(url){const r=await fetch(url);if(!r.ok)throw new Error('Could not load '+url);return r.json();}
+ async function loadStats(){
+  try{
+   const s=await json('/api/public/stats');
+   const nodes=[...document.querySelectorAll('.stat-val')];
+   const values=[s.students+s.members,s.projects,s.events,s.modules,s.communityPosts,s.members];
+   nodes.forEach((el,i)=>{if(values[i]!==undefined)el.textContent=Number(values[i]).toLocaleString();});
+  }catch(e){console.warn('Live homepage stats unavailable',e);}
+ }
+ async function loadModules(){
+  const grid=document.getElementById('modules-grid');if(!grid)return;
+  try{
+   const items=await json('/api/modules');
+   if(!items.length){grid.innerHTML=empty('Learning modules will appear here once published by the club team.');return;}
+   grid.innerHTML=items.slice(0,6).map(m=>'<article class="trc-card p-6 module-card" data-level="'+esc((m.level||'beginner').toLowerCase())+'"><div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:14px"><i class="fa-solid fa-book-open text-2xl"></i><span class="lvl-badge">'+esc(m.level||'Module')+'</span></div><h3>'+esc(m.title||'Untitled module')+'</h3><p>'+esc(m.description||'Explore this published learning module.')+'</p><div style="margin-top:14px;color:#9aab9e;font-size:.78rem">'+Number(m.lessonCount||m.lessonsCount||0)+' lessons</div><a class="btn-outline" href="learn.html">Explore module <i class="fa-solid fa-arrow-right"></i></a></article>').join('');
+  }catch(e){grid.innerHTML=empty('Learning modules are temporarily unavailable.');}
+ }
+ async function loadProjects(){
+  const grid=document.querySelector('#projects .grid');if(!grid)return;
+  try{
+   const items=await json('/api/projects');
+   if(!items.length){grid.innerHTML=empty('No approved projects have been published yet.');return;}
+   grid.innerHTML=items.slice(0,3).map(x=>'<article class="trc-card overflow-hidden"><div class="proj-img-placeholder"><i class="fa-solid fa-robot"></i></div><div class="p-6"><span class="lvl-badge">'+esc(x.category||x.tags?.[0]||'Project')+'</span><h3 class="font-display font-bold text-lg text-light my-3">'+esc(x.title||'Untitled project')+'</h3><p class="text-silver text-sm">'+esc(x.description||x.summary||'')+'</p><div style="margin-top:12px;color:#9aab9e;font-size:.76rem">By '+esc(x.owner?.name||'TRC member')+' · '+(x.team?.length||1)+' team member(s)</div><a href="project.html?id='+encodeURIComponent(x.id)+'" class="btn-outline" style="margin-top:14px">View project <i class="fa-solid fa-arrow-right"></i></a></div></article>').join('');
+  }catch(e){grid.innerHTML=empty('Projects are temporarily unavailable.');}
+ }
+ async function loadEvents(){
+  const grid=document.querySelector('#events .grid');if(!grid)return;
+  try{
+   const items=await json('/api/events');
+   if(!items.length){grid.innerHTML=empty('No upcoming events have been announced yet.');return;}
+   grid.innerHTML=items.slice(0,2).map(x=>'<article class="trc-card p-6"><span class="lvl-badge">'+esc(x.type||'Event')+'</span><h3 class="font-display font-bold text-lg my-3">'+esc(x.title||'Club event')+'</h3><p class="text-silver text-sm">'+esc(x.description||'')+'</p><div style="margin-top:12px;color:#9aab9e;font-size:.78rem">'+(x.date?new Date(x.date).toLocaleString():'Date to be announced')+(x.location?' · '+esc(x.location):'')+'</div></article>').join('');
+  }catch(e){grid.innerHTML=empty('Events are temporarily unavailable.');}
+ }
+ async function loadDiscussions(){
+  const section=document.querySelector('#community');if(!section)return;
+  const root=section.querySelector('.grid');if(!root)return;
+  try{
+   const items=await json('/api/posts');
+   if(!items.length){root.innerHTML=empty('No community discussions have been posted yet.');return;}
+   root.innerHTML=items.slice(0,2).map(p=>'<article class="trc-card p-6"><span class="lvl-badge">'+esc(p.status||'Open')+'</span><h3 class="font-display font-bold text-lg my-3">'+esc(p.title||'Discussion')+'</h3><p class="text-silver text-sm">'+esc(p.body||'')+'</p><div style="margin-top:12px;color:#9aab9e;font-size:.76rem">'+esc(p.author?.name||'Community member')+' · '+Number(p.replyCount||0)+' replies</div></article>').join('');
+  }catch(e){root.innerHTML=empty('Community discussions are temporarily unavailable.');}
+ }
+ loadStats();loadModules();loadProjects();loadEvents();loadDiscussions();
+})();
+</script>
 </body>
 </html>
