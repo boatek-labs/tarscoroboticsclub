@@ -45,7 +45,7 @@
     <a class="nav-link" href="/resources.html"><i class="fa-solid fa-folder-open"></i>Resources</a>
     <div class="nav-label">Account</div>
     <a class="nav-link" href="/profile.html"><i class="fa-regular fa-user"></i>My Profile</a>
-    <a class="nav-link" href="/notifications.html"><i class="fa-regular fa-bell"></i>Notifications</a>
+    <a class="nav-link" href="/notifications.html"><i class="fa-regular fa-bell"></i>Notifications <span id="notification-count" class="pill" style="margin-left:auto" hidden></span></a>
     <a class="nav-link" id="admin-link" href="/admin.html" hidden><i class="fa-solid fa-shield-halved"></i>Administration</a>
   </nav>
   <div class="userbox"><div class="avatar" id="side-avatar">?</div><div class="min-w-0"><div id="side-name" class="font-semibold text-sm truncate">Loading account…</div><div id="side-role" class="muted text-xs">Verifying session</div></div></div>
@@ -125,7 +125,9 @@
       $('welcome-sub').textContent = user.role === 'superadmin' || user.role === 'executive' ? 'Your club administration account is active.' : 'Here is your personal learning and club activity.';
       $('side-name').textContent = name;
       $('side-role').textContent = String(user.role || 'student').replace(/_/g,' ');
-      $('side-avatar').innerHTML = user.picture ? '<img src="'+esc(user.picture)+'" alt="Profile photo">' : esc(name.trim().charAt(0).toUpperCase() || '?');
+      const avatarUrl = user.avatarDataUrl || user.picture || user.avatar || '';
+      $('side-avatar').innerHTML = avatarUrl ? '<img src="'+esc(avatarUrl)+'" alt="Profile photo">' : esc(name.trim().charAt(0).toUpperCase() || '?');
+      try { const notifications = await api('/api/notifications'); const unread = notifications.filter(n=>!n.read).length; if(unread){$('notification-count').textContent=unread>99?'99+':unread;$('notification-count').hidden=false;} } catch (_) { /* dashboard remains usable if notifications are unavailable */ }
       if(['superadmin','executive'].includes(user.role)) $('admin-link').hidden = false;
       $('points').textContent = Number(progress.totalPoints || 0).toLocaleString();
       $('lessons-done').textContent = Number(progress.completedLessons || 0);
