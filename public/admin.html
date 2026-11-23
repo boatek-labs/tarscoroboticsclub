@@ -191,12 +191,12 @@
       <div class="stat-card">
         <div class="stat-lbl">Total Students</div>
         <div class="stat-val" style="color:#E8BE16" id="a1">0</div>
-        <div class="stat-trend" style="color:#69A66A">↑ +8 this week</div>
+        <div class="stat-trend" style="color:#69A66A">Live database total</div>
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Club Members</div>
         <div class="stat-val" style="color:#69A66A" id="a2">0</div>
-        <div class="stat-trend" style="color:#77947D">↑ +2 this month</div>
+        <div class="stat-trend" style="color:#77947D">Live database total</div>
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Pending Apps</div>
@@ -211,21 +211,21 @@
       <div class="stat-card">
         <div class="stat-lbl">Lessons Published</div>
         <div class="stat-val" style="color:#F1F5EE" id="a5">0</div>
-        <div class="stat-trend" style="color:#77947D">Across 6 modules</div>
+        <div class="stat-trend" style="color:#77947D">Live published modules</div>
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Community Posts</div>
         <div class="stat-val" style="color:#F1F5EE" id="a6">0</div>
-        <div class="stat-trend" style="color:#77947D">↑ +14 this week</div>
+        <div class="stat-trend" style="color:#77947D">Live database total</div>
       </div>
     </div>
 
     <!-- Tab navigation -->
     <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
       <button class="tab-btn active" onclick="showAdminTab('overview', this)">Overview</button>
-      <button class="tab-btn" onclick="showAdminTab('membership', this)">Membership Requests <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace">5</span></button>
+      <button class="tab-btn" onclick="showAdminTab('membership', this)">Membership Requests <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace" data-live-count="applications">0</span></button>
       <button class="tab-btn" onclick="showAdminTab('users', this)">Users</button>
-      <button class="tab-btn" onclick="showAdminTab('projects', this)">Project Approvals <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace">3</span></button>
+      <button class="tab-btn" onclick="showAdminTab('projects', this)">Project Approvals <span style="background:#F2CC24;color:#071B11;font-size:.6rem;padding:1px 5px;border-radius:2px;margin-left:4px;font-family:'JetBrains Mono',monospace" data-live-count="projects">0</span></button>
       <button class="tab-btn" onclick="showAdminTab('lessons', this)">Lessons</button>
     </div>
 
@@ -533,6 +533,56 @@ setTimeout(() => {
   animCount('a1',142); animCount('a2',12); animCount('a3',5);
   animCount('a4',3); animCount('a5',60); animCount('a6',88);
 }, 200);
+</script>
+<script id="trc-live-admin-data">
+(()=>{
+ const token=localStorage.getItem('trc_token');
+ const auth={Authorization:'Bearer '+(token||'')};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const date=s=>s?new Date(s).toLocaleDateString():'—';
+ const empty=(cols,msg='No records yet')=>'<tr><td colspan="'+cols+'" style="padding:22px;text-align:center;color:#9aab9e">'+msg+'</td></tr>';
+ async function get(url){const r=await fetch(url,{headers:auth});if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||'Request failed');return r.json();}
+ async function send(url,method){const r=await fetch(url,{method,headers:auth});if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||'Action failed');return r.json();}
+ function setRows(tbody,rows,cols){if(tbody)tbody.innerHTML=rows.length?rows.join(''):empty(cols);}
+ async function load(){
+  if(!token){location.href='login.html';return;}
+  try{
+   const [stats,users,apps,projects]=await Promise.all([
+    get('/api/admin/stats'),get('/api/admin/users'),get('/api/membership/applications'),get('/api/admin/projects')
+   ]);
+   const vals=[stats.totalUsers,stats.clubMembers,stats.pendingApps,stats.pendingProjects,stats.publishedLessons,stats.communityPosts];
+   vals.forEach((v,i)=>{const el=document.getElementById('a'+(i+1));if(el)el.textContent=Number(v||0).toLocaleString();});
+   document.querySelectorAll('.stat-trend').forEach(el=>{el.textContent='Live database total';el.style.color='#9aab9e';});
+   const pending=apps.filter(a=>a.status==='pending');
+   const appRow=a=>'<tr><td>'+esc(a.user?.name||'Unknown account')+'</td><td>'+esc(a.user?.email||'')+'</td><td>'+date(a.appliedAt)+'</td><td>—</td><td>'+esc(a.motivation||'—')+'</td><td><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-approve" data-approve-app="'+esc(a.id)+'">Approve</button><button class="btn-reject" data-reject-app="'+esc(a.id)+'">Reject</button></div></td></tr>';
+   setRows(document.getElementById('membership-tbody'),pending.map(appRow),6);
+   const usersBody=document.querySelector('#tab-users tbody');
+   const userRows=users.sort((a,b)=>new Date(b.joinedAt||0)-new Date(a.joinedAt||0)).map(u=>'<tr><td>'+esc(u.name)+'</td><td>'+esc(u.email)+'</td><td><span class="badge">'+esc(u.role)+'</span></td><td>'+date(u.joinedAt)+'</td><td>—</td><td><span class="badge">'+(u.suspended?'Suspended':'Active')+'</span></td></tr>');
+   setRows(usersBody,userRows,6);
+   const projectRows=projects.filter(x=>x.status==='pending').map(x=>'<tr><td>'+esc(x.title||'Untitled project')+'</td><td>'+esc(x.owner?.name||'Unknown account')+'</td><td><span class="badge">'+esc(x.status)+'</span></td><td><div style="display:flex;gap:7px"><button class="btn-approve" data-approve-project="'+esc(x.id)+'">Approve</button><button class="btn-reject" data-reject-project="'+esc(x.id)+'">Reject</button></div></td></tr>');
+   const projectBody=document.querySelector('#tab-projects tbody');setRows(projectBody,projectRows,4);
+   const overviewBodies=document.querySelectorAll('#tab-overview table tbody');
+   if(overviewBodies[0])setRows(overviewBodies[0],users.slice(0,5).map(u=>'<tr><td>'+esc(u.name)+'</td><td>'+esc(u.role)+'</td><td>'+date(u.joinedAt)+'</td><td>—</td></tr>'),4);
+   if(overviewBodies[1])setRows(overviewBodies[1],pending.slice(0,5).map(a=>'<tr><td>'+esc(a.user?.name||'Unknown account')+'</td><td>'+date(a.appliedAt)+'</td><td><button class="btn-approve" data-approve-app="'+esc(a.id)+'">Approve</button></td></tr>'),3);
+   if(overviewBodies[2])setRows(overviewBodies[2],projects.slice(0,5).map(x=>'<tr><td>'+esc(x.title||'Untitled project')+'</td><td>'+esc(x.owner?.name||'Unknown account')+'</td><td>'+esc(x.status||'pending')+'</td><td>—</td></tr>'),4);
+   document.querySelectorAll('[data-live-count="applications"]').forEach(el=>el.textContent=pending.length);
+   document.querySelectorAll('[data-live-count="projects"]').forEach(el=>el.textContent=projects.filter(x=>x.status==='pending').length);
+  }catch(e){console.error('Admin data load failed:',e);const content=document.getElementById('content');if(content){let n=document.getElementById('admin-data-error');if(!n){n=document.createElement('p');n.id='admin-data-error';n.style.cssText='padding:14px;color:#f0bd65';content.prepend(n);}n.textContent='Live admin data could not be loaded: '+e.message;}}
+ }
+ document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-approve-app],[data-reject-app],[data-approve-project],[data-reject-project]');if(!b)return;
+  const [key,id]=Object.entries(b.dataset)[0]||[];if(!key||!id)return;
+  b.disabled=true;
+  try{
+   if(key==='approveApp')await send('/api/membership/'+encodeURIComponent(id)+'/approve','PATCH');
+   if(key==='rejectApp')await send('/api/membership/'+encodeURIComponent(id)+'/reject','PATCH');
+   if(key==='approveProject')await send('/api/projects/'+encodeURIComponent(id)+'/approve','PATCH');
+   if(key==='rejectProject')await send('/api/projects/'+encodeURIComponent(id)+'/reject','PATCH');
+   await load();
+  }catch(e){alert(e.message);b.disabled=false;}
+ });
+ load();
+})();
 </script>
 </body>
 </html>
