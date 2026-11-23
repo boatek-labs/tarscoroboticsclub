@@ -192,12 +192,13 @@ app.use(async (req, res, next) => {
 // ──────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   await db.read();
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+  const email = String(req.body.email || '').trim().toLowerCase();
   if (!name || !email || !password)
     return res.status(400).json({ message: 'Name, email and password are required' });
   if (password.length < 8)
     return res.status(400).json({ message: 'Password must be at least 8 characters' });
-  if (db.data.users.find(u => u.email === email))
+  if (db.data.users.find(u => String(u.email || '').toLowerCase() === email))
     return res.status(409).json({ message: 'An account with this email already exists' });
 
   const passwordHash = await bcrypt.hash(password, 10);
