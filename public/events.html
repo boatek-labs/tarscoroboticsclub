@@ -312,5 +312,26 @@ function setFilter(type, btn) {
   });
 }
 </script>
+<script id="trc-live-events">
+(async()=>{
+ const list=document.getElementById('events-list'); if(!list)return;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ list.innerHTML='<p class="empty-state">Loading published events…</p>';
+ try{
+  const res=await fetch('/api/events');if(!res.ok)throw new Error('Could not load events');
+  const items=await res.json();
+  if(!items.length){list.innerHTML='<div class="empty-state" style="padding:42px 20px;text-align:center;color:#9aab9e">There are no published events yet. New club events will appear here when announced.</div>';return;}
+  list.innerHTML=items.map(x=>{
+   const date=x.date?new Date(x.date):null,valid=date&&!Number.isNaN(date.getTime());
+   const day=valid?String(date.getDate()).padStart(2,'0'):'—',month=valid?date.toLocaleString(undefined,{month:'short'}):'';
+   return '<article class="evt-card reveal" data-type="'+esc((x.type||'event').toLowerCase())+'"><div class="evt-date-col"><div class="evt-day">'+day+'</div><div class="evt-month">'+month+'</div></div>'+
+   '<div class="evt-body"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span class="type-badge">'+esc(x.type||'Event')+'</span>'+
+   (x.time?'<span>'+esc(x.time)+'</span>':'')+'</div><h3>'+esc(x.title||'Club event')+'</h3><p>'+esc(x.description||'')+'</p>'+
+   '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:#9aab9e;font-size:.8rem">'+(x.location?'<span><i class="fa-solid fa-location-dot"></i> '+esc(x.location)+'</span>':'')+
+   (x.audience?'<span>'+esc(x.audience)+'</span>':'')+'</div></div></article>';
+  }).join('');
+ }catch(err){list.innerHTML='<p class="empty-state">Events are temporarily unavailable.</p>';console.error(err);}
+})();
+</script>
 </body>
 </html>
