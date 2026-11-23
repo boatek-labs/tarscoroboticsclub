@@ -104,8 +104,8 @@ body{min-height:100svh;grid-template-columns:minmax(300px,.88fr) minmax(0,1.12fr
 .google-auth-block{margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid #383838}
 .google-auth-block .divider{margin:0 0 14px;font-size:.75rem;color:#999}
 .google-auth-block .divider:before,.google-auth-block .divider:after{background:#424242}
-#google-signin{width:100%;min-height:44px;overflow:hidden;border-radius:999px}
-#google-signin>div{margin:0 auto}
+#google-signin{width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;overflow:visible;border-radius:999px;background:transparent!important}
+#google-signin>div{margin:0 auto!important;background:transparent!important}
 .google-auth-note{margin-top:9px;color:#999;font-size:.72rem}
 #login-form h2,#signup-form h2{font-family:Inter,sans-serif!important;font-size:clamp(1.55rem,3vw,1.9rem)!important;line-height:1.2;letter-spacing:-.045em;margin-bottom:7px!important}
 #login-form>p:first-of-type,#signup-form>p:first-of-type{color:#aaa!important;margin-bottom:23px!important;line-height:1.55}
@@ -532,10 +532,11 @@ async function initializeGoogleSignIn() {
     });
     google.accounts.id.renderButton(host, {
       type: 'standard',
-      theme: 'outline_dark',
+      theme: 'filled_black',
       size: 'large',
       text: 'continue_with',
       shape: 'pill',
+      logo_alignment: 'left',
       width: Math.min(420, Math.max(240, host.clientWidth || 320))
     });
   } catch (error) {
