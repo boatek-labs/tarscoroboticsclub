@@ -9,6 +9,7 @@ const express     = require('express');
 const db = require('./db');
 const bcrypt      = require('bcryptjs');
 const jwt         = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const multer      = require('multer');
 const path        = require('path');
 const fs          = require('fs');
@@ -18,6 +19,8 @@ require('dotenv').config();
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'trc_secret_change_this');
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const googleOAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is required in production.');
 
 // ──────────────────────────────
@@ -124,7 +127,7 @@ const isMember = requireRole('superadmin', 'executive', 'member');
 // HELPERS
 // ──────────────────────────────
 function safeUser(u) {
-  const { passwordHash, ...safe } = u;
+  const { passwordHash, googleSub, ...safe } = u;
   return safe;
 }
 
@@ -215,8 +218,9 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   await db.read();
   const { email, password } = req.body;
-  const user = db.data.users.find(u => u.email === email);
-  if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const user = db.data.users.find(u => String(u.email || '').toLowerCase() === normalizedEmail);
+  if (!user || !user.passwordHash) return res.status(401).json({ message: 'Invalid email or password' });
   if (user.suspended) return res.status(403).json({ message: 'Account suspended. Contact admin.' });
 
   const valid = await bcrypt.compare(password, user.passwordHash);
@@ -224,6 +228,85 @@ app.post('/api/auth/login', async (req, res) => {
 
   const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: safeUser(user) });
+});
+
+
+// Google Identity Services configuration. Client IDs are public identifiers.
+app.get('/api/auth/google/config', (req, res) => {
+  if (!GOOGLE_CLIENT_ID) return res.status(503).json({ message: 'Google sign-in is not configured.' });
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json({ clientId: GOOGLE_CLIENT_ID });
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  if (!GOOGLE_CLIENT_ID) return res.status(503).json({ message: 'Google sign-in is not configured.' });
+  const credential = req.body?.credential;
+  if (typeof credential !== 'string' || credential.length < 100) {
+    return res.status(400).json({ message: 'A valid Google credential is required.' });
+  }
+
+  try {
+    const ticket = await googleOAuthClient.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+      return res.status(401).json({ message: 'Google could not verify this account.' });
+    }
+
+    await db.read();
+    const email = String(payload.email).trim().toLowerCase();
+    const googleSub = payload.sub;
+    const googleIsAuthoritative = email.endsWith('@gmail.com') || Boolean(payload.hd);
+    let user = db.data.users.find(item => item.googleSub === googleSub);
+
+    if (!user) {
+      user = db.data.users.find(item => String(item.email || '').toLowerCase() === email);
+      if (user) {
+        if (!googleIsAuthoritative) {
+          return res.status(409).json({
+            message: 'This email is already registered. Sign in with your password first, then contact a club administrator to link Google sign-in.'
+          });
+        }
+        if (user.googleSub && user.googleSub !== googleSub) {
+          return res.status(409).json({ message: 'This account is already linked to another Google account.' });
+        }
+        user.googleSub = googleSub;
+      } else {
+        if (!googleIsAuthoritative) {
+          return res.status(403).json({ message: 'Use a Gmail or Google Workspace account for first-time Google registration.' });
+        }
+        user = {
+          id: uuid(),
+          name: String(payload.name || email.split('@')[0]).slice(0, 100),
+          email,
+          googleSub,
+          picture: payload.picture || '',
+          role: 'student',
+          joinedAt: new Date().toISOString(),
+          streak: 0,
+          lastActiveDate: null,
+          badges: [],
+          totalPoints: 0,
+          bio: '',
+          suspended: false
+        };
+        db.data.users.push(user);
+        createNotification(user.id, 'system', 'Welcome to TRC! Start with Introduction to Robotics.', '/learn.html');
+      }
+    }
+
+    if (user.suspended) return res.status(403).json({ message: 'Account suspended. Contact a club administrator.' });
+    if (payload.picture && !user.picture) user.picture = payload.picture;
+    await db.write();
+
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
+    return res.json({ token, user: safeUser(user) });
+  } catch (error) {
+    console.error('Google sign-in verification failed:', error.message);
+    return res.status(401).json({ message: 'Google sign-in could not be verified. Please try again.' });
+  }
 });
 
 // ──────────────────────────────
