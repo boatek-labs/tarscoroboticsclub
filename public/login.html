@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login — TRC</title>
+  <title>Login — TARSCO Robotics Club</title>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -154,6 +154,40 @@ a{transition:color .16s ease,opacity .16s ease}
 }
 @media(prefers-reduced-motion:reduce){.form-wrap *,.form-wrap{transition:none!important;animation:none!important}}
 
+  
+/* Final brand and spacing pass */
+#left{padding:clamp(30px,4.4vw,62px);gap:clamp(34px,5vh,58px)}
+#left>a{gap:16px!important;align-items:center!important}
+#left>a>div:last-child{display:flex;flex-direction:column;gap:5px}
+#left>a>div:last-child>div:first-child{font-size:clamp(1.05rem,1.5vw,1.28rem)!important;letter-spacing:-.025em;line-height:1.2}
+#left>a>div:last-child>div:last-child{font-size:.68rem!important;letter-spacing:.08em}
+#left>div:nth-of-type(2){width:100%;max-width:560px;align-self:center}
+#left>div:nth-of-type(2)>p{margin-bottom:22px!important;letter-spacing:.16em!important}
+#left .feat{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:16px;padding:15px 0;line-height:1.55}
+#left .feat>div:last-child{min-width:0}
+#left .feat strong{display:inline-block;margin-bottom:3px;font-size:.94rem}
+#left .feat>div:last-child{font-size:.82rem;color:#aeb9b0}
+#left>div:last-child{width:100%;max-width:560px;align-self:center;margin-top:auto}
+#left>div:last-child>div{padding:4px 0 4px 18px!important}
+#left>div:last-child p:first-child{font-size:.88rem;line-height:1.8}
+#right{padding:clamp(26px,5vw,76px)}
+.form-wrap{max-width:480px;padding:clamp(26px,3.5vw,42px)}
+#signup-form>div[style*="grid-template-columns"]{gap:16px!important;margin:0 0 18px!important}
+#signup-form>div[style*="height:16px"]{display:none!important}
+#signup-form .field{margin-bottom:19px!important}
+#signup-form .field:has(#s-agree){margin:8px 0 19px!important}
+#signup-form .field label{line-height:1.45}
+#signup-form #s-agree{flex:0 0 16px}
+#signup-form .btn-primary{margin-top:4px!important}
+@media(max-width:900px){
+ #right{padding:clamp(20px,5vw,42px)}
+}
+@media(max-width:520px){
+ .form-wrap{padding:23px 18px}
+ #signup-form>div[style*="grid-template-columns"]{gap:11px!important}
+ #left>a img{width:48px!important;height:48px!important;flex-basis:48px!important}
+}
+
   </style>
   <link rel="stylesheet" href="assets/trc-brand.css?v=20261123-4" />
   <meta name="theme-color" content="#071B11" />
@@ -167,9 +201,7 @@ a{transition:color .16s ease,opacity .16s ease}
   <!-- Logo -->
   <div style="position:relative;z-index:1">
     <a href="trc-home.html" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none">
-      <div style="width:40px;height:40px;border:2px solid #E8BE16;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#E8BE1612">
-        <span style="font-family:Rajdhani;font-weight:700;color:#E8BE16;font-size:1rem">TRC</span>
-      </div>
+      <img src="assets/trc-roundel.webp" alt="TARSCO Robotics Club circular logo" style="width:54px;height:54px;flex:0 0 54px;object-fit:contain;border-radius:50%;background:#fff;padding:3px;border:1px solid #e8be1680;box-shadow:0 5px 20px #0005"/>
       <div>
         <div style="font-family:Rajdhani;font-weight:700;font-size:1.1rem;color:#F1F5EE">TARSCO Robotics Club</div>
         <div style="font-size:.7rem;font-family:'JetBrains Mono',monospace;color:#77947D">TARSCO School · Ghana</div>
@@ -333,7 +365,7 @@ function switchTab(tab) {
   document.getElementById('signup-form').style.display = isLogin ? 'none'  : 'block';
   document.getElementById('tab-login').classList.toggle('active', isLogin);
   document.getElementById('tab-signup').classList.toggle('active', !isLogin);
-  document.title = isLogin ? 'Login — TRC' : 'Sign Up — TRC';
+  document.title = isLogin ? 'Login — TARSCO Robotics Club' : 'Sign Up — TARSCO Robotics Club';
 }
 
 // Check URL param
