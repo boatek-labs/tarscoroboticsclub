@@ -505,19 +505,42 @@ app.post('/api/lessons/:id/complete', verifyToken, async (req, res) => {
 
 app.get('/api/progress/me', verifyToken, async (req, res) => {
   await db.read();
-  const progress = db.data.lessonProgress.filter(
-    p => p.userId === req.user.id && p.completed
-  );
-  const user = db.data.users.find(u => u.id === req.user.id);
+  const userId = req.user.id;
+  const progress = db.data.lessonProgress.filter(p => p.userId === userId && p.completed);
+  const user = db.data.users.find(u => u.id === userId);
+  const attempts = db.data.quizAttempts.filter(a => a.userId === userId);
+  const publishedLessons = db.data.lessons.filter(l => l.published);
+  const modules = db.data.modules.filter(m => m.published).sort((a,b) => (a.order || 0) - (b.order || 0));
+  const byModule = progress.reduce((acc, p) => {
+    acc[p.moduleId] = (acc[p.moduleId] || 0) + 1;
+    return acc;
+  }, {});
+  const recentActivity = [
+    ...progress.map(p => {
+      const lesson = db.data.lessons.find(l => l.id === p.lessonId);
+      return { type: 'lesson', title: lesson?.title || 'Completed lesson', date: p.completedAt || p.updatedAt || null };
+    }),
+    ...attempts.map(a => {
+      const quiz = db.data.quizzes.find(q => q.id === a.quizId);
+      return { type: 'quiz', title: quiz?.title || 'Quiz attempt', score: a.score, date: a.takenAt || null };
+    })
+  ].filter(item => item.date).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0,5);
+  const upcomingEvents = db.data.events
+    .filter(e => e.date && new Date(e.date) >= new Date())
+    .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
   res.json({
     completedLessons: progress.length,
+    totalLessons: publishedLessons.length,
+    totalModules: modules.length,
+    startedModules: modules.filter(m => (byModule[m.id] || 0) > 0).length,
     streak: user?.streak || 0,
     badges: user?.badges || [],
     totalPoints: user?.totalPoints || 0,
-    byModule: progress.reduce((acc, p) => {
-      acc[p.moduleId] = (acc[p.moduleId] || 0) + 1;
-      return acc;
-    }, {})
+    quizAverage: attempts.length ? Math.round(attempts.reduce((sum,a) => sum + Number(a.score || 0), 0) / attempts.length) : null,
+    quizCount: attempts.length,
+    byModule,
+    recentActivity,
+    upcomingEvents
   });
 });
 
