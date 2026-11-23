@@ -533,11 +533,11 @@ async function initializeGoogleSignIn() {
     google.accounts.id.renderButton(host, {
       type: 'standard',
       theme: 'filled_black',
-      size: 'large',
-      text: 'continue_with',
+      size: 'medium',
+      text: 'signin_with',
       shape: 'pill',
       logo_alignment: 'left',
-      width: Math.min(420, Math.max(240, host.clientWidth || 320))
+      width: Math.min(380, Math.max(240, host.clientWidth || 320))
     });
   } catch (error) {
     console.error('Google sign-in initialization failed:', error);
