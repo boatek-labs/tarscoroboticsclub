@@ -603,6 +603,15 @@ app.get('/api/projects', async (req, res) => {
   })));
 });
 
+app.get('/api/admin/projects', verifyToken, isAdmin, async (req, res) => {
+  await db.read();
+  const projects = [...db.data.projects].sort((a,b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
+  res.json(projects.map(project => {
+    const owner = db.data.users.find(user => user.id === project.submittedBy);
+    return { ...project, owner: owner ? safeUser(owner) : null };
+  }));
+});
+
 app.get('/api/projects/:id', async (req, res) => {
   await db.read();
   const project = db.data.projects.find(p => p.id === req.params.id);
