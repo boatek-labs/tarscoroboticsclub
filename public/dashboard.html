@@ -38,6 +38,9 @@
     <a class="nav-link active" href="/dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
     <a class="nav-link" href="/my-learning.html"><i class="fa-solid fa-book-open"></i>My Learning</a>
     <a class="nav-link" href="/my-projects.html"><i class="fa-solid fa-diagram-project"></i>My Projects</a>
+    <a class="nav-link" href="/members.html"><i class="fa-solid fa-users"></i>Member Directory</a>
+    <a class="nav-link" href="/activity.html"><i class="fa-solid fa-bolt"></i>Club Activity</a>
+    <a class="nav-link" href="/calendar.html"><i class="fa-regular fa-calendar-days"></i>Club Calendar</a>
     <div class="nav-label">Community</div>
     <a class="nav-link" href="/community.html"><i class="fa-solid fa-comments"></i>Community</a>
     <a class="nav-link" href="/messages.html"><i class="fa-solid fa-envelope"></i>Messages</a>
@@ -45,6 +48,7 @@
     <a class="nav-link" href="/resources.html"><i class="fa-solid fa-folder-open"></i>Resources</a>
     <div class="nav-label">Account</div>
     <a class="nav-link" href="/profile.html"><i class="fa-regular fa-user"></i>My Profile</a>
+    <a class="nav-link" href="/security.html"><i class="fa-solid fa-shield-halved"></i>Account Security</a>
     <a class="nav-link" href="/notifications.html"><i class="fa-regular fa-bell"></i>Notifications <span id="notification-count" class="pill" style="margin-left:auto" hidden></span></a>
     <a class="nav-link" id="admin-link" href="/admin.html" hidden><i class="fa-solid fa-shield-halved"></i>Administration</a>
   </nav>
@@ -158,7 +162,7 @@
       fail(error.message || 'Your dashboard could not be loaded. Please refresh and try again.');
     }
   }
-  $('logout').addEventListener('click',()=>{localStorage.removeItem('trc_token');localStorage.removeItem('trc_user');location.replace('/login.html');});
+  $('logout').addEventListener('click',async()=>{try{await fetch('/api/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+token}});}catch(_){}localStorage.removeItem('trc_token');localStorage.removeItem('trc_user');location.replace('/login.html');});
   $('menu').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
   init();
 })();
