@@ -204,70 +204,9 @@
 </div>
 
 <script>
-function togglePostForm() {
-  const f = document.getElementById('post-form');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
-
-function postQuestion() {
-  const title = document.getElementById('q-title').value.trim();
-  const body  = document.getElementById('q-body').value.trim();
-  if(!title) { document.getElementById('q-title').style.borderColor='#FF3B30'; return; }
-
-  const thread = document.createElement('div');
-  thread.className = 'thread';
-  thread.innerHTML = `
-    <div style="display:flex;gap:14px">
-      <div>
-        <button class="vote-btn" onclick="event.stopPropagation();toggleVote(this)">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 11l5-5 5 5H13v6h-2v-6z"/></svg>
-          <span class="vote-count">0</span>
-        </button>
-      </div>
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span class="badge b-open">Open</span>
-        </div>
-        <div style="font-family:Rajdhani;font-weight:700;font-size:1.05rem;color:#F1F5EE;margin-bottom:6px">${title}</div>
-        <p style="font-size:.88rem;color:#BDCCBF;line-height:1.7;margin-bottom:10px">${body}</p>
-        <div style="display:flex;align-items:center;gap:12px;font-size:.78rem;color:#77947D">
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="avatar" style="width:24px;height:24px;background:#E8BE1622;color:#E8BE16;font-size:.7rem">K</div>
-            <span><strong style="color:#BDCCBF">Kwame A.</strong></span>
-          </div>
-          <span>Just now</span>
-          <span>· 0 replies</span>
-        </div>
-      </div>
-    </div>`;
-
-  document.getElementById('threads').prepend(thread);
-  document.getElementById('q-title').value = '';
-  document.getElementById('q-body').value = '';
-  document.getElementById('q-tags').value = '';
-  togglePostForm();
-}
-
-function toggleVote(btn) {
-  const count = btn.querySelector('.vote-count');
-  const v = parseInt(count.textContent);
-  if(btn.classList.contains('voted')) {
-    btn.classList.remove('voted');
-    count.textContent = v - 1;
-  } else {
-    btn.classList.add('voted');
-    count.textContent = v + 1;
-  }
-}
-
-function setFilter(btn, filter) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function openThread(id) {
-  // In full build this would navigate to thread detail
-  console.log('Open thread', id);
+function togglePostForm(){
+ const form=document.getElementById('post-form');
+ if(form)form.style.display=form.style.display==='none'?'block':'none';
 }
 </script>
 <script id="trc-live-community">
