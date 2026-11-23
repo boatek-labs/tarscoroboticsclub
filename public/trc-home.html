@@ -1141,23 +1141,11 @@ html[data-theme="light"] footer{background:#eae6f0!important}
           members get access to project teams, internal updates, and competition preparation.
         </p>
 
-        <div class="grid grid-cols-2 gap-5 mb-8">
-          <div class="trc-card p-4">
-            <div class="stat-val text-2xl mb-1">3</div>
-            <div class="stat-lbl text-xs">Competition Trophies</div>
-          </div>
-          <div class="trc-card p-4">
-            <div class="stat-val text-2xl mb-1" style="color:#F2CC24">15</div>
-            <div class="stat-lbl text-xs">Club Members</div>
-          </div>
-          <div class="trc-card p-4">
-            <div class="stat-val text-2xl mb-1" style="color:#69A66A">6</div>
-            <div class="stat-lbl text-xs">Active Projects</div>
-          </div>
-          <div class="trc-card p-4">
-            <div class="stat-val text-2xl mb-1" style="color:#A855F7">2009</div>
-            <div class="stat-lbl text-xs">Year Established</div>
-          </div>
+        <div class="grid grid-cols-2 gap-5 mb-8" id="about-live-stats">
+          <div class="trc-card p-4"><div class="stat-val text-2xl mb-1" data-live-stat="members">—</div><div class="stat-lbl text-xs">Verified Members</div></div>
+          <div class="trc-card p-4"><div class="stat-val text-2xl mb-1" data-live-stat="projects">—</div><div class="stat-lbl text-xs">Published Projects</div></div>
+          <div class="trc-card p-4"><div class="stat-val text-2xl mb-1" data-live-stat="modules">—</div><div class="stat-lbl text-xs">Published Modules</div></div>
+          <div class="trc-card p-4"><div class="stat-val text-2xl mb-1" data-live-stat="students">—</div><div class="stat-lbl text-xs">Student Accounts</div></div>
         </div>
 
         <a href="#about" class="btn-outline">Learn More About TRC</a>
@@ -1567,9 +1555,7 @@ window.addEventListener('scroll', () => {
  async function loadStats(){
   try{
    const s=await json('/api/public/stats');
-   const nodes=[...document.querySelectorAll('.stat-val')];
-   const values=[s.students+s.members,s.projects,s.events,s.modules,s.communityPosts,s.members];
-   nodes.forEach((el,i)=>{if(values[i]!==undefined)el.textContent=Number(values[i]).toLocaleString();});
+   document.querySelectorAll('[data-live-stat]').forEach(el=>{const key=el.dataset.liveStat;el.textContent=Number(s[key]||0).toLocaleString();});
   }catch(e){console.warn('Live homepage stats unavailable',e);}
  }
  async function loadModules(){
@@ -1598,7 +1584,7 @@ window.addEventListener('scroll', () => {
  }
  async function loadDiscussions(){
   const section=document.querySelector('#community');if(!section)return;
-  const root=section.querySelector('.grid');if(!root)return;
+  const root=section.querySelector('.max-w-3xl');if(!root)return;
   try{
    const items=await json('/api/posts');
    if(!items.length){root.innerHTML=empty('No community discussions have been posted yet.');return;}
