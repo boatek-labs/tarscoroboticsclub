@@ -77,6 +77,11 @@
       #left{display:none}
     }
 
+    .google-auth-block{margin:0 0 22px}
+    .google-auth-block .divider{margin:0 0 16px}
+    #google-signin{display:flex;justify-content:center;min-height:44px}
+    .google-auth-note{font-size:.72rem;color:#77947D;text-align:center;margin-top:9px}
+    
     /* Loading spinner */
     .spinner{width:18px;height:18px;border:2px solid #071B1144;border-top-color:#071B11;
              border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
@@ -146,6 +151,12 @@
     <div style="display:flex;border-bottom:1px solid #285438;margin-bottom:28px">
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
       <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <div class="google-auth-block">
+      <div class="divider"><span>or continue with Google</span></div>
+      <div id="google-signin"></div>
+      <p class="google-auth-note">Your Google account is securely verified by Google.</p>
     </div>
 
     <!-- ─── LOGIN FORM ─── -->
@@ -326,9 +337,10 @@ async function doLogin() {
       btn.disabled = false;
     }
   } catch(e) {
-    // Demo mode
-    err.style.display = 'none';
-    setTimeout(() => { location.href = 'dashboard.html'; }, 800);
+    err.textContent = 'Unable to reach the sign-in service. Check your connection and try again.';
+    err.style.display = 'block';
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
   }
 }
 
@@ -376,9 +388,65 @@ async function doSignup() {
       btn.disabled = false;
     }
   } catch(e) {
-    ok.textContent = 'Account created! Redirecting…';
-    ok.style.display = 'block';
-    setTimeout(() => location.href = 'dashboard.html', 1200);
+    err.textContent = 'Unable to reach the registration service. Check your connection and try again.';
+    err.style.display = 'block';
+    btn.innerHTML = 'Create Free Account';
+    btn.disabled = false;
+  }
+}
+
+// ── Google Identity Services ──
+async function initializeGoogleSignIn() {
+  const host = document.getElementById('google-signin');
+  if (!host || !window.google?.accounts?.id) return;
+  try {
+    const response = await fetch('/api/auth/google/config');
+    const config = await response.json();
+    if (!response.ok || !config.clientId) throw new Error(config.message || 'Google sign-in is unavailable.');
+    google.accounts.id.initialize({
+      client_id: config.clientId,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    google.accounts.id.renderButton(host, {
+      type: 'standard',
+      theme: 'filled_black',
+      size: 'large',
+      text: 'continue_with',
+      shape: 'rectangular',
+      width: Math.min(380, Math.max(240, host.clientWidth || 320))
+    });
+  } catch (error) {
+    console.error('Google sign-in initialization failed:', error);
+    host.innerHTML = '<p style="color:#FF8A80;font-size:.8rem;text-align:center">Google sign-in is temporarily unavailable.</p>';
+  }
+}
+
+async function handleGoogleCredential(response) {
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Signing in with Google…';
+  try {
+    const result = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+    const data = await result.json();
+    if (!result.ok) throw new Error(data.message || 'Google sign-in failed.');
+    localStorage.setItem('trc_token', data.token);
+    localStorage.setItem('trc_user', JSON.stringify(data.user));
+    location.href = ['superadmin', 'executive'].includes(data.user.role)
+      ? 'admin.html'
+      : 'dashboard.html';
+  } catch (error) {
+    err.textContent = error.message || 'Google sign-in failed. Please try again.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'Sign In';
   }
 }
 
@@ -417,5 +485,6 @@ document.addEventListener('keydown', e => {
 gsap.from('#right .form-wrap', {opacity:0, x:30, duration:.6, ease:'power2.out', delay:.1});
 gsap.from('#left > *', {opacity:0, y:20, duration:.7, stagger:.12, ease:'power2.out'});
 </script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="initializeGoogleSignIn()"></script>
 </body>
 </html>
