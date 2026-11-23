@@ -806,6 +806,69 @@ app.post('/api/projects/:id/comment', verifyToken, async (req, res) => {
 });
 
 // ──────────────────────────────
+// PROJECT TEAM WORKSPACE
+// ──────────────────────────────
+function canAccessProject(project, userId, role) {
+  return ['superadmin','executive'].includes(role) || project.submittedBy === userId || (project.teamMembers || []).includes(userId);
+}
+app.get('/api/projects/:id/workspace', verifyToken, async (req, res) => {
+  await db.read();
+  const project = db.data.projects.find(p => p.id === req.params.id);
+  if (!project) return res.status(404).json({message:'Project not found'});
+  if (!canAccessProject(project, req.user.id, req.user.role)) return res.status(403).json({message:'Only project collaborators can access this workspace.'});
+  const members = (project.teamMembers || []).map(id => db.data.users.find(u => u.id === id)).filter(Boolean).map(u => ({id:u.id,name:u.name,role:u.role,avatar:u.avatarDataUrl || u.picture || u.avatar || null}));
+  const tasks = Array.isArray(project.tasks) ? project.tasks : [];
+  const comments = (db.data.projectComments || []).filter(c => c.projectId === project.id).map(c => ({...c,author:(()=>{const u=db.data.users.find(x=>x.id===c.userId);return u?{id:u.id,name:u.name,avatar:u.avatarDataUrl||u.picture||u.avatar||null}:null;})()})).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  res.set('Cache-Control','private, no-store');
+  res.json({project:{id:project.id,title:project.title,description:project.description,status:project.status,submittedBy:project.submittedBy},members,tasks,comments});
+});
+app.post('/api/projects/:id/tasks', verifyToken, async (req,res) => {
+  await db.read();
+  const project=db.data.projects.find(p=>p.id===req.params.id);
+  if(!project) return res.status(404).json({message:'Project not found'});
+  if(!canAccessProject(project,req.user.id,req.user.role)) return res.status(403).json({message:'Only project collaborators can add tasks.'});
+  const title=String(req.body.title||'').trim(), description=String(req.body.description||'').trim();
+  if(title.length<2||title.length>140) return res.status(400).json({message:'Task title must be 2–140 characters.'});
+  project.tasks=Array.isArray(project.tasks)?project.tasks:[];
+  const task={id:uuid(),title,description:description.slice(0,1000),status:'todo',assigneeId:(project.teamMembers||[]).includes(req.body.assigneeId)?req.body.assigneeId:null,createdBy:req.user.id,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  project.tasks.push(task); await db.write(); res.status(201).json(task);
+});
+app.patch('/api/projects/:id/tasks/:taskId', verifyToken, async (req,res) => {
+  await db.read();
+  const project=db.data.projects.find(p=>p.id===req.params.id);
+  if(!project) return res.status(404).json({message:'Project not found'});
+  if(!canAccessProject(project,req.user.id,req.user.role)) return res.status(403).json({message:'Only project collaborators can update tasks.'});
+  const task=(project.tasks||[]).find(t=>t.id===req.params.taskId);
+  if(!task) return res.status(404).json({message:'Task not found'});
+  if(req.body.status!==undefined){if(!['todo','in-progress','done'].includes(req.body.status))return res.status(400).json({message:'Invalid task status.'});task.status=req.body.status;}
+  if(req.body.title!==undefined){const title=String(req.body.title).trim();if(title.length<2||title.length>140)return res.status(400).json({message:'Invalid task title.'});task.title=title;}
+  if(req.body.description!==undefined)task.description=String(req.body.description).slice(0,1000);
+  if(req.body.assigneeId!==undefined)task.assigneeId=(project.teamMembers||[]).includes(req.body.assigneeId)?req.body.assigneeId:null;
+  task.updatedAt=new Date().toISOString(); await db.write(); res.json(task);
+});
+app.delete('/api/projects/:id/tasks/:taskId', verifyToken, async (req,res) => {
+  await db.read();
+  const project=db.data.projects.find(p=>p.id===req.params.id);
+  if(!project) return res.status(404).json({message:'Project not found'});
+  if(!canAccessProject(project,req.user.id,req.user.role)) return res.status(403).json({message:'Only project collaborators can remove tasks.'});
+  const before=(project.tasks||[]).length; project.tasks=(project.tasks||[]).filter(t=>t.id!==req.params.taskId);
+  if(project.tasks.length===before)return res.status(404).json({message:'Task not found'});
+  await db.write(); res.json({success:true});
+});
+app.post('/api/projects/:id/team', verifyToken, async (req,res) => {
+  await db.read();
+  const project=db.data.projects.find(p=>p.id===req.params.id);
+  if(!project) return res.status(404).json({message:'Project not found'});
+  if(!canAccessProject(project,req.user.id,req.user.role)) return res.status(403).json({message:'Only project collaborators can invite teammates.'});
+  const user=db.data.users.find(u=>u.id===req.body.userId&&!u.suspended);
+  if(!user) return res.status(404).json({message:'User not found'});
+  project.teamMembers=Array.isArray(project.teamMembers)?project.teamMembers:[];
+  if(!project.teamMembers.includes(user.id))project.teamMembers.push(user.id);
+  createNotification(user.id,'project','You were added to the project workspace: '+(project.title||'Project'),'/project-workspace.html?id='+encodeURIComponent(project.id));
+  await db.write(); res.json({success:true});
+});
+
+// ──────────────────────────────
 // COMMUNITY
 // ──────────────────────────────
 app.get('/api/posts', async (req, res) => {
