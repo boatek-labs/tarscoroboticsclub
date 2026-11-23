@@ -838,6 +838,13 @@ app.post('/api/projects/:id/comment', verifyToken, async (req, res) => {
   res.status(201).json(comment);
 });
 
+app.get('/api/my/projects', verifyToken, async (req,res) => {
+  await db.read();
+  const items=db.data.projects.filter(p=>p.submittedBy===req.user.id||(p.teamMembers||[]).includes(req.user.id))
+    .sort((a,b)=>new Date(b.submittedAt||0)-new Date(a.submittedAt||0))
+    .map(p=>({id:p.id,title:p.title,description:p.description,status:p.status,submittedAt:p.submittedAt,teamSize:(p.teamMembers||[]).length,taskCount:(p.tasks||[]).length}));
+  res.set('Cache-Control','private, no-store');res.json(items);
+});
 // ──────────────────────────────
 // PROJECT TEAM WORKSPACE
 // ──────────────────────────────
