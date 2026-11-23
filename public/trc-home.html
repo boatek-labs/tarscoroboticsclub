@@ -583,6 +583,26 @@ html[data-theme="light"] footer{background:#eae6f0!important}
 }
 </style>
 
+<style id="trc-nav-morph-refresh">
+.trc-home-nav .nav-links{gap:clamp(12px,1.55vw,24px)!important}
+.trc-home-nav .nav-link{font-size:.69rem!important;letter-spacing:.025em!important;white-space:nowrap}
+.trc-home-nav .nav-link:after{bottom:-9px}
+.nav-account{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:0 15px;border:1px solid var(--line,#354256);border-radius:9px;background:rgba(255,255,255,.045);color:var(--text,#f4f5f7);text-decoration:none;font:700 .76rem Inter,sans-serif;transition:transform .22s,border-color .22s,background .22s}
+.nav-account i{font-size:1.05rem;color:var(--accent,#d7a94e)}
+.nav-account:hover{transform:translateY(-2px);border-color:var(--accent,#d7a94e);background:rgba(215,169,78,.1)}
+.nav-account.is-authenticated{border-color:rgba(215,169,78,.42);background:rgba(215,169,78,.1)}
+.nav-account .account-avatar{width:25px;height:25px;border-radius:50%;object-fit:cover;border:1px solid var(--accent,#d7a94e)}
+#mobile-menu .nav-account{min-height:44px}
+@media(max-width:768px){.trc-home-nav .nav-links{display:none!important}.trc-home-nav .nav-actions{margin-left:auto;margin-right:10px}.trc-home-nav .nav-account span{display:none}.trc-home-nav .nav-account{width:42px;padding:0}.trc-home-nav .nav-account i{font-size:1.15rem}}
+/* Scroll-linked section morph: soft glassy entrance, no pinned/blocked scrolling. */
+.trc-morph-section{position:relative;transform-origin:50% 0;will-change:transform,opacity,clip-path}
+.trc-morph-section.is-morphed{border-radius:26px;overflow:clip}
+.trc-morph-section .trc-morph-glow{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0;background:radial-gradient(ellipse at 50% 0%,rgba(215,169,78,.13),transparent 55%)}
+.trc-morph-section>*{position:relative}
+.trc-morph-section .trc-morph-glow{position:absolute}
+@media(max-width:768px){.trc-morph-section.is-morphed{border-radius:16px}}
+@media(prefers-reduced-motion:reduce){.trc-morph-section{will-change:auto!important;transform:none!important;clip-path:none!important;opacity:1!important}}
+</style>
 </head>
 <body class="trc-home-page">
 
@@ -599,19 +619,20 @@ html[data-theme="light"] footer{background:#eae6f0!important}
     </a>
 
     <!-- Desktop links -->
-    <div class="nav-links flex items-center gap-8">
-      <a href="#learn"    class="nav-link">Learn</a>
+    <div class="nav-links flex items-center gap-6">
+      <a href="#learn" class="nav-link">Learn</a>
       <a href="#projects" class="nav-link">Projects</a>
-      <a href="#events"   class="nav-link">Events</a>
-      <a href="#community"class="nav-link">Community</a>
-      <a href="#about"    class="nav-link">About</a>
+      <a href="#events" class="nav-link">Events</a>
+      <a href="#community" class="nav-link">Community</a>
+      <a href="/members.html" class="nav-link">Members</a>
+      <a href="/activity.html" class="nav-link">Activity</a>
+      <a href="/calendar.html" class="nav-link">Club calendar</a>
     </div>
 
     <!-- CTA cluster -->
     <div class="nav-actions flex items-center gap-3">
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light mode"><i class="fa-solid fa-sun"></i></button>
-      <a href="login.html"  class="btn-outline" style="padding:8px 18px;font-size:.85rem">Log In</a>
-      <a href="login.html?signup=1" class="btn-primary"  style="padding:8px 18px;font-size:.85rem">Join Free</a>
+      <a id="nav-account" href="/login.html" class="nav-account" aria-label="Log in"><i class="fa-regular fa-circle-user"></i><span>Account</span></a>
     </div>
 
     <!-- Hamburger -->
@@ -625,15 +646,17 @@ html[data-theme="light"] footer{background:#eae6f0!important}
 
   <!-- Mobile menu -->
   <div id="mobile-menu" class="flex-col px-6 pb-4 gap-4 border-t border-border">
-    <a href="#learn"     class="nav-link py-2">Learn</a>
-    <a href="#projects"  class="nav-link py-2">Projects</a>
-    <a href="#events"    class="nav-link py-2">Events</a>
+    <a href="#learn" class="nav-link py-2">Learn</a>
+    <a href="#projects" class="nav-link py-2">Projects</a>
+    <a href="#events" class="nav-link py-2">Events</a>
     <a href="#community" class="nav-link py-2">Community</a>
-    <a href="#about"     class="nav-link py-2">About</a>
+    <a href="/members.html" class="nav-link py-2">Members</a>
+    <a href="/activity.html" class="nav-link py-2">Activity</a>
+    <a href="/profile.html" class="nav-link py-2">Profile</a>
+    <a href="/calendar.html" class="nav-link py-2">Club calendar</a>
     <div class="flex gap-3 pt-2">
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme"><i class="fa-solid fa-circle-half-stroke"></i> Theme</button>
-      <a href="login.html"  class="btn-outline" style="padding:8px 16px;font-size:.85rem;flex:1;justify-content:center">Log In</a>
-      <a href="login.html?signup=1" class="btn-primary"  style="padding:8px 16px;font-size:.85rem;flex:1;justify-content:center">Join Free</a>
+      <a id="mobile-nav-account" href="/login.html" class="nav-account" style="flex:1;justify-content:center"><i class="fa-regular fa-circle-user"></i><span>Account</span></a>
     </div>
   </div>
 </nav>
@@ -1324,6 +1347,49 @@ window.addEventListener('scroll', () => {
   }catch(e){root.innerHTML=empty('Community discussions are temporarily unavailable.');}
  }
  loadStats();loadModules();loadProjects();loadEvents();loadDiscussions();
+})();
+</script>
+<script id="trc-account-nav-state">
+(()=> {
+ const token=localStorage.getItem('trc_token');
+ const nodes=[document.getElementById('nav-account'),document.getElementById('mobile-nav-account')].filter(Boolean);
+ const paint=(user)=>{
+   nodes.forEach(a=>{
+     a.href='/profile.html';a.classList.add('is-authenticated');
+     const label=user?.name?String(user.name).trim().split(/\\s+/)[0]:'My profile';
+     const avatar=user?.avatarDataUrl||user?.picture||user?.avatar;
+     a.innerHTML=(avatar?'<img class="account-avatar" alt="" src="'+String(avatar).replace(/["<>]/g,'')+'">':'<i class="fa-solid fa-circle-user"></i>')+'<span>'+label.replace(/[&<>"]/g,'')+'</span>';
+     a.setAttribute('aria-label','Signed in. Open profile');
+     a.title='Signed in — '+label;
+   });
+ };
+ if(!token){nodes.forEach(a=>{a.href='/login.html';a.innerHTML='<i class="fa-regular fa-circle-user"></i><span>Account</span>';});return;}
+ paint({name:'My profile'});
+ fetch('/api/users/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'})
+  .then(r=>{if(!r.ok)throw new Error('Session expired');return r.json();})
+  .then(user=>{localStorage.setItem('trc_user',JSON.stringify(user));paint(user);})
+  .catch(()=>{localStorage.removeItem('trc_token');localStorage.removeItem('trc_user');nodes.forEach(a=>{a.href='/login.html';a.classList.remove('is-authenticated');a.innerHTML='<i class="fa-regular fa-circle-user"></i><span>Account</span>';});});
+})();
+</script>
+<script id="trc-scroll-morph">
+(()=> {
+ const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const sections=[...document.querySelectorAll('body.trc-home-page > section')].filter(s=>s.id!=='hero'&&!s.closest('footer'));
+ if(!sections.length)return;
+ sections.forEach(section=>{
+   section.classList.add('trc-morph-section','is-morphed');
+   const glow=document.createElement('span');glow.className='trc-morph-glow';glow.setAttribute('aria-hidden','true');section.prepend(glow);
+ });
+ if(reduce||!window.gsap||!window.ScrollTrigger)return;
+ gsap.registerPlugin(ScrollTrigger);
+ sections.forEach((section,index)=>{
+   const glow=section.querySelector('.trc-morph-glow');
+   gsap.fromTo(section,{y:54,scale:.965,opacity:.72,clipPath:'inset(7% 3% 0% round 28px)'},{
+     y:0,scale:1,opacity:1,clipPath:'inset(0% 0% 0% round 0px)',duration:1.05,ease:'power3.out',
+     scrollTrigger:{trigger:section,start:'top 88%',end:'top 40%',scrub:.75,once:false}
+   });
+   if(glow)gsap.to(glow,{opacity:1,scrollTrigger:{trigger:section,start:'top 82%',end:'top 40%',scrub:.7}});
+ });
 })();
 </script>
 </body>
