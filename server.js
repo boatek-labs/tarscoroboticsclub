@@ -56,17 +56,19 @@ async function initDB() {
   }
   await db.write();
 
-  // Keep the legacy first-run admin account for compatibility.
-  // Change its password immediately after first login.
-  if (!db.data.users.length) {
-    const hash = await bcrypt.hash(process.env.INITIAL_ADMIN_PASSWORD || 'admin123', 10);
+  // Never invent a default administrator identity or password.
+  // Provision the first administrator only when explicit environment credentials exist.
+  if (!db.data.users.length && process.env.INITIAL_ADMIN_EMAIL && process.env.INITIAL_ADMIN_PASSWORD) {
+    const hash = await bcrypt.hash(process.env.INITIAL_ADMIN_PASSWORD, 10);
     db.data.users.push({
-      id: uuid(), name: 'TRC Admin', email: process.env.INITIAL_ADMIN_EMAIL || 'admin@tarsco.edu',
+      id: uuid(),
+      name: process.env.INITIAL_ADMIN_NAME || 'TRC Administrator',
+      email: process.env.INITIAL_ADMIN_EMAIL.trim().toLowerCase(),
       passwordHash: hash, role: 'superadmin', joinedAt: new Date().toISOString(),
       streak: 0, lastActiveDate: null, badges: [], totalPoints: 0, suspended: false
     });
     await db.write();
-    console.log('TRC initial administrator account created');
+    console.log('TRC initial administrator provisioned from environment credentials');
   }
 }
 
@@ -588,7 +590,17 @@ app.get('/api/projects', async (req, res) => {
   await db.read();
   let projects = db.data.projects.filter(p => p.status === 'approved');
   if (req.query.tag) projects = projects.filter(p => p.tags?.includes(req.query.tag));
-  res.json(projects);
+  res.json(projects.map(project => ({
+    ...project,
+    team: (project.teamMembers || []).map(id => {
+      const member = db.data.users.find(user => user.id === id);
+      return member ? { id: member.id, name: member.name, avatar: member.avatar || null } : null;
+    }).filter(Boolean),
+    owner: (() => {
+      const owner = db.data.users.find(user => user.id === project.submittedBy);
+      return owner ? { id: owner.id, name: owner.name } : null;
+    })()
+  })));
 });
 
 app.get('/api/projects/:id', async (req, res) => {
@@ -683,7 +695,15 @@ app.get('/api/posts', async (req, res) => {
   else if (sort === 'unanswered') posts = posts.filter(p => p.status === 'open');
   else if (sort === 'answered')   posts = posts.filter(p => p.status === 'answered');
   else posts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json(posts);
+  res.json(posts.map(post => {
+    const author = db.data.users.find(user => user.id === post.userId);
+    const replies = db.data.communityReplies.filter(reply => reply.postId === post.id && !reply.flagged);
+    return {
+      ...post,
+      author: author ? { id: author.id, name: author.name, role: author.role, avatar: author.avatar || null } : null,
+      replyCount: replies.length
+    };
+  }));
 });
 
 app.get('/api/posts/:id', async (req, res) => {
@@ -941,6 +961,20 @@ app.post('/api/notifications/mark-all-read', verifyToken, async (req, res) => {
   db.data.notifications.filter(n => n.userId === req.user.id).forEach(n => n.read = true);
   await db.write();
   res.json({ success: true });
+});
+
+
+app.get('/api/public/stats', async (req, res) => {
+  await db.read();
+  res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
+  res.json({
+    students: db.data.users.filter(user => user.role === 'student' && !user.suspended).length,
+    members: db.data.users.filter(user => user.role === 'member' && !user.suspended).length,
+    projects: db.data.projects.filter(project => project.status === 'approved').length,
+    events: db.data.events.length,
+    modules: db.data.modules.filter(module => module.published).length,
+    communityPosts: db.data.communityPosts.filter(post => !post.flagged).length
+  });
 });
 
 // ──────────────────────────────
