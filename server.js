@@ -75,7 +75,7 @@ async function initDB() {
 // ──────────────────────────────
 // MIDDLEWARE
 // ──────────────────────────────
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Local uploads are served only for local development. Vercel's filesystem is ephemeral.
@@ -326,11 +326,50 @@ app.patch('/api/users/me', verifyToken, async (req, res) => {
   await db.read();
   const user = db.data.users.find(u => u.id === req.user.id);
   if (!user) return res.status(404).json({ message: 'User not found' });
-  const { name, bio } = req.body;
-  if (name) user.name = name;
-  if (bio !== undefined) user.bio = bio;
+  const { name, bio, avatarDataUrl, removeAvatar, notificationPreferences } = req.body || {};
+  if (name !== undefined) {
+    if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100)
+      return res.status(400).json({ message: 'Name must be between 2 and 100 characters.' });
+    user.name = name.trim();
+  }
+  if (bio !== undefined) {
+    if (typeof bio !== 'string' || bio.length > 500)
+      return res.status(400).json({ message: 'Bio must be 500 characters or fewer.' });
+    user.bio = bio.trim();
+  }
+  if (removeAvatar === true) { delete user.avatarDataUrl; delete user.picture; }
+  if (avatarDataUrl !== undefined) {
+    if (typeof avatarDataUrl !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(avatarDataUrl) || avatarDataUrl.length > 1400000)
+      return res.status(400).json({ message: 'Use a JPEG, PNG or WebP image smaller than 1 MB.' });
+    user.avatarDataUrl = avatarDataUrl;
+  }
+  if (notificationPreferences !== undefined) {
+    if (!notificationPreferences || typeof notificationPreferences !== 'object' || Array.isArray(notificationPreferences))
+      return res.status(400).json({ message: 'Invalid notification preferences.' });
+    user.notificationPreferences = {
+      learning: notificationPreferences.learning !== false,
+      community: notificationPreferences.community !== false,
+      events: notificationPreferences.events !== false,
+      system: notificationPreferences.system !== false
+    };
+  }
   await db.write();
   res.json(safeUser(user));
+});
+
+app.post('/api/users/me/password', verifyToken, async (req, res) => {
+  await db.read();
+  const user = db.data.users.find(u => u.id === req.user.id);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  const { currentPassword, newPassword } = req.body || {};
+  if (!user.passwordHash) return res.status(400).json({ message: 'This account uses Google sign-in and has no password to change.' });
+  if (typeof currentPassword !== 'string' || !await bcrypt.compare(currentPassword, user.passwordHash))
+    return res.status(400).json({ message: 'Current password is incorrect.' });
+  if (typeof newPassword !== 'string' || newPassword.length < 8 || newPassword.length > 128)
+    return res.status(400).json({ message: 'New password must be 8–128 characters.' });
+  user.passwordHash = await bcrypt.hash(newPassword, 12);
+  await db.write();
+  res.json({ success: true, message: 'Password updated successfully.' });
 });
 
 app.get('/api/users/:id', verifyToken, async (req, res) => {
