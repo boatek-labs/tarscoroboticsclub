@@ -344,51 +344,13 @@
 </div>
 
 <script>
-// Tab switching
-function showAdminTab(name, btn) {
-  ['overview','membership','users','projects','lessons'].forEach(t => {
-    document.getElementById('tab-'+t).style.display = 'none';
-  });
-  document.getElementById('tab-'+name).style.display = 'block';
-  if(btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+function showAdminTab(name,btn){
+ ['overview','membership','users','projects','lessons'].forEach(t=>{
+  const el=document.getElementById('tab-'+t);if(el)el.style.display='none';
+ });
+ const target=document.getElementById('tab-'+name);if(target)target.style.display='block';
+ if(btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 }
-
-// Approve / reject membership
-function approveApp(btn) {
-  const row = btn.closest('tr');
-  const name = row.cells[0].textContent;
-  row.cells[row.cells.length-1].innerHTML = '<span class="badge b-approved">✓ Approved</span>';
-  updateBadgeCount();
-}
-function rejectApp(btn) {
-  const row = btn.closest('tr');
-  row.cells[row.cells.length-1].innerHTML = '<span class="badge b-rejected">✕ Rejected</span>';
-  updateBadgeCount();
-}
-function updateBadgeCount() {
-  const pending = document.querySelectorAll('#membership-tbody tr td:last-child .btn-approve').length;
-  document.querySelectorAll('.nav-badge')[0].textContent = pending;
-}
-function promoteUser(btn) {
-  const row = btn.closest('tr');
-  row.cells[2].innerHTML = '<span class="badge b-member">Member</span>';
-  btn.remove();
-}
-
-// Counters
-function animCount(id, target) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  let v = 0; const step = target/40;
-  const t = setInterval(() => { v = Math.min(v+step,target); el.textContent = Math.round(v); if(v>=target) clearInterval(t); }, 25);
-}
-setTimeout(() => {
-  animCount('a1',142); animCount('a2',12); animCount('a3',5);
-  animCount('a4',3); animCount('a5',60); animCount('a6',88);
-}, 200);
 </script>
 <script id="trc-live-admin-data">
 (()=>{
