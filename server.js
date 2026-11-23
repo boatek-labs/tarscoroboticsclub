@@ -1021,21 +1021,33 @@ app.get('/api/messages', verifyToken, async (req, res) => {
 app.get('/api/messages/:userId', verifyToken, async (req, res) => {
   await db.read();
   const me = req.user.id, them = req.params.userId;
-  const thread = db.data.messages.filter(
-    m => (m.fromUserId === me && m.toUserId === them) ||
-         (m.fromUserId === them && m.toUserId === me)
+  if (me === them) return res.status(400).json({message:'You cannot open a conversation with yourself.'});
+  const other = db.data.users.find(u => u.id === them && !u.suspended);
+  if (!other) return res.status(404).json({message:'Member not found.'});
+  const thread = db.data.messages.filter(m =>
+    (m.fromUserId === me && m.toUserId === them) ||
+    (m.fromUserId === them && m.toUserId === me)
   ).sort((a,b) => new Date(a.sentAt) - new Date(b.sentAt));
+  let changed=false;
+  thread.forEach(m=>{if(m.toUserId===me&&!m.readAt){m.readAt=new Date().toISOString();changed=true;}});
+  if(changed) await db.write();
+  res.set('Cache-Control','private, no-store');
   res.json(thread);
 });
 
 app.post('/api/messages/:userId', verifyToken, async (req, res) => {
   await db.read();
+  const recipient=db.data.users.find(u=>u.id===req.params.userId&&!u.suspended);
+  if(!recipient) return res.status(404).json({message:'Recipient not found.'});
+  if(recipient.id===req.user.id) return res.status(400).json({message:'You cannot message yourself.'});
+  const body=String(req.body.body||'').trim();
+  if(!body||body.length>4000) return res.status(400).json({message:'Message must contain 1–4,000 characters.'});
   const message = {
-    id: uuid(), fromUserId: req.user.id, toUserId: req.params.userId,
-    body: req.body.body, readAt: null, sentAt: new Date().toISOString()
+    id: uuid(), fromUserId: req.user.id, toUserId: recipient.id,
+    body, readAt: null, sentAt: new Date().toISOString()
   };
   db.data.messages.push(message);
-  createNotification(req.params.userId, 'message', 'You have a new message', '/messages.html');
+  createNotification(recipient.id, 'message', 'You have a new message', '/messages.html?user='+encodeURIComponent(req.user.id));
   await db.write();
   res.status(201).json(message);
 });
