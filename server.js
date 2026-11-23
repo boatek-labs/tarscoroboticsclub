@@ -36,7 +36,7 @@ async function initDB() {
     quizzes: [], quizAttempts: [], lessonProgress: [], projects: [],
     projectComments: [], communityPosts: [], communityReplies: [],
     messages: [], events: [], resources: [], gallery: [],
-    notifications: [], internalUpdates: [],
+    notifications: [], internalUpdates: [], sessions: [],
     badges: [
       { id:'first-lesson', name:'First Step', icon:'👣', description:'Complete your first lesson' },
       { id:'circuit-starter', name:'Circuit Starter', icon:'⚡', description:'Complete Basic Electronics module' },
@@ -101,15 +101,31 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 // Auth middleware
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith('Bearer ')) return res.status(401).json({ message: 'Unauthorized' });
   try {
     req.user = jwt.verify(auth.slice(7), JWT_SECRET);
+    if (req.user.jti) {
+      await db.read();
+      const session = (db.data.sessions || []).find(item => item.id === req.user.jti && item.userId === req.user.id && !item.revokedAt && new Date(item.expiresAt) > new Date());
+      if (!session) return res.status(401).json({ message: 'This session has ended. Please sign in again.' });
+      session.lastSeenAt = new Date().toISOString();
+      await db.write();
+    }
     next();
   } catch {
     res.status(401).json({ message: 'Token invalid or expired' });
   }
+}
+async function createSessionToken(user, req) {
+  const id = uuid();
+  const now = new Date();
+  const token = jwt.sign({ id:user.id, role:user.role, jti:id }, JWT_SECRET, { expiresIn:'30d' });
+  db.data.sessions = db.data.sessions || [];
+  db.data.sessions.push({id,userId:user.id,createdAt:now.toISOString(),lastSeenAt:now.toISOString(),expiresAt:new Date(now.getTime()+30*86400000).toISOString(),userAgent:String(req.headers['user-agent']||'Unknown device').slice(0,240),revokedAt:null});
+  await db.write();
+  return token;
 }
 
 // Role middleware factory
@@ -218,7 +234,7 @@ app.post('/api/auth/register', async (req, res) => {
   createNotification(user.id, 'system', 'Welcome to TRC! Start with Introduction to Robotics.', '/learn.html');
   await db.write();
 
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
+  const token = await createSessionToken(user, req);
   res.status(201).json({ token, user: safeUser(user) });
 });
 
@@ -319,6 +335,23 @@ app.post('/api/auth/google', async (req, res) => {
 // ──────────────────────────────
 // USER ROUTES
 // ──────────────────────────────
+app.post('/api/auth/logout', verifyToken, async (req,res) => {
+  await db.read();
+  const session=(db.data.sessions||[]).find(item=>item.id===req.user.jti&&item.userId===req.user.id);
+  if(session&&!session.revokedAt)session.revokedAt=new Date().toISOString();
+  await db.write();res.json({success:true});
+});
+app.get('/api/users/me/sessions', verifyToken, async (req,res) => {
+  await db.read();
+  const sessions=(db.data.sessions||[]).filter(item=>item.userId===req.user.id&&!item.revokedAt&&new Date(item.expiresAt)>new Date()).sort((a,b)=>new Date(b.lastSeenAt)-new Date(a.lastSeenAt)).map(item=>({id:item.id,createdAt:item.createdAt,lastSeenAt:item.lastSeenAt,expiresAt:item.expiresAt,userAgent:item.userAgent,current:item.id===req.user.jti}));
+  res.set('Cache-Control','private, no-store');res.json(sessions);
+});
+app.delete('/api/users/me/sessions/:id', verifyToken, async (req,res) => {
+  await db.read();
+  const session=(db.data.sessions||[]).find(item=>item.id===req.params.id&&item.userId===req.user.id&&!item.revokedAt);
+  if(!session)return res.status(404).json({message:'Session not found.'});
+  session.revokedAt=new Date().toISOString();await db.write();res.json({success:true,current:session.id===req.user.jti});
+});
 app.get('/api/users/me', verifyToken, async (req, res) => {
   await db.read();
   const user = db.data.users.find(u => u.id === req.user.id);
